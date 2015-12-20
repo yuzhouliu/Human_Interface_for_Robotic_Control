@@ -5,7 +5,9 @@
 //
 // servo_driver.h
 //
-// Header file for Servo driver for CC3200-LAUNCHXL as part of the robotic hand project
+// Header file for low-level Servo driver for CC3200-LAUNCHXL
+//
+// Project: Human Interface for Robotic Control
 //
 // Created:
 // December 20, 2015
@@ -34,21 +36,16 @@
 //
 //*****************************************************************************
 
+// Driverlib includes
+#include "hw_types.h"
+#include "hw_ints.h"
+
 // PWM register defines
 #define PWM_PRESCALE 0x18
 #define PWM_INTERVAL_RELOAD 0x6A00
 #define PWM_0_DEGREES 0x9C40UL          // Actual may be 0xC000
 #define PWM_180_DEGREES 0x30D54UL       // Actual may be 0x31400
 #define PWM_MATCH_PER_DEGREE (0x30D54UL - 0x9C40UL)/180  // Equates to 0x379 or 889
-
-// Defines for fingers
-enum enum_Finger_Type {
-    finger_thumb,
-    finger_index,
-    finger_middle,
-    finger_ring,
-    finger_pinky
-};
 
 //*****************************************************************************
 // Sets up the Timer for PWM mode
@@ -60,7 +57,22 @@ void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
 // Sets up the identified timers as PWM to drive the peripherals
 //*****************************************************************************
 void InitPWMModules();
+
+//*****************************************************************************
+// Disables Timer PWMs
+//*****************************************************************************
 void DeInitPWMModules();
-void UpdatePWM_Finger(int usDegrees, enum enum_Finger_Type);
+
+//*****************************************************************************
+// Updates the TimerMatch and PrescaleMatch for specified Timer PWM
+//*****************************************************************************
+void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
+                     unsigned short usMatchVal, unsigned char ucPrescaleVal);
+
+//*****************************************************************************
+// Converts the input of degrees to a Match value and Prescale value
+//*****************************************************************************
+void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal, 
+                              unsigned char *ucPrescaleVal);
 
 #endif //  __SERVO_DRIVER_H__

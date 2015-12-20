@@ -1,33 +1,52 @@
-
-#ifndef __PIN_MUX_CONFIG_H__
-#define __PIN_MUX_CONFIG_H__
-
 //*****************************************************************************
+// tcp_socket.h
 //
-// pin_mux_config.h
+// TCP socket on TI CC3200 by providing those functions:
+// 1. Connect to the WIFI network 
+// 2. Create a server socket
+// 3. Listen to client request
+// 
+// This source file uses code snippets from Texas Instruments Incorporated's
+// CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
+// this file.
 //
-// Pin mux configuration
+// Author: Minh Mai
 //
-// This header file was generated using TI's pin mux online tool:
-// https://dev.ti.com/pinmux/app.html#/config/CC3200/ID_500/ID_0/null/null
-// Copyright notice is moved to the end of this file.
+// Created: Dec 20 2015
 //
-// Created:
-// December 20, 2015
+// Modified: Dec 20 2015
 //
-// Modified:
-// December 20, 2015
-//
+//****************************************************************************
+
+/* Config for the TCP application*/
+#define APPLICATION_NAME        "TCP Socket"
+#define APPLICATION_VERSION     "1.1.1"
+#define DBG_PRINT               Report
+
+/* Config for the WLAN */
+#define SSID_NAME           "Minh's iPhone"    /* AP SSID */
+#define SECURITY_TYPE       SL_SEC_TYPE_WPA/* Security type (OPEN or WEP or WPA*/
+#define SECURITY_KEY        "minh1234"              /* Password of the secured AP */
+#define SSID_LEN_MAX        32
+#define BSSID_LEN_MAX       6
+
+/* Config for the TCP Socket Server */
+#define IP_ADDR             0xc0a8006E /* Default IP: 192.168.0.110 */
+#define PORT_NUM            5001 /*Default PORT_NUM */
+#define BUF_SIZE            1400 /*Defaut BUFFER SIZE */
+#define TCP_PACKET_COUNT    1000 /*Default TCP Packet Count */
+
+
+/***************************END OF TCP CONFIG ************************************/
+
+//****************************************************************************
+//                      INTERFACE FUNCTIONS
+//****************************************************************************
+long WlanConnect(signed char *cSSID, signed char *cSecurityType, \
+                    signed char*cSecurityKey); //connect to the WIFI network
+int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
+int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
 //*****************************************************************************
-
-extern void PinMuxConfig(void);
-
-#endif //  __PIN_MUX_CONFIG_H__
-
-//*****************************************************************************
-// pin_mux_config.h
-//
-// configure the device pins for different signals
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
 // 
@@ -62,7 +81,3 @@ extern void PinMuxConfig(void);
 //
 //*****************************************************************************
 
-// This file was automatically generated on 12/20/2015 at 2:02:41 PM
-// by TI PinMux version 
-//
-//*****************************************************************************
