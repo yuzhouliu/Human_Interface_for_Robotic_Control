@@ -3,11 +3,13 @@
 //
 // servo_driver.c
 //
-// Servo driver for CC3200-LAUNCHXL as part of the robotic hand project
+// Low-level Servo driver for CC3200-LAUNCHXL
 //
 // This source file uses code snippets from Texas Instruments Incorporated's
 // CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
 // this file.
+//
+// Project: Human Interface for Robotic Control
 //
 // Created:
 // December 20, 2015
@@ -39,13 +41,7 @@
 // Servo driver header
 #include "servo_driver.h"
 // Servo pinmux inludes
-#include "servo_pinmux.h"
-
-/*
-#define FINGER_THUMB 1
-#define FINGER_INDEX 2
-#define FINGER_MIDDLE 3
-*/
+#include "pin_mux_config.h"
 
 //*****************************************************************************
 // Sets up the Timer for PWM mode
@@ -89,11 +85,6 @@ void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
 //*****************************************************************************
 void InitPWMModules()
 {
-    // Initialization of timers to generate PWM output
-    // Already done in pinmux so commented out
-    //MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
-    //MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
-
     // TIMERA2 (TIMER B), Pin 64 as Index finger
     // Also as RED of RGB light. GPIO 9 --> PWM_5
     SetupTimerPWMMode(TIMERA2_BASE, TIMER_B,
@@ -109,10 +100,69 @@ void InitPWMModules()
     SetupTimerPWMMode(TIMERA3_BASE, TIMER_B,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
 
+    //TODO setup the rest of the PWM modules!!!
+
     // Enable the timers
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_B);
+}
+
+//****************************************************************************
+//
+// Disables the timer PWMs
+//
+// \param none
+//
+// \return None.
+//
+//****************************************************************************
+void DeInitPWMModules()
+{
+    // Disable the peripherals
+    MAP_TimerDisable(TIMERA2_BASE, TIMER_B);
+    MAP_TimerDisable(TIMERA3_BASE, TIMER_A);
+    MAP_TimerDisable(TIMERA3_BASE, TIMER_B);
+    MAP_PRCMPeripheralClkDisable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkDisable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
+}
+
+//****************************************************************************
+//
+// Updates the TimerMatch and PrescaleMatch for specified Timer PWM
+//
+// \param ulBase is the base address of the timer to be configured
+// \param ulTimer is the timer to be setup (TIMER_A or  TIMER_B)
+//
+// \return None.
+//
+//****************************************************************************
+void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
+                     uint16_t matchVal, uint8_t prescaleVal)
+{
+    MAP_TimerMatchSet(ulBase, ulTimer, matchVal);
+    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, prescaleVal);
+}
+
+//*****************************************************************************
+// Converts the input of degrees to a Match value and Prescale value
+//
+// \param usDegrees is the rotation in degrees
+// \param matchVal is reference to 16-bit value loaded into match
+// \param prescaleVal is reference to 8-bt value loaded into prescale
+//
+// \return None. (all values updated by reference)
+//*****************************************************************************
+void Convert_Degrees_To_Match(unsigned short usDegrees, uint16_t *matchVal, 
+                              uint8_t *prescaleVal)
+{
+    uint32_t degrees_to_match;
+    degrees_to_match = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
+
+    *matchVal = degrees_to_match & 0xFFFF;
+    *prescaleVal = (degrees_to_match & 0xFF0000) >> 16;
+
+    return;
 }
 
 //*****************************************************************************

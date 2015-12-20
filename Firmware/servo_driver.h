@@ -41,15 +41,6 @@
 #define PWM_180_DEGREES 0x30D54UL       // Actual may be 0x31400
 #define PWM_MATCH_PER_DEGREE (0x30D54UL - 0x9C40UL)/180  // Equates to 0x379 or 889
 
-// Defines for fingers
-enum enum_Finger_Type {
-    finger_thumb,
-    finger_index,
-    finger_middle,
-    finger_ring,
-    finger_pinky
-};
-
 //*****************************************************************************
 // Sets up the Timer for PWM mode
 //*****************************************************************************
@@ -60,7 +51,22 @@ void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
 // Sets up the identified timers as PWM to drive the peripherals
 //*****************************************************************************
 void InitPWMModules();
+
+//*****************************************************************************
+// Disables Timer PWMs
+//*****************************************************************************
 void DeInitPWMModules();
-void UpdatePWM_Finger(int usDegrees, enum enum_Finger_Type);
+
+//*****************************************************************************
+// Updates the MatchSet value and PrescaleMatchSet value of the timer specified
+//*****************************************************************************
+void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
+                     uint16_t matchVal, uint8_t prescaleVal);
+
+//*****************************************************************************
+// Converts the input of degrees to a Match value and Prescale value
+//*****************************************************************************
+void Convert_Degrees_To_Match(unsigned short usDegrees, uint16_t *matchVal, 
+                              uint8_t *prescaleVal);
 
 #endif //  __SERVO_DRIVER_H__
