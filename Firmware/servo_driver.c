@@ -38,9 +38,9 @@
 #include "utils.h"
 #include "prcm.h"
 
-// Servo driver header
 #include "servo_driver.h"
-// Servo pinmux inludes
+
+// Pinmux configuration include
 #include "pin_mux_config.h"
 
 //*****************************************************************************
@@ -138,10 +138,10 @@ void DeInitPWMModules()
 //
 //****************************************************************************
 void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
-                     uint16_t matchVal, uint8_t prescaleVal)
+                     unsigned short usMatchVal, unsigned char ucPrescaleVal)
 {
-    MAP_TimerMatchSet(ulBase, ulTimer, matchVal);
-    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, prescaleVal);
+    MAP_TimerMatchSet(ulBase, ulTimer, usMatchVal);
+    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, ucPrescaleVal);
 }
 
 //*****************************************************************************
@@ -153,14 +153,14 @@ void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
 //
 // \return None. (all values updated by reference)
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned short usDegrees, uint16_t *matchVal, 
-                              uint8_t *prescaleVal)
+void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal,
+                              unsigned char *ucPrescaleVal)
 {
-    uint32_t degrees_to_match;
-    degrees_to_match = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
+    unsigned int uiDegreesToMatch;
+    uiDegreesToMatch = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
 
-    *matchVal = degrees_to_match & 0xFFFF;
-    *prescaleVal = (degrees_to_match & 0xFF0000) >> 16;
+    *usMatchVal = uiDegreesToMatch & 0xFFFF;
+    *ucPrescaleVal = (uiDegreesToMatch & 0xFF0000) >> 16;
 
     return;
 }

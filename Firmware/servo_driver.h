@@ -5,7 +5,9 @@
 //
 // servo_driver.h
 //
-// Header file for Servo driver for CC3200-LAUNCHXL as part of the robotic hand project
+// Header file for low-level Servo driver for CC3200-LAUNCHXL
+//
+// Project: Human Interface for Robotic Control
 //
 // Created:
 // December 20, 2015
@@ -34,6 +36,10 @@
 //
 //*****************************************************************************
 
+// Driverlib includes
+#include "hw_types.h"
+#include "hw_ints.h"
+
 // PWM register defines
 #define PWM_PRESCALE 0x18
 #define PWM_INTERVAL_RELOAD 0x6A00
@@ -58,15 +64,15 @@ void InitPWMModules();
 void DeInitPWMModules();
 
 //*****************************************************************************
-// Updates the MatchSet value and PrescaleMatchSet value of the timer specified
+// Updates the TimerMatch and PrescaleMatch for specified Timer PWM
 //*****************************************************************************
 void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
-                     uint16_t matchVal, uint8_t prescaleVal);
+                     unsigned short usMatchVal, unsigned char ucPrescaleVal);
 
 //*****************************************************************************
 // Converts the input of degrees to a Match value and Prescale value
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned short usDegrees, uint16_t *matchVal, 
-                              uint8_t *prescaleVal);
+void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal, 
+                              unsigned char *ucPrescaleVal);
 
 #endif //  __SERVO_DRIVER_H__

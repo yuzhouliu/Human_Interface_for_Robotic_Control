@@ -3,7 +3,7 @@
 
 //*****************************************************************************
 //
-// servo_driver.h
+// servo_driver_if.h
 //
 // Header file for high-level Servo driver for CC3200-LAUNCHXL
 //
@@ -39,6 +39,6 @@ void DisableServos();
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum_Finger_Type eFinger);
+void MoveServo(unsigned short usDegrees, enum enum_Finger_Type eFinger);
 
 #endif //  __SERVO_DRIVER_IF_H__

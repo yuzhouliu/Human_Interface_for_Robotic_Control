@@ -14,6 +14,24 @@
 //
 //*****************************************************************************
 
+// Driverlib includes
+#include "hw_types.h"
+#include "hw_ints.h"
+#include "hw_memmap.h"
+#include "hw_apps_rcm.h"
+#include "hw_common_reg.h"
+#include "interrupt.h"
+#include "rom.h"
+#include "rom_map.h"
+#include "timer.h"
+#include "utils.h"
+#include "prcm.h"
+#include "uart.h"
+
+#include "servo_driver_if.h"
+
+// Low-level Servo driver include
+#include "servo_driver.h"
 
 //****************************************************************************
 //
@@ -53,22 +71,22 @@ void DisableServos()
 // \return None.
 //
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum_Finger_Type eFinger)
+void MoveServo(unsigned short usDegrees, enum enum_Finger_Type eFinger)
 {
-    uint16_t matchVal;
-    uint8_t prescaleVal;
+    unsigned short usMatchVal;
+    unsigned char usPrescaleVal;
 
-    Convert_Degrees_To_Match(usDegrees, &matchVal, &prescaleVal);
+    Convert_Degrees_To_Match(usDegrees, &usMatchVal, &usPrescaleVal);
 
     switch(eFinger) {
         case finger_thumb:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_A, matchVal, prescaleVal);
+            UpdatePWM_Match(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         case finger_index:
-            UpdatePWM_Match(TIMERA2_BASE, TIMER_B, matchVal, prescaleVal);
+            UpdatePWM_Match(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case finger_middle:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_B, matchVal, prescaleVal);
+            UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case finger_ring:
             // TODO map to appropriate pin
