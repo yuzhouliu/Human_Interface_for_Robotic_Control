@@ -100,12 +100,31 @@ void InitPWMModules()
     SetupTimerPWMMode(TIMERA3_BASE, TIMER_B,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
 
-    //TODO setup the rest of the PWM modules!!!
+    // TIMERA1 (TIMER A), Pin 21 as Ring
+    // SOP2 --> PWM_2
+    SetupTimerPWMMode(TIMERA1_BASE, TIMER_A,
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+
+    //TODO setup the rest of the PWM modules, Problem at the moment with PinMuxConfig!!!
+    /*
+    // TIMERA1 (TIMER B), Pin 19 as Pinky
+    // TCK --> PWM_3
+    SetupTimerPWMMode(TIMERA1_BASE, TIMER_B,
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+
+    // TIMERA0 (TIMER B), Pin 17 as Wrist
+    // TDO --> PWM_0
+    SetupTimerPWMMode(TIMERA0_BASE, TIMER_B,
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PWM), 1);
+    */
 
     // Enable the timers
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_B);
+    MAP_TimerEnable(TIMERA1_BASE,TIMER_A);
+    //MAP_TimerEnable(TIMERA1_BASE,TIMER_B);
+    //MAP_TimerEnable(TIMERA0_BASE,TIMER_B);
 }
 
 //****************************************************************************

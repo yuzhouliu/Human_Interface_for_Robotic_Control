@@ -20,6 +20,8 @@
 #include "hw_types.h"
 #include "hw_memmap.h"
 #include "hw_gpio.h"
+#include "rom.h"
+#include "rom_map.h"
 #include "pin.h"
 #include "gpio.h"
 #include "prcm.h"
@@ -57,15 +59,16 @@ void PinMuxConfig(void)
     //
     MAP_PinTypeTimer(PIN_21, PIN_MODE_9);
 
+    //TODO setup the rest of the PWM modules, Problem at the moment with PinMuxConfig!!!
     //
     // Configure PIN_19 for TimerPWM3 GT_PWM03
     //
-    MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
+    //MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
 
     //
     // Configure PIN_17 for TimerPWM0 GT_PWM00
     //
-    MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
+    //MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
 
     //
     // Configure PIN_57 for ADC0 ADC_CH0

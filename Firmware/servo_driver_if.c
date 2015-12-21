@@ -20,9 +20,6 @@
 #include "hw_memmap.h"
 #include "hw_apps_rcm.h"
 #include "hw_common_reg.h"
-#include "interrupt.h"
-#include "rom.h"
-#include "rom_map.h"
 #include "timer.h"
 #include "utils.h"
 #include "prcm.h"
@@ -89,12 +86,15 @@ void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
             UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case FINGER_RING:
-            // TODO map to appropriate pin
+        	UpdatePWM_Match(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         case FINGER_PINKY:
-            // TODo map to appropriate pin
+            // TODO map to appropriate pin
             break;
+        case WRIST:
+        	// TODO map to appropriate pin
+        	break;
         default:
-            UART_PRINT("[MoveServo] Invalid Finger input\n");
+            //UART_PRINT("[MoveServo] Invalid Finger input\n");
     }
 }
