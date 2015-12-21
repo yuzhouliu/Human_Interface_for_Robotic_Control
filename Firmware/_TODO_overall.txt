@@ -1,6 +1,0 @@
-1. Refactor code
-2. Make ADC module
-
-3. Test Foam
-3. Assemble H/W
-4. Get 5 more servos
