@@ -18,12 +18,12 @@
 //*****************************************************************************
 
 // Defines for fingers
-enum enum_Finger_Type {
-    finger_thumb,
-    finger_index,
-    finger_middle,
-    finger_ring,
-    finger_pinky
+enum Finger_Type {
+    FINGER_THUMB,
+    FINGER_INDEX,
+    FINGER_MIDDLE,
+    FINGER_RING,
+    FINGER_PINKY
 };
 
 //****************************************************************************
@@ -39,6 +39,6 @@ void DisableServos();
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum enum_Finger_Type eFinger);
+void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger);
 
 #endif //  __SERVO_DRIVER_IF_H__

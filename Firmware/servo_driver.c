@@ -160,7 +160,7 @@ void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchV
     uiDegreesToMatch = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
 
     *usMatchVal = uiDegreesToMatch & 0xFFFF;
-    *ucPrescaleVal = (uiDegreesToMatch & 0xFF0000) >> 16;
+    *ucPrescaleVal = (uiDegreesToMatch >> 16) & 0xFF;
 
     return;
 }

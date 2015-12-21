@@ -71,7 +71,7 @@ void DisableServos()
 // \return None.
 //
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum enum_Finger_Type eFinger)
+void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
 {
     unsigned short usMatchVal;
     unsigned char usPrescaleVal;
@@ -79,19 +79,19 @@ void MoveServo(unsigned short usDegrees, enum enum_Finger_Type eFinger)
     Convert_Degrees_To_Match(usDegrees, &usMatchVal, &usPrescaleVal);
 
     switch(eFinger) {
-        case finger_thumb:
+        case FINGER_THUMB:
             UpdatePWM_Match(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
-        case finger_index:
+        case FINGER_INDEX:
             UpdatePWM_Match(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case finger_middle:
+        case FINGER_MIDDLE:
             UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case finger_ring:
+        case FINGER_RING:
             // TODO map to appropriate pin
             break;
-        case finger_pinky:
+        case FINGER_PINKY:
             // TODo map to appropriate pin
             break;
         default:
