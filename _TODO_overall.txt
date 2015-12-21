@@ -12,3 +12,4 @@
 //*********************
 1. Submit reimbursment claims through http://carleton.ca/te/ using Yuzhou's account
 2. Submit application for more funding for Winter term
+3. Email Dansereau new meeting times for Winter
