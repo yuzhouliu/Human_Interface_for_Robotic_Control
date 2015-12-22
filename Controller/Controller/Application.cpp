@@ -8,7 +8,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 21, 2015
 //
 //*****************************************************************************
 #include "Application.h"
@@ -18,7 +18,14 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "FrameRateManager.h"
+
 Application::Application()
+{
+
+}
+
+Application::~Application()
 {
 
 }
@@ -30,21 +37,41 @@ Application::Application()
 //! \param None.
 //!
 //! \return Returns \b true if the application was run successfully and \b
-//! otherwise.
+//! false otherwise.
 //
 //*****************************************************************************
 int Application::run()
 {
+    //
+    // Initialize application
+    //
     if (!initialize())
     {
         return EXIT_FAILURE;
     }
 
+    //
+    // Main program logic
+    //
+    FrameRateManager fpsManager;
     while (true)
     {
+        //
+        // Begins tracking fps
+        //
+        fpsManager.beginFrame();
+
         // TODO (Brandon): Main program logic
+
+        //
+        // Ends frame and blocks until FPS elapses
+        //
+        fpsManager.endFrame();
     }
 
+    //
+    // Terminates application
+    //
     terminate();
 
     return EXIT_SUCCESS;
@@ -57,7 +84,7 @@ int Application::run()
 //! \param None.
 //!
 //! \return Returns \b true if the application was initialized successfully and
-//! \b otherwise.
+//! \b false otherwise.
 //
 //*****************************************************************************
 bool Application::initialize()
@@ -116,3 +143,4 @@ int main(int argc, char *argv[])
 
     return app.run();
 }
+
