@@ -10,6 +10,21 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\FrameRateManager.h" />
+    <ClInclude Include="include\Image.h" />
+    <ClInclude Include="include\IObserver.h" />
+    <ClInclude Include="include\Timer.h" />
+    <ClInclude Include="include\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\FrameRateManager.cpp" />
+    <ClCompile Include="src\Image.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\Window.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{510DB082-CAC7-40F8-8B02-AB4E353D4128}</ProjectGuid>
     <RootNamespace>Controller</RootNamespace>
@@ -39,7 +54,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\VS Development Libraries\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <ExecutablePath>C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(ExecutablePath)</ExecutablePath>
@@ -69,21 +84,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="FrameRateManager.cpp" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="FrameRateManager.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="IObserver.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="Window.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
