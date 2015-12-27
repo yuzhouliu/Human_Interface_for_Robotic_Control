@@ -86,14 +86,14 @@ void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
             UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case FINGER_RING:
-        	UpdatePWM_Match(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
+            UpdatePWM_Match(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         case FINGER_PINKY:
             // TODO map to appropriate pin
             break;
         case WRIST:
-        	// TODO map to appropriate pin
-        	break;
+            // TODO map to appropriate pin
+            break;
         default:
             //UART_PRINT("[MoveServo] Invalid Finger input\n");
     }
