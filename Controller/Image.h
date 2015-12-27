@@ -30,9 +30,6 @@ private:
     unsigned char alpha;
     bool alphaEnabled;
 
-    /* Methods */
-    SDL_Texture *_createTexture();
-
 public:
     /* Constructor */
     Image();
