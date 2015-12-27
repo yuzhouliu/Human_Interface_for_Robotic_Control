@@ -27,7 +27,8 @@
 //
 //*****************************************************************************
 Window::Window()
-    : _window(NULL), _renderer(NULL), _width(0), _height(0)
+    : _window(NULL), _renderer(NULL), _width(_DEFAULT_WIDTH),
+      _height(_DEFAULT_HEIGHT)
 {
     //
     // Initialize application
@@ -65,7 +66,15 @@ Window::~Window()
 //*****************************************************************************
 void Window::update()
 {
-    // TODO (Brandon): Implement
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT)
+        {
+            notify(SDL_QUIT);
+        }
+    }
 }
 
 //*****************************************************************************
@@ -80,8 +89,57 @@ void Window::update()
 //*****************************************************************************
 bool Window::_initialize()
 {
-    // TODO (Brandon): Implement
-    return false;
+    int iRetVal = 0;
+
+    //
+    // Creates OpenGL context
+    //
+    _window = SDL_CreateWindow("HIRC Application", SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_SHOWN);
+    if (_window == NULL)
+    {
+        std::cerr << "[ERROR] Window::_initialize(): SDL_CreateWindow() "\
+            "failed. SDL Error " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    //
+    // Creates renderer
+    //
+    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED |
+        SDL_RENDERER_TARGETTEXTURE);
+    if (_renderer == NULL)
+    {
+        std::cerr << "[ERROR] Window::_initialize(): SDL_CreateRenderer() "\
+            "failed. SDL Error " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    //
+    // Sets renderer to default to an Opqaue White color on screen clear
+    //
+    iRetVal = SDL_SetRenderDrawColor(_renderer, 0xFF, 0xFF, 0xFF,
+        SDL_ALPHA_OPAQUE);
+    if (iRetVal < 0)
+    {
+        std::cerr << "[ERROR] Window::_initialize(): SDL_SetRenderDrawColor()"\
+            " failed. SDL Error " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    //
+    // Sets a device independent resolution for rendering
+    //
+    iRetVal = SDL_RenderSetLogicalSize(_renderer, _width, _height);
+    if (iRetVal < 0)
+    {
+        std::cerr << "[ERROR] Window::_initialize(): "\
+            "SDL_RenderSetLogicalSize() failed. SDL Error " << SDL_GetError()
+            << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 //*****************************************************************************
@@ -95,5 +153,13 @@ bool Window::_initialize()
 //*****************************************************************************
 void Window::_terminate()
 {
-    // TODO (Brandon): Implement
+    if (_renderer != NULL)
+    {
+        SDL_DestroyRenderer(_renderer);
+    }
+
+    if (_window != NULL)
+    {
+        SDL_DestroyWindow(_window);
+    }
 }

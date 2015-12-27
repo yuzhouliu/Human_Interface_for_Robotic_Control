@@ -20,7 +20,7 @@ class FrameRateManager
 {
 private:
     /* Fields */
-    const int _DEFAULT_FRAMES_PER_SECOND = 60;
+    const int _DEFAULT_FRAMES_PER_SECOND = 10;
     Timer _fpsTimer;
     int _fps;
 

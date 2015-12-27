@@ -14,10 +14,17 @@
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
-class Application
+#include <memory>
+
+#include "IObserver.h"
+#include "Window.h"
+
+class Application : public IObserver
 {
 private:
     /* Fields */
+    Window *_window;
+    bool _exit;
 
     /* Methods */
     bool _initialize();
@@ -32,6 +39,9 @@ public:
 
     /* Methods */
     int run();
+
+    /* IObserver virtual methods */
+    void onNotify(int event);
 };
 
 #endif /* _APPLICATION_H_ */

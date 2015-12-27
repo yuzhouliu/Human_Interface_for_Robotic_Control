@@ -80,6 +80,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="FrameRateManager.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="IObserver.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

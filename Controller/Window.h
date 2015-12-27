@@ -17,14 +17,17 @@
 #include <vector>
 
 #include "Image.h"
+#include "IObserver.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;
 
-class Window
+class Window : public IObservable
 {
 private:
     /* Fields */
+    const int _DEFAULT_WIDTH = 640;
+    const int _DEFAULT_HEIGHT = 480;
     SDL_Window *_window;
     SDL_Renderer *_renderer;
     unsigned short _width;
