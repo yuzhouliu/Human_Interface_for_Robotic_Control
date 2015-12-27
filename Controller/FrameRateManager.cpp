@@ -15,12 +15,30 @@
 
 #include <SDL.h>
 
+//*****************************************************************************
+//
+//! Empty constructor for FrameRateManager.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 FrameRateManager::FrameRateManager()
     : fps(DEFAULT_FRAMES_PER_SECOND)
 {
 
 }
 
+//*****************************************************************************
+//
+//! Empty destructor for FrameRateManager.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 FrameRateManager::~FrameRateManager()
 {
 

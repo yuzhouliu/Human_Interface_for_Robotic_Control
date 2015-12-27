@@ -8,7 +8,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #ifndef _APPLICATION_H_
@@ -19,6 +19,10 @@ class Application
 private:
     /* Fields */
 
+    /* Methods */
+    bool _initialize();
+    void _terminate();
+
 public:
     /* Constructor */
     Application();
@@ -28,8 +32,6 @@ public:
 
     /* Methods */
     int run();
-    bool initialize();
-    void terminate();
 };
 
 #endif /* _APPLICATION_H_ */

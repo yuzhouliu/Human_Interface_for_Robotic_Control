@@ -18,6 +18,15 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+//*****************************************************************************
+//
+//! Empty constructor for Image.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Image::Image()
     : texture(NULL), width(0), height(0), angle(0), alpha(SDL_ALPHA_OPAQUE),
       alphaEnabled(false)
@@ -25,6 +34,45 @@ Image::Image()
 
 }
 
+//*****************************************************************************
+//
+//! Constructor for Image. Loads a texture for renderer from path.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+Image::Image(std::string path, SDL_Renderer *renderer)
+{
+    Image();
+    setTexture(path, renderer);
+}
+
+//*****************************************************************************
+//
+//! Constructor for Image. Sets pre-loaded texture.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+Image::Image(SDL_Texture *texture)
+{
+    Image();
+    setTexture(texture);
+}
+
+//*****************************************************************************
+//
+//! Destructor for Image. Releases resources used by texture.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Image::~Image()
 {
     if (texture != NULL)

@@ -31,6 +31,10 @@ private:
     unsigned short height;
     std::vector<Image> renderList;
 
+    /* Methods */
+    bool _initialize();
+    void _terminate();
+
 public:
     /* Constructor */
     Window();
@@ -39,8 +43,6 @@ public:
     ~Window();
 
     /* Methods */
-    bool initialize();
-    void terminate();
     void update();
 };
 

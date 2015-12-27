@@ -8,7 +8,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #include "Application.h"
@@ -20,14 +20,40 @@
 
 #include "FrameRateManager.h"
 
+//*****************************************************************************
+//
+//! Constructor for Image. Acquires resources for SDL and window.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Application::Application()
 {
-
+    //
+    // Initialize application
+    //
+    if (!_initialize())
+    {
+        std::cerr << "[ERROR] Application::Application(): Failed to "\
+            "initialize." << std::endl;
+        return;
+    }
 }
 
+//*****************************************************************************
+//
+//! Destructor for Application. Releases resources used by SDL and window.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Application::~Application()
 {
-
+    _terminate();
 }
 
 //*****************************************************************************
@@ -42,18 +68,11 @@ Application::~Application()
 //*****************************************************************************
 int Application::run()
 {
-    //
-    // Initialize application
-    //
-    if (!initialize())
-    {
-        return EXIT_FAILURE;
-    }
+    FrameRateManager fpsManager;
 
     //
     // Main program logic
     //
-    FrameRateManager fpsManager;
     while (true)
     {
         //
@@ -70,11 +89,6 @@ int Application::run()
         fpsManager.endFrame();
     }
 
-    //
-    // Terminates application
-    //
-    terminate();
-
     return EXIT_SUCCESS;
 }
 
@@ -88,7 +102,7 @@ int Application::run()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool Application::initialize()
+bool Application::_initialize()
 {
     //
     // Initializes SDL
@@ -123,7 +137,7 @@ bool Application::initialize()
 //! \return None.
 //
 //*****************************************************************************
-void Application::terminate()
+void Application::_terminate()
 {
     IMG_Quit();
     SDL_Quit();

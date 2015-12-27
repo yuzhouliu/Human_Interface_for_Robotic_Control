@@ -31,8 +31,10 @@ private:
     bool alphaEnabled;
 
 public:
-    /* Constructor */
+    /* Constructors */
     Image();
+    Image(std::string path, SDL_Renderer *renderer);
+    Image(SDL_Texture *texture);
 
     /* Destructor */
     ~Image();

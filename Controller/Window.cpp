@@ -13,16 +13,59 @@
 //*****************************************************************************
 #include "Window.h"
 
+#include <iostream>
+
 #include <SDL.h>
 
+//*****************************************************************************
+//
+//! Constructor for Window. Acquires resources for window and renderer.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Window::Window()
+    : window(NULL), renderer(NULL), width(0), height(0)
 {
-
+    //
+    // Initialize application
+    //
+    if (!_initialize())
+    {
+        std::cerr << "[ERROR] Application::Application(): Failed to "\
+            "initialize." << std::endl;
+        return;
+    }
 }
 
+//*****************************************************************************
+//
+//! Destructor for Window. Releases resources used by window and renderer.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Window::~Window()
 {
+    _terminate();
+}
 
+//*****************************************************************************
+//
+//! Updates the window. Called once every frame.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::update()
+{
+    // TODO (Brandon): Implement
 }
 
 //*****************************************************************************
@@ -35,7 +78,7 @@ Window::~Window()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool Window::initialize()
+bool Window::_initialize()
 {
     // TODO (Brandon): Implement
     return false;
@@ -50,21 +93,7 @@ bool Window::initialize()
 //! \return None.
 //
 //*****************************************************************************
-void Window::terminate()
-{
-    // TODO (Brandon): Implement
-}
-
-//*****************************************************************************
-//
-//! Updates the window. Called once every frame.
-//!
-//! \param None.
-//!
-//! \return None.
-//
-//*****************************************************************************
-void Window::update()
+void Window::_terminate()
 {
     // TODO (Brandon): Implement
 }
