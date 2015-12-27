@@ -24,7 +24,7 @@ enum Finger_Type {
     FINGER_MIDDLE,
     FINGER_RING,
     FINGER_PINKY,
-	WRIST
+    WRIST
 };
 
 //****************************************************************************
