@@ -25,11 +25,11 @@ class Window
 {
 private:
     /* Fields */
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    unsigned short width;
-    unsigned short height;
-    std::vector<Image> renderList;
+    SDL_Window *_window;
+    SDL_Renderer *_renderer;
+    unsigned short _width;
+    unsigned short _height;
+    std::vector<Image> _renderList;
 
     /* Methods */
     bool _initialize();

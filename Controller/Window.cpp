@@ -27,7 +27,7 @@
 //
 //*****************************************************************************
 Window::Window()
-    : window(NULL), renderer(NULL), width(0), height(0)
+    : _window(NULL), _renderer(NULL), _width(0), _height(0)
 {
     //
     // Initialize application

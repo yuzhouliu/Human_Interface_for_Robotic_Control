@@ -25,7 +25,8 @@
 //
 //*****************************************************************************
 Timer::Timer()
-    : startTime(0), tempTime(0), pausedTime(0), started(false), paused(false)
+    : _startTime(0), _tempTime(0), _pausedTime(0), _started(false),
+      _paused(false)
 {
 
 }
@@ -55,13 +56,13 @@ Timer::~Timer()
 //*****************************************************************************
 void Timer::start()
 {
-    if (!started)
+    if (!_started)
     {
-        startTime = SDL_GetTicks();
-        tempTime = startTime;
-        pausedTime = 0;
-        started = false;
-        paused = false;
+        _startTime = SDL_GetTicks();
+        _tempTime = _startTime;
+        _pausedTime = 0;
+        _started = false;
+        _paused = false;
     }
 }
 
@@ -76,13 +77,13 @@ void Timer::start()
 //*****************************************************************************
 void Timer::stop()
 {
-    if (started)
+    if (_started)
     {
-        startTime = 0;
-        tempTime = 0;
-        pausedTime = 0;
-        started = false;
-        paused = false;
+        _startTime = 0;
+        _tempTime = 0;
+        _pausedTime = 0;
+        _started = false;
+        _paused = false;
     }
 }
 
@@ -97,12 +98,12 @@ void Timer::stop()
 //*****************************************************************************
 void Timer::pause()
 {
-    if (started)
+    if (_started)
     {
-        if (!paused)
+        if (!_paused)
         {
-            pausedTime = getTimeOnTimer();
-            paused = true;
+            _pausedTime = getTimeOnTimer();
+            _paused = true;
         }
     }
 }
@@ -118,13 +119,13 @@ void Timer::pause()
 //*****************************************************************************
 void Timer::resume()
 {
-    if (started)
+    if (_started)
     {
-        if (paused)
+        if (_paused)
         {
-            tempTime = SDL_GetTicks() - pausedTime;
-            pausedTime = 0;
-            paused = false;
+            _tempTime = SDL_GetTicks() - _pausedTime;
+            _pausedTime = 0;
+            _paused = false;
         }
     }
 }
@@ -140,15 +141,15 @@ void Timer::resume()
 //*****************************************************************************
 unsigned int Timer::getTimeOnTimer()
 {
-    if (started)
+    if (_started)
     {
-        if (paused)
+        if (_paused)
         {
-            return pausedTime;
+            return _pausedTime;
         }
         else
         {
-            return SDL_GetTicks() - tempTime;
+            return SDL_GetTicks() - _tempTime;
         }
     }
     else
@@ -168,9 +169,9 @@ unsigned int Timer::getTimeOnTimer()
 //*****************************************************************************
 unsigned int Timer::getTimeSinceTimerStarted()
 {
-    if (started)
+    if (_started)
     {
-        return SDL_GetTicks() - startTime;
+        return SDL_GetTicks() - _startTime;
     }
     else
     {
@@ -190,7 +191,7 @@ unsigned int Timer::getTimeSinceTimerStarted()
 //*****************************************************************************
 bool Timer::isStarted()
 {
-    return started;
+    return _started;
 }
 
 //*****************************************************************************
@@ -205,5 +206,5 @@ bool Timer::isStarted()
 //*****************************************************************************
 bool Timer::isPaused()
 {
-    return paused;
+    return _paused;
 }
