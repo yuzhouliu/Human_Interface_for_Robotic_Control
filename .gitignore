@@ -1,9 +1,6 @@
 # Created by https://www.gitignore.io/api/visualstudio,windows
 #
 
-*.vcxproj
-*.vcxproj.filters
-*.sln
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
