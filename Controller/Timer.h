@@ -8,22 +8,19 @@
 // December 21, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-//extern Uint32;
-#include <SDL.h>
-
 class Timer
 {
 private:
     /* Fields */
-    Uint32 startTime;
-    Uint32 tempTime;
-    Uint32 pausedTime;
+    unsigned int startTime;
+    unsigned int tempTime;
+    unsigned int pausedTime;
     bool started;
     bool paused;
 
@@ -39,8 +36,8 @@ public:
     void stop();
     void pause();
     void resume();
-    Uint32 getTimeOnTimer();
-    Uint32 getTimeSinceTimerStarted();
+    unsigned int getTimeOnTimer();
+    unsigned int getTimeSinceTimerStarted();
     bool isStarted();
     bool isPaused();
 };

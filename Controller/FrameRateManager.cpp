@@ -8,14 +8,12 @@
 // December 21, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #include "FrameRateManager.h"
 
 #include <SDL.h>
-
-#include "Timer.h"
 
 FrameRateManager::FrameRateManager()
     : fps(DEFAULT_FRAMES_PER_SECOND)

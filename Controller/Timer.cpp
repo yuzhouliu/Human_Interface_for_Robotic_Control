@@ -8,7 +8,7 @@
 // December 21, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #include "Timer.h"
@@ -120,7 +120,7 @@ void Timer::resume()
 //! \return Returns the current time on the timer.
 //
 //*****************************************************************************
-Uint32 Timer::getTimeOnTimer()
+unsigned int Timer::getTimeOnTimer()
 {
     if (started)
     {
@@ -148,7 +148,7 @@ Uint32 Timer::getTimeOnTimer()
 //! \return Returns the time since the timer started.
 //
 //*****************************************************************************
-Uint32 Timer::getTimeSinceTimerStarted()
+unsigned int Timer::getTimeSinceTimerStarted()
 {
     if (started)
     {

@@ -8,13 +8,12 @@
 // December 21, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #ifndef _FRAMERATEMANAGER_H_
 #define _FRAMERATEMANAGER_H_
 
-//extern class Timer;
 #include "Timer.h"
 
 class FrameRateManager

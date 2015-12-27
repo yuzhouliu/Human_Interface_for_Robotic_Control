@@ -72,12 +72,16 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="FrameRateManager.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="FrameRateManager.h" />
+    <ClInclude Include="Image.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
