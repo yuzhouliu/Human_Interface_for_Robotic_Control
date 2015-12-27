@@ -62,6 +62,7 @@ int Application::run()
         fpsManager.beginFrame();
 
         // TODO (Brandon): Main program logic
+        std::cout << "Hello world!" << std::endl;
 
         //
         // Ends frame and blocks until FPS elapses
