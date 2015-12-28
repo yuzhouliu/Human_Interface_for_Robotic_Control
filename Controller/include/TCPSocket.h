@@ -16,11 +16,17 @@
 
 #include "SocketBase.h"
 
+typedef int socklen_t;
+typedef int ssize_t;
+
 class TCPSocket : public SocketBase
 {
 public:
     /* Constructor */
     TCPSocket();
+
+    /* Destructor */
+    ~TCPSocket();
 
     /* Methods */
     bool open();
