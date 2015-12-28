@@ -82,7 +82,7 @@ int Application::run()
         fpsManager.beginFrame();
 
         // TODO (Brandon): Main program logic
-        //std::cout << "Hello world!" << std::endl;
+        _window->update();
 
         //
         // Ends frame and blocks until FPS elapses
@@ -147,6 +147,11 @@ bool Application::_initialize()
     // Consructs a window to render images on
     //
     _window = new Window();
+
+    //
+    // Register this object to be notified by window
+    //
+    _window->addObserver(this);
 
     return true;
 }
