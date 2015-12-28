@@ -23,6 +23,9 @@ public:
     IPv4Address();
     IPv4Address(unsigned int address);
 
+    /* Destructor */
+    ~IPv4Address();
+
     /* Methods */
     unsigned int getAddress();
     void setAddress(unsigned int address);
