@@ -36,9 +36,10 @@ IPv4Address::IPv4Address()
 //! \return None.
 //
 //*****************************************************************************
-IPv4Address::IPv4Address(unsigned int address)
+IPv4Address::IPv4Address(unsigned int address, unsigned short port)
 {
     setAddress(address);
+    setPort(port);
 }
 
 //*****************************************************************************

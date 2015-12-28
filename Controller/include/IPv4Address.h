@@ -21,7 +21,7 @@ class IPv4Address : public AddressBase<unsigned int>
 public:
     /* Constructor */
     IPv4Address();
-    IPv4Address(unsigned int address);
+    IPv4Address(unsigned int address, unsigned short port);
 
     /* Destructor */
     ~IPv4Address();
