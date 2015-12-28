@@ -49,15 +49,52 @@
 #include "uart_if.h"
 
 #define UART_PRINT Report
-#define FOREVER            1
-#define NO_OF_SAMPLES       1
+#define FOREVER 1
+#define NO_OF_SAMPLES 1
 
 unsigned long pulAdcSamples[4096];
 
-//*****************************************************************************
+//****************************************************************************
+// Initializes the Sensor ADCs for operation
 //
+// \param None.
 //
 // \return None.
+//****************************************************************************
+void InitSensorADC(void)
+{
+    // Enable ADC module
+    MAP_ADCEnable(ADC_BASE);
+
+    // Enable ADC channel
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);			// NOTE: Cannot enabled concurrently with UART0 RX
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_1);
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_2);
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_3);
+
+}
+
+//****************************************************************************
+// Disables the Sensor ADCs
+//
+// \param None.
+//
+// \return None.
+//****************************************************************************
+void DisableSensorADC(void)
+{
+	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_0);
+	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_1);
+	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_2);
+	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_3);
+}
+
+//*****************************************************************************
+// Gets the Sensor Reading from Finger-Tip sensors using ADC
+//
+// \param eFinger -> finger type (ex: FINGER_THUMB, FINGER_INDEX, etc)
+//
+// \return A float value ranging from 0 - 1.4V
 //*****************************************************************************
 float GetSensorReading(enum Finger_Type eFinger)
 {
@@ -65,28 +102,18 @@ float GetSensorReading(enum Finger_Type eFinger)
     unsigned int  uiIndex=0;
     unsigned long ulSample;
 
-    //
     // Initialize Array index for multiple execution
-    //
     uiIndex=0;
 
 #ifdef CC3200_ES_1_2_1
-    //
     // Enable ADC clocks.###IMPORTANT###Need to be removed for PG 1.32
-    //
     HWREG(GPRCM_BASE + GPRCM_O_ADC_CLK_CONFIG) = 0x00000043;
     HWREG(ADC_BASE + ADC_O_ADC_CTRL) = 0x00000004;
     HWREG(ADC_BASE + ADC_O_ADC_SPARE0) = 0x00000100;
     HWREG(ADC_BASE + ADC_O_ADC_SPARE1) = 0x0355AA00;
 #endif
-    //
-    // Pinmux for the selected ADC input pin
-    //
-    //MAP_PinTypeADC(uiAdcInputPin,PIN_MODE_255);
 
-    //
     // Convert pin number to channel number
-    //
     switch(eFinger)
     {
         case FINGER_THUMB:
@@ -105,26 +132,6 @@ float GetSensorReading(enum Finger_Type eFinger)
             break;
     }
 
-    //
-    // Configure ADC timer which is used to timestamp the ADC data samples
-    //
-    //MAP_ADCTimerConfig(ADC_BASE,2^17);
-
-    //
-    // Enable ADC timer which is used to timestamp the ADC data samples
-    //
-    //MAP_ADCTimerEnable(ADC_BASE);
-
-    //
-    // Enable ADC module
-    //
-    MAP_ADCEnable(ADC_BASE);
-
-    //
-    // Enable ADC channel
-    //
-    MAP_ADCChannelEnable(ADC_BASE, uiChannel);
-
     while(uiIndex < NO_OF_SAMPLES + 4)
     {
         if(MAP_ADCFIFOLvlGet(ADC_BASE, uiChannel))
@@ -132,26 +139,9 @@ float GetSensorReading(enum Finger_Type eFinger)
             ulSample = MAP_ADCFIFORead(ADC_BASE, uiChannel);
             pulAdcSamples[uiIndex++] = ulSample;
         }
-
-
     }
-
-    MAP_ADCChannelDisable(ADC_BASE, uiChannel);
 
     uiIndex = 0;
-
-    /*
-    //
-    // Print out ADC samples
-    //
-    while(uiIndex < NO_OF_SAMPLES)
-    {
-        UART_PRINT("\n\rVoltage is %f\n\r",(((float)((pulAdcSamples[4+uiIndex] >> 2 ) & 0x0FFF))*1.4)/4096);
-        uiIndex++;
-    }
-
-    UART_PRINT("\n\r");
-    */
 
     return (((float)((pulAdcSamples[4+uiIndex] >> 2 ) & 0x0FFF))*1.4)/4096;
 

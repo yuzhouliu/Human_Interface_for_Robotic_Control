@@ -45,10 +45,7 @@
 #include "uart_if.h"
 
 #define UART_PRINT Report
-#define FOREVER            1
-//#define NO_OF_SAMPLES       1
-
-//unsigned long pulAdcSamples[4096];
+#define FOREVER 1
 
 //*****************************************************************************
 //                      GLOBAL VARIABLES
@@ -60,19 +57,15 @@ extern void (* const g_pfnVectors[])(void);
 extern uVectorEntry __vector_table;
 #endif
 
-/****************************************************************************/
-/*                      LOCAL FUNCTION PROTOTYPES                           */
-/****************************************************************************/
+
 static void BoardInit(void);
 
 //*****************************************************************************
+// Board Initialization & Configuration
 //
-//! Board Initialization & Configuration
-//!
-//! \param  None
-//!
-//! \return None
+// \param  None
 //
+// \return None
 //*****************************************************************************
 static void BoardInit(void)
 {
@@ -108,6 +101,8 @@ void main()
     PinMuxConfig();
     InitTerm();
 
+    InitSensorADC();
+
     // Continously get sensor reading
     while(FOREVER)
     {
@@ -125,6 +120,7 @@ void main()
         UART_PRINT("FINGER_RING: %f (V)\n\r", GetSensorReading(FINGER_RING));
 
         MAP_UtilsDelay(30000000);
+        UART_PRINT("=========================================\n\r");
     }
 }
 
