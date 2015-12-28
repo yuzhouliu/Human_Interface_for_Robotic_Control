@@ -17,7 +17,7 @@
 template <class T>
 class AddressBase
 {
-private:
+protected:
     /* Fields */
     T _address;
     unsigned short _port;
@@ -27,10 +27,11 @@ public:
     virtual ~AddressBase(){};
 
     /* Methods */
-    virtual T getAddress();
-    virtual void setAddress(T address);
-    virtual unsigned short getPort();
-    virtual void setPort(unsigned short port);
+    virtual T getAddress() = 0;
+    virtual void setAddress(T address) = 0;
+    virtual unsigned short getPort() = 0;
+    virtual void setPort(unsigned short port) = 0;
 };
 
 #endif /* _ADDRESSBASE_H_ */
+

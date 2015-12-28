@@ -18,7 +18,7 @@
 
 class SocketBase
 {
-private:
+protected:
     /* Fields */
     int _sockfd;
     AddressBase<unsigned int> *_address;
@@ -28,11 +28,11 @@ public:
     virtual ~SocketBase(){};
 
     /* Methods */
-    virtual bool open();
-    virtual void close();
-    virtual bool connect(AddressBase<unsigned int> *address);
-    virtual bool send(char *message);
-    virtual bool recv(char *message);
+    virtual bool open() = 0;
+    virtual void close() = 0;
+    virtual bool connect(AddressBase<unsigned int> *address) = 0;
+    virtual bool send(char *message) = 0;
+    virtual bool recv(char *message) = 0;
 };
 
 #endif /* _SOCKETBASE_H_ */
