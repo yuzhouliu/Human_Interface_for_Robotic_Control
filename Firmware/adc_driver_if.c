@@ -38,13 +38,14 @@
 #include "interrupt.h"
 #include "prcm.h"
 #include "uart.h"
-#include "pinmux.h"
 #include "pin.h"
 #include "adc.h"
 
+#include "pin_mux_config.h"
 #include "adc_driver_if.h"
 #include "uart_if.h"
 
+#define UART_PRINT Report
 #define FOREVER            1
 #define NO_OF_SAMPLES       1
 
@@ -55,7 +56,7 @@ unsigned long pulAdcSamples[4096];
 //
 // \return None.
 //*****************************************************************************
-void GetADC(enum Finger_Type eFinger)
+float GetSensorReading(enum Finger_Type eFinger)
 {
     unsigned int  uiChannel;
     unsigned int  uiIndex=0;
@@ -78,20 +79,23 @@ void GetADC(enum Finger_Type eFinger)
     //
     // Pinmux for the selected ADC input pin
     //
-    MAP_PinTypeADC(uiAdcInputPin,PIN_MODE_255);
+    //MAP_PinTypeADC(uiAdcInputPin,PIN_MODE_255);
 
     //
     // Convert pin number to channel number
     //
-    switch(uiAdcInputPin)
+    switch(eFinger)
     {
-        case PIN_58:
+        case FINGER_THUMB:
+            uiChannel = ADC_CH_0;
+            break;
+        case FINGER_INDEX:
             uiChannel = ADC_CH_1;
             break;
-        case PIN_59:
+        case FINGER_MIDDLE:
             uiChannel = ADC_CH_2;
             break;
-        case PIN_60:
+        case FINGER_RING:
             uiChannel = ADC_CH_3;
             break;
         default:
@@ -133,6 +137,7 @@ void GetADC(enum Finger_Type eFinger)
 
     uiIndex = 0;
 
+    /*
     //
     // Print out ADC samples
     //
@@ -143,6 +148,9 @@ void GetADC(enum Finger_Type eFinger)
     }
 
     UART_PRINT("\n\r");
+    */
+
+    return (((float)((pulAdcSamples[4+uiIndex] >> 2 ) & 0x0FFF))*1.4)/4096;
 
 }
 

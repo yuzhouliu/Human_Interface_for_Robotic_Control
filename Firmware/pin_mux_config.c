@@ -73,7 +73,7 @@ void PinMuxConfig(void)
     //
     // Configure PIN_57 for ADC0 ADC_CH0
     //
-    MAP_PinTypeADC(PIN_57, PIN_MODE_255);
+    //MAP_PinTypeADC(PIN_57, PIN_MODE_255);
 
     //
     // Configure PIN_58 for ADC0 ADC_CH1

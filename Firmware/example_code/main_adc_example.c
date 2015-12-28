@@ -37,17 +37,18 @@
 #include "interrupt.h"
 #include "prcm.h"
 #include "uart.h"
-#include "pinmux.h"
 #include "pin.h"
 #include "adc.h"
 
+#include "pin_mux_config.h"
 #include "adc_driver_if.h"
 #include "uart_if.h"
 
+#define UART_PRINT Report
 #define FOREVER            1
-#define NO_OF_SAMPLES       1
+//#define NO_OF_SAMPLES       1
 
-unsigned long pulAdcSamples[4096];
+//unsigned long pulAdcSamples[4096];
 
 //*****************************************************************************
 //                      GLOBAL VARIABLES
@@ -98,30 +99,31 @@ static void BoardInit(void)
 
 void main()
 {
-    //
     // Initialize Board configurations
-    //
     BoardInit();
 
-    //
     // Configuring UART for Receiving input and displaying output
     // 1. PinMux setting
     // 2. Initialize UART
-    //
     PinMuxConfig();
     InitTerm();
 
+    // Continously get sensor reading
     while(FOREVER)
     {
         //PIN_57 is muxed between UART0 RX and ADC0, cannot do both at same time
         //UART_PRINT("PIN_57:\n\r");
-        //getADC(PIN_57);
-        UART_PRINT("PIN_58:\n\r");
-        getADC(PIN_58);
-        UART_PRINT("PIN_59:\n\r");
-        getADC(PIN_59);
-        UART_PRINT("PIN_60:\n\r");
-        getADC(PIN_60);
+        //UART_PRINT("FINGER_THUMB: %f (V)\n\r", GetSensorReading(FINGER_THUMB));
+
+        //UART_PRINT("PIN_58:\n\r");
+        UART_PRINT("FINGER_INDEX: %f (V)\n\r", GetSensorReading(FINGER_INDEX));
+
+        //UART_PRINT("PIN_59:\n\r");
+        UART_PRINT("FINGER_MIDDLE: %f (V)\n\r", GetSensorReading(FINGER_MIDDLE));
+
+        //UART_PRINT("PIN_60:\n\r");
+        UART_PRINT("FINGER_RING: %f (V)\n\r", GetSensorReading(FINGER_RING));
+
         MAP_UtilsDelay(30000000);
     }
 }

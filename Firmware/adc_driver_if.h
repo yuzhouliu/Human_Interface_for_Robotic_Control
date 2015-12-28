@@ -17,16 +17,14 @@
 //
 //*****************************************************************************
 
-// Defines for fingers
+// Defines for fingertip sensors
 enum Finger_Type {
     FINGER_THUMB,
     FINGER_INDEX,
     FINGER_MIDDLE,
-    FINGER_RING,
-    FINGER_PINKY,
-    WRIST
+    FINGER_RING
 };
 
-void GetADC(enum Finger_Type eFinger);
+float GetSensorReading(enum Finger_Type eFinger);
 
 #endif //  __ADC_DRIVER_IF_H__
