@@ -39,32 +39,39 @@ Image::Image()
 
 //*****************************************************************************
 //
-//! Constructor for Image. Loads a texture for renderer from path.
+//! Constructor for Image. Sets default renderer.
 //!
-//! \param None.
+//! \param renderer that textures will be rendered on.
 //!
 //! \return None.
 //
 //*****************************************************************************
-Image::Image(std::string path, SDL_Renderer *renderer)
+Image::Image(SDL_Renderer *renderer)
 {
     Image();
-    setTexture(path, renderer);
+    setRenderer(renderer);
 }
 
 //*****************************************************************************
 //
-//! Constructor for Image. Sets pre-loaded texture.
+//! Constructor for Image. Loads a texture for renderer from path.
 //!
-//! \param None.
+//! \param renderer that the texture will be rendered on.
+//! \param path to image on file system.
 //!
 //! \return None.
 //
 //*****************************************************************************
-Image::Image(SDL_Texture *texture)
+Image::Image(SDL_Renderer *renderer, std::string path)
 {
     Image();
-    setTexture(texture);
+    setRenderer(renderer);
+    if (!setTexture(path))
+    {
+        std::cerr << "[ERROR] Image::Image(): Texture was not set." <<
+            std::endl;
+        return;
+    }
 }
 
 //*****************************************************************************
@@ -86,17 +93,38 @@ Image::~Image()
 
 //*****************************************************************************
 //
+//! Sets the renderer that the class will use.
+//!
+//! \param path to image on file system.
+//!
+//! \return Returns \b true if the renderer was set successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+void Image::setRenderer(SDL_Renderer *renderer)
+{
+    _renderer = renderer;
+}
+
+//*****************************************************************************
+//
 //! Sets the texture that the class will manage.
 //!
 //! \param path to image on file system.
-//!        renderer that the texture will be rendered on.
 //!
 //! \return Returns \b true if the texture was loaded and set successfully and
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool Image::setTexture(std::string path, SDL_Renderer *renderer)
+bool Image::setTexture(std::string path)
 {
+    if (_renderer == NULL)
+    {
+        std::cerr << "[ERROR] Image::setTexture(): Renderer has not been set."\
+            " Call setRenderer() first." << std::endl;
+        return false;
+    }
+
     SDL_Surface *surface = NULL;
     SDL_Texture *texture = NULL;
 
@@ -115,7 +143,7 @@ bool Image::setTexture(std::string path, SDL_Renderer *renderer)
     //
     // Creates texture from surface
     //
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    texture = SDL_CreateTextureFromSurface(_renderer, surface);
     if (texture == NULL)
     {
         std::cerr << "[ERROR] Image::setTexture(): Unable to create texture "\
@@ -125,60 +153,7 @@ bool Image::setTexture(std::string path, SDL_Renderer *renderer)
     }
     SDL_FreeSurface(surface);
 
-    return setTexture(texture);
-}
-
-//*****************************************************************************
-//
-//! Sets the texture that the class will manage.
-//!
-//! \param texture to set.
-//!
-//! \return Returns \b true if the texture was loaded and set successfully and
-//! \b false otherwise.
-//
-//*****************************************************************************
-bool Image::setTexture(SDL_Texture *texture)
-{
-    if (texture == NULL)
-    {
-        return false;
-    }
-
-    //
-    // Destroys old texture and reset variables
-    //
-    if (_texture != NULL)
-    {
-        SDL_DestroyTexture(_texture);
-        _texture = NULL;
-        _width = 0;
-        _height = 0;
-        _angle = 0;
-        _alpha = SDL_ALPHA_OPAQUE;
-        _alphaEnabled = false;
-    }
-
-    //
-    // Sets new texture as texture
-    //
-    _texture = texture;
-
-    //
-    // Sets the width and height to the width and height of the new texture and
-    // and sets the width and height of the rendering rectangle to the width
-    // and height of the new texture.
-    //
-    int width, height;
-    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
-    _width = width;
-    _height = height;
-    _renderRect.x = 0;
-    _renderRect.y = 0;
-    _renderRect.w = width;
-    _renderRect.h = height;
-
-    return true;
+    return _setTexture(texture);
 }
 
 //*****************************************************************************
@@ -373,3 +348,88 @@ unsigned char Image::getAlphaBlend()
 
     return _alpha;
 }
+
+//*****************************************************************************
+//
+//! Renders image on screen.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Image::onRender()
+{
+    if (_renderer == NULL)
+    {
+        std::cerr << "[WARNING] Image::onRender(): Image not rendered because"\
+            " renderer was not set." << std::endl;
+        return;
+    }
+
+    if (_texture == NULL)
+    {
+        std::cerr << "[WARNING] Image::onRender(): Image not rendered because"\
+            " texture was not set." << std::endl;
+        return;
+    }
+
+    //
+    // Renders image to buffered screen
+    //
+    SDL_RenderCopy(_renderer, _texture, NULL, &_renderRect);
+}
+
+//*****************************************************************************
+//
+//! Sets the texture that the class will manage.
+//!
+//! \param texture to set.
+//!
+//! \return Returns \b true if the texture was loaded and set successfully and
+//! \b false otherwise.
+//
+//*****************************************************************************
+bool Image::_setTexture(SDL_Texture *texture)
+{
+    if (texture == NULL)
+    {
+        return false;
+    }
+
+    //
+    // Destroys old texture and reset variables
+    //
+    if (_texture != NULL)
+    {
+        SDL_DestroyTexture(_texture);
+        _texture = NULL;
+        _width = 0;
+        _height = 0;
+        _angle = 0;
+        _alpha = SDL_ALPHA_OPAQUE;
+        _alphaEnabled = false;
+    }
+
+    //
+    // Sets new texture as texture
+    //
+    _texture = texture;
+
+    //
+    // Sets the width and height to the width and height of the new texture and
+    // and sets the width and height of the rendering rectangle to the width
+    // and height of the new texture.
+    //
+    int width, height;
+    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+    _width = width;
+    _height = height;
+    _renderRect.x = 0;
+    _renderRect.y = 0;
+    _renderRect.w = width;
+    _renderRect.h = height;
+
+    return true;
+}
+

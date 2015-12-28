@@ -220,9 +220,9 @@ void Window::_render()
     SDL_RenderClear(_renderer);
 
     //
-    // Renders all textures to screen
+    // TODO (Brandon): Renders all textures to screen
     //
-    // TODO (Brandon): Implement
+
 
     //
     // Updates screen (swaps screen buffers)

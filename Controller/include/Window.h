@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "Image.h"
-#include "IObserver.h"
+#include "IObservable.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;

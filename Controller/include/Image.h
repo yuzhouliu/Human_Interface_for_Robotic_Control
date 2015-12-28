@@ -18,13 +18,15 @@
 #define _IMAGE_H_
 
 #include <string>
-
 #include <SDL.h>
 
-class Image
+#include "IRenderable.h"
+
+class Image : public IRenderable
 {
 private:
     /* Fields */
+    SDL_Renderer *_renderer;
     SDL_Texture *_texture;
     SDL_Rect _renderRect;
     unsigned short _width;
@@ -33,18 +35,21 @@ private:
     unsigned char _alpha;
     bool _alphaEnabled;
 
+    /* Methods */
+    bool _setTexture(SDL_Texture *texture);
+
 public:
     /* Constructors */
     Image();
-    Image(std::string path, SDL_Renderer *renderer);
-    Image(SDL_Texture *texture);
+    Image(SDL_Renderer *renderer);
+    Image(SDL_Renderer *renderer, std::string path);
 
     /* Destructor */
     ~Image();
 
     /* Methods */
-    bool setTexture(std::string path, SDL_Renderer *renderer);
-    bool setTexture(SDL_Texture *texture);
+    void setRenderer(SDL_Renderer *renderer);
+    bool setTexture(std::string path);
     SDL_Texture *getTexture();
     unsigned short getWidth();
     unsigned short getHeight();
@@ -56,6 +61,9 @@ public:
     void disableAlphaBlend();
     void setAlphaBlend(unsigned char alpha);
     unsigned char getAlphaBlend();
+
+    /* IRenderable virtual methods */
+    void onRender();
 };
 
 #endif /* _IMAGE_H_ */
