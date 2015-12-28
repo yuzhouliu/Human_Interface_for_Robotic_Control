@@ -4,11 +4,14 @@
 //
 // Abstract base class for internet addresses.
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // Created:
 // December 27, 2015
 //
 // Modified:
-// December 27, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 #ifndef _ADDRESSBASE_H_

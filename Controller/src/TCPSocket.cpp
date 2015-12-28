@@ -4,11 +4,14 @@
 //
 // Class representing a TCP socket data type.
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // Created:
 // December 27, 2015
 //
 // Modified:
-// December 27, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 #include "TCPSocket.h"
@@ -44,6 +47,16 @@ TCPSocket::~TCPSocket()
     close();
 }
 
+//*****************************************************************************
+//
+//! Creates and opens a TCP streaming socket.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if the socket was opened successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
 bool TCPSocket::open()
 {
     //
@@ -67,6 +80,15 @@ bool TCPSocket::open()
     }
 }
 
+//*****************************************************************************
+//
+//! Closes the TCP streaming socket. Automatically called by destructor.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 void TCPSocket::close()
 {
 #ifdef _WIN32
@@ -82,6 +104,16 @@ void TCPSocket::close()
 #endif
 }
 
+//*****************************************************************************
+//
+//! Establishes a TCP connection to remote host.
+//!
+//! \param address in which to attempt TCP connection.
+//!
+//! \return Returns \b true if the connection was established and \b
+//! false otherwise.
+//
+//*****************************************************************************
 bool TCPSocket::connect(AddressBase<unsigned int> *address)
 {
     //
@@ -106,12 +138,34 @@ bool TCPSocket::connect(AddressBase<unsigned int> *address)
     }
 }
 
+//*****************************************************************************
+//
+//! Sends the entire message to remote host.
+//!
+//! \param message buffer containing message to send.
+//!
+//! \return Returns \b true if the message was sent successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
 bool TCPSocket::send(char *message)
 {
+    // TODO (Brandon): Implement
     return false;
 }
 
+//*****************************************************************************
+//
+//! Receives the entire message from remote host.
+//!
+//! \param message buffer to store message to be received.
+//!
+//! \return Returns \b true if the message was received successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
 bool TCPSocket::recv(char *message)
 {
+    // TODO (Brandon): Implement
     return false;
 }

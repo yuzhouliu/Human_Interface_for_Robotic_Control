@@ -16,7 +16,7 @@
 //
 //*****************************************************************************
 
-#include "pin_mux_config.h" 
+#include "pin_mux_config.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 #include "hw_gpio.h"
