@@ -5,6 +5,9 @@
 //
 // Low-level Servo driver for CC3200-LAUNCHXL
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // This source file uses code snippets from Texas Instruments Incorporated's
 // CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
 // this file.
@@ -15,7 +18,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 
