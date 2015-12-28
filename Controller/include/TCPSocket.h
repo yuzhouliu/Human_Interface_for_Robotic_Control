@@ -8,16 +8,14 @@
 // December 27, 2015
 //
 // Modified:
-// December 27, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 #ifndef _TCPSOCKET_H_
 #define _TCPSOCKET_H_
 
+#include "Network.h"
 #include "SocketBase.h"
-
-typedef int socklen_t;
-typedef int ssize_t;
 
 class TCPSocket : public SocketBase
 {
