@@ -34,12 +34,12 @@ Window::Window()
       _height(_DEFAULT_HEIGHT)
 {
     //
-    // Initialize application
+    // Initialize window
     //
     if (!_initialize())
     {
-        std::cerr << "[ERROR] Application::Application(): Failed to "\
-            "initialize." << std::endl;
+        std::cerr << "[ERROR] Window::Window(): Failed to initialize." <<
+            std::endl;
         return;
     }
 }
