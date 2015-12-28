@@ -37,6 +37,9 @@ private:
     /* Methods */
     bool _initialize();
     void _terminate();
+    void _processInput();
+    void _update();
+    void _render();
 
 public:
     /* Constructor */

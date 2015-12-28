@@ -66,15 +66,9 @@ Window::~Window()
 //*****************************************************************************
 void Window::update()
 {
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT)
-        {
-            notify(SDL_QUIT);
-        }
-    }
+    _processInput();
+    _update();
+    _render();
 }
 
 //*****************************************************************************
@@ -162,4 +156,73 @@ void Window::_terminate()
     {
         SDL_DestroyWindow(_window);
     }
+}
+
+//*****************************************************************************
+//
+//! Processes user input. Called once per frame by update().
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::_processInput()
+{
+    SDL_Event event;
+
+    //
+    // Polls the event queue for pending events
+    //
+    while (SDL_PollEvent(&event))
+    {
+        //
+        // Lets the Application class know when the user wants to quit
+        //
+        if (event.type == SDL_QUIT)
+        {
+            notify(SDL_QUIT);
+        }
+    }
+}
+
+//*****************************************************************************
+//
+//! Updates program logic. Called once per frame by update().
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::_update()
+{
+    // TODO (Brandon): Implement
+}
+
+//*****************************************************************************
+//
+//! Renders frame. Called once per frame by update().
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::_render()
+{
+    //
+    // Clears screen
+    //
+    SDL_RenderClear(_renderer);
+
+    //
+    // Renders all textures to screen
+    //
+    // TODO (Brandon): Implement
+
+    //
+    // Updates screen (swaps screen buffers)
+    //
+    SDL_RenderPresent(_renderer);
 }
