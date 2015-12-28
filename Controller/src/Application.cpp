@@ -19,6 +19,7 @@
 #include <SDL_image.h>
 
 #include "FrameRateManager.h"
+#include "Network.h"
 
 //*****************************************************************************
 //
@@ -95,7 +96,7 @@ int Application::run()
 
 //*****************************************************************************
 //
-//! Sets the exit flag is SDL_QUIT event is raised.
+//! Sets the exit flag if SDL_QUIT event is raised.
 //!
 //! \param event that was raised.
 //!
@@ -133,7 +134,7 @@ bool Application::_initialize()
     }
 
     //
-    // Initialize SDL_image
+    // Initializes SDL_image
     //
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
@@ -153,6 +154,16 @@ bool Application::_initialize()
     //
     _window->addObserver(this);
 
+    //
+    // Initializes socket API
+    //
+    if (!network::initialize())
+    {
+        std::cerr << "[ERROR] Application::_initialize(): "\
+            "network::initialize() failed." << std::endl;
+        return false;
+    }
+
     return true;
 }
 
@@ -167,6 +178,8 @@ bool Application::_initialize()
 //*****************************************************************************
 void Application::_terminate()
 {
+    network::terminate();
+
     if (_window != NULL)
     {
         delete _window;

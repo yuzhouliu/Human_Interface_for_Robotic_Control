@@ -9,9 +9,11 @@ microcontroller.
 
 Dependencies
 ============
-SDL2: https://www.libsdl.org/download-2.0.php
+SDL2 (SDL2.lib & SDL2main.lib): https://www.libsdl.org/download-2.0.php
 
-SDL2_image: https://www.libsdl.org/projects/SDL_image/
+SDL2_image (SDL2_image.lib): https://www.libsdl.org/projects/SDL_image/
 
-Leap Motion SDK: https://developer.leapmotion.com/downloads
+Leap Motion SDK (Leap.lib): https://developer.leapmotion.com/downloads
+
+WSock32 (wsock32.lib): Should be installed on Windows.
 
