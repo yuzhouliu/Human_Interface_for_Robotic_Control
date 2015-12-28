@@ -48,11 +48,8 @@
 #include "adc_driver_if.h"
 #include "uart_if.h"
 
-#define UART_PRINT Report
 #define FOREVER 1
-#define NO_OF_SAMPLES 1
-
-unsigned long pulAdcSamples[4096];
+#define NO_OF_SAMPLES 4
 
 //****************************************************************************
 // Initializes the Sensor ADCs for operation
@@ -67,7 +64,7 @@ void InitSensorADC(void)
     MAP_ADCEnable(ADC_BASE);
 
     // Enable ADC channel
-    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);			// NOTE: Cannot enabled concurrently with UART0 RX
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);    // NOTE: Cannot enabled concurrently with UART0 RX
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_1);
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_2);
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_3);
@@ -98,12 +95,9 @@ void DisableSensorADC(void)
 //*****************************************************************************
 float GetSensorReading(enum Finger_Type eFinger)
 {
-    unsigned int  uiChannel;
-    unsigned int  uiIndex=0;
-    unsigned long ulSample;
-
-    // Initialize Array index for multiple execution
-    uiIndex=0;
+    unsigned int uiChannel;
+    unsigned char ucCount;
+    unsigned long ulSampleTotal;
 
 #ifdef CC3200_ES_1_2_1
     // Enable ADC clocks.###IMPORTANT###Need to be removed for PG 1.32
@@ -117,34 +111,35 @@ float GetSensorReading(enum Finger_Type eFinger)
     switch(eFinger)
     {
         case FINGER_THUMB:
-            uiChannel = ADC_CH_0;
+            uiChannel = ADC_CH_0;    // Pin_57
             break;
         case FINGER_INDEX:
-            uiChannel = ADC_CH_1;
+            uiChannel = ADC_CH_1;    // Pin_58
             break;
         case FINGER_MIDDLE:
-            uiChannel = ADC_CH_2;
+            uiChannel = ADC_CH_2;    // Pin_59
             break;
         case FINGER_RING:
-            uiChannel = ADC_CH_3;
+            uiChannel = ADC_CH_3;    // Pin_60
             break;
         default:
             break;
     }
 
-    while(uiIndex < NO_OF_SAMPLES + 4)
+    // Initialize Counter and Sum of Samples to 0
+    ucCount = 0;
+    ulSampleTotal = 0;
+
+    while(ucCount < NO_OF_SAMPLES)
     {
         if(MAP_ADCFIFOLvlGet(ADC_BASE, uiChannel))
         {
-            ulSample = MAP_ADCFIFORead(ADC_BASE, uiChannel);
-            pulAdcSamples[uiIndex++] = ulSample;
+            ulSampleTotal += (MAP_ADCFIFORead(ADC_BASE, uiChannel) >> 2) & 0x0FFF;
+            ucCount++;
         }
     }
 
-    uiIndex = 0;
-
-    return (((float)((pulAdcSamples[4+uiIndex] >> 2 ) & 0x0FFF))*1.4)/4096;
-
+    return (float) ((ulSampleTotal/NO_OF_SAMPLES)*1.4)/4096;
 }
 
 //*****************************************************************************

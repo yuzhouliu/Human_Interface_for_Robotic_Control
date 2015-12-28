@@ -107,16 +107,12 @@ void main()
     while(FOREVER)
     {
         //PIN_57 is muxed between UART0 RX and ADC0, cannot do both at same time
-        //UART_PRINT("PIN_57:\n\r");
         //UART_PRINT("FINGER_THUMB: %f (V)\n\r", GetSensorReading(FINGER_THUMB));
 
-        //UART_PRINT("PIN_58:\n\r");
         UART_PRINT("FINGER_INDEX: %f (V)\n\r", GetSensorReading(FINGER_INDEX));
 
-        //UART_PRINT("PIN_59:\n\r");
         UART_PRINT("FINGER_MIDDLE: %f (V)\n\r", GetSensorReading(FINGER_MIDDLE));
 
-        //UART_PRINT("PIN_60:\n\r");
         UART_PRINT("FINGER_RING: %f (V)\n\r", GetSensorReading(FINGER_RING));
 
         MAP_UtilsDelay(30000000);
