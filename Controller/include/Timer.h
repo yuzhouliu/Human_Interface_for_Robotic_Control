@@ -18,11 +18,11 @@ class Timer
 {
 private:
     /* Fields */
-    unsigned int startTime;
-    unsigned int tempTime;
-    unsigned int pausedTime;
-    bool started;
-    bool paused;
+    unsigned int _startTime;
+    unsigned int _tempTime;
+    unsigned int _pausedTime;
+    bool _started;
+    bool _paused;
 
 public:
     /* Constructor */

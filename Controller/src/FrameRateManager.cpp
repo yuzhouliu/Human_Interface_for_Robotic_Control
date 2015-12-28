@@ -15,12 +15,30 @@
 
 #include <SDL.h>
 
+//*****************************************************************************
+//
+//! Empty constructor for FrameRateManager.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 FrameRateManager::FrameRateManager()
-    : fps(DEFAULT_FRAMES_PER_SECOND)
+    : _fps(_DEFAULT_FRAMES_PER_SECOND)
 {
 
 }
 
+//*****************************************************************************
+//
+//! Empty destructor for FrameRateManager.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 FrameRateManager::~FrameRateManager()
 {
 
@@ -37,7 +55,7 @@ FrameRateManager::~FrameRateManager()
 //*****************************************************************************
 void FrameRateManager::beginFrame()
 {
-    fpsTimer.start();
+    _fpsTimer.start();
 }
 
 //*****************************************************************************
@@ -51,12 +69,12 @@ void FrameRateManager::beginFrame()
 //*****************************************************************************
 void FrameRateManager::endFrame()
 {
-    int time = fpsTimer.getTimeOnTimer();
-    if (time < 1000/fps)
+    int time = _fpsTimer.getTimeOnTimer();
+    if (time < 1000/_fps)
     {
-        SDL_Delay(1000/fps - time);
+        SDL_Delay(1000/_fps - time);
     }
-    fpsTimer.stop();
+    _fpsTimer.stop();
 }
 
 //*****************************************************************************
@@ -70,5 +88,5 @@ void FrameRateManager::endFrame()
 //*****************************************************************************
 void FrameRateManager::setFPS(int fps)
 {
-    this->fps = fps;
+    _fps = fps;
 }

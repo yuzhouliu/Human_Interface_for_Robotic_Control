@@ -8,7 +8,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 21, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #include "Application.h"
@@ -19,15 +19,43 @@
 #include <SDL_image.h>
 
 #include "FrameRateManager.h"
+#include "Network.h"
 
+//*****************************************************************************
+//
+//! Constructor for Image. Acquires resources for SDL and window.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Application::Application()
+    : _exit(false)
 {
-
+    //
+    // Initialize application
+    //
+    if (!_initialize())
+    {
+        std::cerr << "[ERROR] Application::Application(): Failed to "\
+            "initialize." << std::endl;
+        return;
+    }
 }
 
+//*****************************************************************************
+//
+//! Destructor for Application. Releases resources used by SDL and window.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Application::~Application()
 {
-
+    _terminate();
 }
 
 //*****************************************************************************
@@ -42,19 +70,12 @@ Application::~Application()
 //*****************************************************************************
 int Application::run()
 {
-    //
-    // Initialize application
-    //
-    if (!initialize())
-    {
-        return EXIT_FAILURE;
-    }
+    FrameRateManager fpsManager;
 
     //
     // Main program logic
     //
-    FrameRateManager fpsManager;
-    while (true)
+    while (!_exit)
     {
         //
         // Begins tracking fps
@@ -62,7 +83,7 @@ int Application::run()
         fpsManager.beginFrame();
 
         // TODO (Brandon): Main program logic
-        std::cout << "Hello world!" << std::endl;
+        _window->update();
 
         //
         // Ends frame and blocks until FPS elapses
@@ -70,12 +91,24 @@ int Application::run()
         fpsManager.endFrame();
     }
 
-    //
-    // Terminates application
-    //
-    terminate();
-
     return EXIT_SUCCESS;
+}
+
+//*****************************************************************************
+//
+//! Sets the exit flag if SDL_QUIT event is raised.
+//!
+//! \param event that was raised.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Application::onNotify(int event)
+{
+    if (event == SDL_QUIT)
+    {
+        _exit = true;
+    }
 }
 
 //*****************************************************************************
@@ -88,26 +121,46 @@ int Application::run()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool Application::initialize()
+bool Application::_initialize()
 {
     //
     // Initializes SDL
     //
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
-        std::cerr << "SDL_Init() failed. SDL Error: " << SDL_GetError()
-            << std::endl;
+        std::cerr << "[ERROR] Application::_initialize(): SDL_Init() failed. "\
+            "SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
 
     //
-    // Initialize SDL_image
+    // Initializes SDL_image
     //
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
     {
-        std::cerr << "IMG_Init() failed. SDL_image Error: " << IMG_GetError()
-            << std::endl;
+        std::cerr << "[ERROR] Application::_initialize(): IMG_Init() failed. "\
+            "SDL_image Error: " << IMG_GetError() << std::endl;
+        return false;
+    }
+
+    //
+    // Consructs a window to render images on
+    //
+    _window = new Window();
+
+    //
+    // Register this object to be notified by window
+    //
+    _window->addObserver(this);
+
+    //
+    // Initializes socket API
+    //
+    if (!network::initialize())
+    {
+        std::cerr << "[ERROR] Application::_initialize(): "\
+            "network::initialize() failed." << std::endl;
         return false;
     }
 
@@ -123,8 +176,15 @@ bool Application::initialize()
 //! \return None.
 //
 //*****************************************************************************
-void Application::terminate()
+void Application::_terminate()
 {
+    network::terminate();
+
+    if (_window != NULL)
+    {
+        delete _window;
+    }
+
     IMG_Quit();
     SDL_Quit();
 }
@@ -135,7 +195,7 @@ void Application::terminate()
 //!
 //! \param None.
 //!
-//! \return None.
+//! \return Returns 0 on success, and a non-zero value otherwise.
 //
 //*****************************************************************************
 int main(int argc, char *argv[])

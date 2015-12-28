@@ -22,17 +22,19 @@ class Image
 {
 private:
     /* Fields */
-    SDL_Texture *texture;
-    SDL_Rect renderRect;
-    unsigned short width;
-    unsigned short height;
-    unsigned short angle;
-    unsigned char alpha;
-    bool alphaEnabled;
+    SDL_Texture *_texture;
+    SDL_Rect _renderRect;
+    unsigned short _width;
+    unsigned short _height;
+    unsigned short _angle;
+    unsigned char _alpha;
+    bool _alphaEnabled;
 
 public:
-    /* Constructor */
+    /* Constructors */
     Image();
+    Image(std::string path, SDL_Renderer *renderer);
+    Image(SDL_Texture *texture);
 
     /* Destructor */
     ~Image();

@@ -17,19 +17,29 @@
 #include <vector>
 
 #include "Image.h"
+#include "IObserver.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;
 
-class Window
+class Window : public IObservable
 {
 private:
     /* Fields */
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    unsigned short width;
-    unsigned short height;
-    std::vector<Image> renderList;
+    const int _DEFAULT_WIDTH = 640;
+    const int _DEFAULT_HEIGHT = 480;
+    SDL_Window *_window;
+    SDL_Renderer *_renderer;
+    unsigned short _width;
+    unsigned short _height;
+    std::vector<Image> _renderList;
+
+    /* Methods */
+    bool _initialize();
+    void _terminate();
+    void _processInput();
+    void _update();
+    void _render();
 
 public:
     /* Constructor */
@@ -39,8 +49,6 @@ public:
     ~Window();
 
     /* Methods */
-    bool initialize();
-    void terminate();
     void update();
 };
 

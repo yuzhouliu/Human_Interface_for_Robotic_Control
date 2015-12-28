@@ -8,16 +8,27 @@
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 27, 2015
 //
 //*****************************************************************************
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
-class Application
+#include <memory>
+
+#include "IObserver.h"
+#include "Window.h"
+
+class Application : public IObserver
 {
 private:
     /* Fields */
+    Window *_window;
+    bool _exit;
+
+    /* Methods */
+    bool _initialize();
+    void _terminate();
 
 public:
     /* Constructor */
@@ -28,8 +39,9 @@ public:
 
     /* Methods */
     int run();
-    bool initialize();
-    void terminate();
+
+    /* IObserver virtual methods */
+    void onNotify(int event);
 };
 
 #endif /* _APPLICATION_H_ */

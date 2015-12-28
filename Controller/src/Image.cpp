@@ -18,18 +18,66 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+//*****************************************************************************
+//
+//! Empty constructor for Image.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Image::Image()
-    : texture(NULL), width(0), height(0), angle(0), alpha(SDL_ALPHA_OPAQUE),
-      alphaEnabled(false)
+    : _texture(NULL), _width(0), _height(0), _angle(0),
+      _alpha(SDL_ALPHA_OPAQUE), _alphaEnabled(false)
 {
 
 }
 
+//*****************************************************************************
+//
+//! Constructor for Image. Loads a texture for renderer from path.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+Image::Image(std::string path, SDL_Renderer *renderer)
+{
+    Image();
+    setTexture(path, renderer);
+}
+
+//*****************************************************************************
+//
+//! Constructor for Image. Sets pre-loaded texture.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+Image::Image(SDL_Texture *texture)
+{
+    Image();
+    setTexture(texture);
+}
+
+//*****************************************************************************
+//
+//! Destructor for Image. Releases resources used by texture.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
 Image::~Image()
 {
-    if (texture != NULL)
+    if (_texture != NULL)
     {
-        SDL_DestroyTexture(texture);
+        SDL_DestroyTexture(_texture);
     }
 }
 
@@ -97,21 +145,21 @@ bool Image::setTexture(SDL_Texture *texture)
     //
     // Destroys old texture and reset variables
     //
-    if (this->texture != NULL)
+    if (_texture != NULL)
     {
-        SDL_DestroyTexture(this->texture);
-        this->texture = NULL;
-        width = 0;
-        height = 0;
-        angle = 0;
-        alpha = SDL_ALPHA_OPAQUE;
-        alphaEnabled = false;
+        SDL_DestroyTexture(_texture);
+        _texture = NULL;
+        _width = 0;
+        _height = 0;
+        _angle = 0;
+        _alpha = SDL_ALPHA_OPAQUE;
+        _alphaEnabled = false;
     }
 
     //
     // Sets new texture as texture
     //
-    this->texture = texture;
+    _texture = texture;
 
     //
     // Sets the width and height to the width and height of the new texture and
@@ -119,13 +167,13 @@ bool Image::setTexture(SDL_Texture *texture)
     // and height of the new texture.
     //
     int width, height;
-    SDL_QueryTexture(this->texture, NULL, NULL, &width, &height);
-    this->width = width;
-    this->height = height;
-    renderRect.x = 0;
-    renderRect.y = 0;
-    renderRect.w = width;
-    renderRect.h = height;
+    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+    _width = width;
+    _height = height;
+    _renderRect.x = 0;
+    _renderRect.y = 0;
+    _renderRect.w = width;
+    _renderRect.h = height;
 
     return true;
 }
@@ -141,7 +189,7 @@ bool Image::setTexture(SDL_Texture *texture)
 //*****************************************************************************
 SDL_Texture *Image::getTexture()
 {
-    return texture;
+    return _texture;
 }
 
 //*****************************************************************************
@@ -155,7 +203,7 @@ SDL_Texture *Image::getTexture()
 //*****************************************************************************
 unsigned short Image::getWidth()
 {
-    return width;
+    return _width;
 }
 
 //*****************************************************************************
@@ -169,7 +217,7 @@ unsigned short Image::getWidth()
 //*****************************************************************************
 unsigned short Image::getHeight()
 {
-    return height;
+    return _height;
 }
 
 //*****************************************************************************
@@ -183,7 +231,7 @@ unsigned short Image::getHeight()
 //*****************************************************************************
 void Image::setRenderRect(SDL_Rect *renderRect)
 {
-    this->renderRect = *renderRect;
+    _renderRect = *renderRect;
 }
 
 //*****************************************************************************
@@ -198,7 +246,7 @@ void Image::setRenderRect(SDL_Rect *renderRect)
 //*****************************************************************************
 SDL_Rect Image::getRenderRect()
 {
-    return renderRect;
+    return _renderRect;
 }
 
 //*****************************************************************************
@@ -217,7 +265,7 @@ void Image::setAngle(unsigned short angle)
         angle %= 360;
     }
 
-    this->angle = angle;
+    _angle = angle;
 }
 
 //*****************************************************************************
@@ -231,7 +279,7 @@ void Image::setAngle(unsigned short angle)
 //*****************************************************************************
 unsigned short Image::getAngle()
 {
-    return angle;
+    return _angle;
 }
 
 //*****************************************************************************
@@ -245,10 +293,10 @@ unsigned short Image::getAngle()
 //*****************************************************************************
 void Image::enableAlphaBlend()
 {
-    if (!alphaEnabled)
+    if (!_alphaEnabled)
     {
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-        alphaEnabled = true;
+        SDL_SetTextureBlendMode(_texture, SDL_BLENDMODE_BLEND);
+        _alphaEnabled = true;
     }
     else
     {
@@ -268,10 +316,10 @@ void Image::enableAlphaBlend()
 //*****************************************************************************
 void Image::disableAlphaBlend()
 {
-    if (alphaEnabled)
+    if (_alphaEnabled)
     {
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-        alphaEnabled = false;
+        SDL_SetTextureBlendMode(_texture, SDL_BLENDMODE_NONE);
+        _alphaEnabled = false;
     }
     else
     {
@@ -291,10 +339,10 @@ void Image::disableAlphaBlend()
 //*****************************************************************************
 void Image::setAlphaBlend(unsigned char alpha)
 {
-    if (alphaEnabled)
+    if (_alphaEnabled)
     {
-        this->alpha = alpha;
-        SDL_SetTextureAlphaMod(texture, alpha);
+        _alpha = alpha;
+        SDL_SetTextureAlphaMod(_texture, alpha);
     }
     else
     {
@@ -314,11 +362,11 @@ void Image::setAlphaBlend(unsigned char alpha)
 //*****************************************************************************
 unsigned char Image::getAlphaBlend()
 {
-    if (!alphaEnabled)
+    if (!_alphaEnabled)
     {
         std::cerr << "[WARNING] Image::getAlphaBlend(): Called before alpha "\
             "blending has been enabled." << std::endl;
     }
 
-    return alpha;
+    return _alpha;
 }
