@@ -36,6 +36,12 @@
     <ClInclude Include="include\Network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AddressBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SocketBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
