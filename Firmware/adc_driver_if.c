@@ -80,10 +80,10 @@ void InitSensorADC(void)
 //****************************************************************************
 void DisableSensorADC(void)
 {
-	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_0);
-	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_1);
-	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_2);
-	MAP_ADCChannelDisable(ADC_BASE, ADC_CH_3);
+    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_0);
+    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_1);
+    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_2);
+    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_3);
 }
 
 //*****************************************************************************

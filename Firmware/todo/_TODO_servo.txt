@@ -1,1 +1,2 @@
-Setup the rest of the pins for PWM output
+PIN_17/19 are muxed with JTAG so cannot use CCS debugger
+to run program. Must load program using Uniflash instead.

@@ -1,1 +1,2 @@
-Refactor and upload code
+Cannot use ADC_CH0 (PIN_57) and UART0 RX concurrently.
+Currently ADC_CH0 disabled. Once UART not needed, enable.
