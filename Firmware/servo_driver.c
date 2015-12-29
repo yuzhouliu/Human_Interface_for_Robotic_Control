@@ -41,10 +41,9 @@
 #include "utils.h"
 #include "prcm.h"
 
+#include "pin_mux_config.h"
 #include "servo_driver.h"
 
-// Pinmux configuration include
-#include "pin_mux_config.h"
 
 //*****************************************************************************
 // Sets up the Timer for PWM mode
