@@ -41,7 +41,6 @@ private:
 public:
     /* Constructors */
     Image();
-    Image(SDL_Renderer *renderer);
     Image(SDL_Renderer *renderer, std::string path);
 
     /* Destructor */

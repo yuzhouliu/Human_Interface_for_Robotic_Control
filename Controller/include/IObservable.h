@@ -47,10 +47,9 @@ protected:
     /* Methods */
     virtual void notify(int event)
     {
-        for (auto iterator = _observers.begin(); iterator != _observers.end();
-            iterator++)
+        for (auto it = _observers.begin(); it != _observers.end(); it++)
         {
-            (*iterator)->onNotify(event);
+            (*it)->onNotify(event);
         }
             
     };

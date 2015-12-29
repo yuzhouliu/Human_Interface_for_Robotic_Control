@@ -42,6 +42,19 @@ Window::Window()
             std::endl;
         return;
     }
+
+    //
+    // Add images to render list
+    //
+    _renderList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_base.png")));
+
+    //
+    // Centre all images for aesthetic purposes
+    //
+    for (auto it = _renderList.begin(); it != _renderList.end(); it++)
+    {
+        _centreImage(*it);
+    }
 }
 
 //*****************************************************************************
@@ -91,8 +104,9 @@ bool Window::_initialize()
     //
     // Creates OpenGL context
     //
-    _window = SDL_CreateWindow("HIRC Application", SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_SHOWN);
+    _window = SDL_CreateWindow("Human Interface for Robotic Control",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height,
+        SDL_WINDOW_SHOWN);
     if (_window == NULL)
     {
         std::cerr << "[ERROR] Window::_initialize(): SDL_CreateWindow() "\
@@ -180,7 +194,7 @@ void Window::_processInput()
     while (SDL_PollEvent(&event))
     {
         //
-        // Lets the Application class know when the user wants to quit
+        // Notifies the Application class that the user wants to quit
         //
         if (event.type == SDL_QUIT)
         {
@@ -220,12 +234,34 @@ void Window::_render()
     SDL_RenderClear(_renderer);
 
     //
-    // TODO (Brandon): Renders all textures to screen
+    // Renders all images to screen
     //
-
+    for (auto it = _renderList.begin(); it != _renderList.end(); it++)
+    {
+        (*it)->onRender();
+    }
 
     //
     // Updates screen (swaps screen buffers)
     //
     SDL_RenderPresent(_renderer);
+}
+
+//*****************************************************************************
+//
+//! Centre the image on the screen.
+//!
+//! \param image the image to be centred.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::_centreImage(const std::unique_ptr<Image> &image)
+{
+    SDL_Rect centredRect;
+    centredRect.w = image->getWidth();
+    centredRect.h = image->getHeight();
+    centredRect.x = (_width - centredRect.w) / 2;
+    centredRect.y = (_height - centredRect.h) / 2;
+    image->setRenderRect(&centredRect);
 }

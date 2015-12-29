@@ -17,8 +17,6 @@
 #include "Image.h"
 
 #include <iostream>
-
-#include <SDL.h>
 #include <SDL_image.h>
 
 //*****************************************************************************
@@ -31,25 +29,9 @@
 //
 //*****************************************************************************
 Image::Image()
-    : _texture(NULL), _width(0), _height(0), _angle(0),
-      _alpha(SDL_ALPHA_OPAQUE), _alphaEnabled(false)
+    : Image(nullptr, nullptr)
 {
 
-}
-
-//*****************************************************************************
-//
-//! Constructor for Image. Sets default renderer.
-//!
-//! \param renderer that textures will be rendered on.
-//!
-//! \return None.
-//
-//*****************************************************************************
-Image::Image(SDL_Renderer *renderer)
-{
-    Image();
-    setRenderer(renderer);
 }
 
 //*****************************************************************************
@@ -63,10 +45,10 @@ Image::Image(SDL_Renderer *renderer)
 //
 //*****************************************************************************
 Image::Image(SDL_Renderer *renderer, std::string path)
+    : _renderer(renderer), _texture(nullptr), _width(0), _height(0), _angle(0),
+      _alpha(SDL_ALPHA_OPAQUE), _alphaEnabled(false)
 {
-    Image();
-    setRenderer(renderer);
-    if (!setTexture(path))
+    if ((renderer != nullptr) && !setTexture(path))
     {
         std::cerr << "[ERROR] Image::Image(): Texture was not set." <<
             std::endl;
@@ -85,7 +67,7 @@ Image::Image(SDL_Renderer *renderer, std::string path)
 //*****************************************************************************
 Image::~Image()
 {
-    if (_texture != NULL)
+    if (_texture != nullptr)
     {
         SDL_DestroyTexture(_texture);
     }
@@ -118,21 +100,21 @@ void Image::setRenderer(SDL_Renderer *renderer)
 //*****************************************************************************
 bool Image::setTexture(std::string path)
 {
-    if (_renderer == NULL)
+    if (_renderer == nullptr)
     {
         std::cerr << "[ERROR] Image::setTexture(): Renderer has not been set."\
             " Call setRenderer() first." << std::endl;
         return false;
     }
 
-    SDL_Surface *surface = NULL;
-    SDL_Texture *texture = NULL;
+    SDL_Surface *surface = nullptr;
+    SDL_Texture *texture = nullptr;
 
     //
     // Loads surface from path
     //
     surface = IMG_Load(path.c_str());
-    if (surface == NULL)
+    if (surface == nullptr)
     {
         std::cerr << "[ERROR] Image::setTexture(): Unable to load image from "
             << path.c_str() << "! SDL_image Error: " << IMG_GetError() <<
@@ -144,7 +126,7 @@ bool Image::setTexture(std::string path)
     // Creates texture from surface
     //
     texture = SDL_CreateTextureFromSurface(_renderer, surface);
-    if (texture == NULL)
+    if (texture == nullptr)
     {
         std::cerr << "[ERROR] Image::setTexture(): Unable to create texture "\
             "from " << path.c_str() << "SDL Error: " << SDL_GetError() <<
@@ -360,14 +342,14 @@ unsigned char Image::getAlphaBlend()
 //*****************************************************************************
 void Image::onRender()
 {
-    if (_renderer == NULL)
+    if (_renderer == nullptr)
     {
         std::cerr << "[WARNING] Image::onRender(): Image not rendered because"\
             " renderer was not set." << std::endl;
         return;
     }
 
-    if (_texture == NULL)
+    if (_texture == nullptr)
     {
         std::cerr << "[WARNING] Image::onRender(): Image not rendered because"\
             " texture was not set." << std::endl;
@@ -377,7 +359,7 @@ void Image::onRender()
     //
     // Renders image to buffered screen
     //
-    SDL_RenderCopy(_renderer, _texture, NULL, &_renderRect);
+    SDL_RenderCopy(_renderer, _texture, nullptr, &_renderRect);
 }
 
 //*****************************************************************************
@@ -392,7 +374,7 @@ void Image::onRender()
 //*****************************************************************************
 bool Image::_setTexture(SDL_Texture *texture)
 {
-    if (texture == NULL)
+    if (texture == nullptr)
     {
         return false;
     }
@@ -400,10 +382,10 @@ bool Image::_setTexture(SDL_Texture *texture)
     //
     // Destroys old texture and reset variables
     //
-    if (_texture != NULL)
+    if (_texture != nullptr)
     {
         SDL_DestroyTexture(_texture);
-        _texture = NULL;
+        _texture = nullptr;
         _width = 0;
         _height = 0;
         _angle = 0;
@@ -422,7 +404,7 @@ bool Image::_setTexture(SDL_Texture *texture)
     // and height of the new texture.
     //
     int width, height;
-    SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+    SDL_QueryTexture(_texture, nullptr, nullptr, &width, &height);
     _width = width;
     _height = height;
     _renderRect.x = 0;
