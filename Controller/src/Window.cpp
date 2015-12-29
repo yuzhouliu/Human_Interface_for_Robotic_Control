@@ -30,7 +30,7 @@
 //
 //*****************************************************************************
 Window::Window()
-    : _window(NULL), _renderer(NULL), _width(_DEFAULT_WIDTH),
+    : _window(nullptr), _renderer(nullptr), _width(_DEFAULT_WIDTH),
       _height(_DEFAULT_HEIGHT)
 {
     //
@@ -117,7 +117,7 @@ bool Window::_initialize()
     _window = SDL_CreateWindow("Human Interface for Robotic Control",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height,
         SDL_WINDOW_SHOWN);
-    if (_window == NULL)
+    if (_window == nullptr)
     {
         std::cerr << "[ERROR] Window::_initialize(): SDL_CreateWindow() "\
             "failed. SDL Error " << SDL_GetError() << std::endl;
@@ -129,7 +129,7 @@ bool Window::_initialize()
     //
     _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED |
         SDL_RENDERER_TARGETTEXTURE);
-    if (_renderer == NULL)
+    if (_renderer == nullptr)
     {
         std::cerr << "[ERROR] Window::_initialize(): SDL_CreateRenderer() "\
             "failed. SDL Error " << SDL_GetError() << std::endl;
@@ -174,12 +174,12 @@ bool Window::_initialize()
 //*****************************************************************************
 void Window::_terminate()
 {
-    if (_renderer != NULL)
+    if (_renderer != nullptr)
     {
         SDL_DestroyRenderer(_renderer);
     }
 
-    if (_window != NULL)
+    if (_window != nullptr)
     {
         SDL_DestroyWindow(_window);
     }
