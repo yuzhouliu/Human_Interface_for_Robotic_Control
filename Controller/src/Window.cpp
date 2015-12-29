@@ -46,24 +46,32 @@ Window::Window()
     //
     // Creates base hand image
     //
-    _baseImage = std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_base.png"));
+    _baseImage = std::unique_ptr<Image>(new Image(_renderer,
+        "data/gfx/hand_base.png"));
 
     //
-    // Creates and add images to finger image list
+    // Creates and add fingers to list
     //
-    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_thumb.png")));
-    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_index.png")));
-    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_middle.png")));
-    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_ring.png")));
-    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_pinky.png")));
+    _fingerList.push_back(std::unique_ptr<Finger>(
+        new Finger(FingerType::THUMB, _renderer)));
+    _fingerList.push_back(std::unique_ptr<Finger>(
+        new Finger(FingerType::INDEX, _renderer)));
+    _fingerList.push_back(std::unique_ptr<Finger>(
+        new Finger(FingerType::MIDDLE, _renderer)));
+    _fingerList.push_back(std::unique_ptr<Finger>(
+        new Finger(FingerType::RING, _renderer)));
+    _fingerList.push_back(std::unique_ptr<Finger>(
+        new Finger(FingerType::PINKY, _renderer)));
 
     //
     // Centre all images for aesthetic purposes
     //
     _centreImage(_baseImage);
-    for (auto it = _fingerImageList.begin(); it != _fingerImageList.end(); it++)
+    for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
     {
-        _centreImage(*it);
+        _centreImage((*it)->getImage());
+        (*it)->getImage()->enableAlphaBlend();
+        (*it)->getImage()->setAlphaBlend(0);
     }
 }
 
@@ -247,10 +255,9 @@ void Window::_render()
     // Renders all images to screen
     //
     _baseImage->onRender();
-    for (auto it = _fingerImageList.begin(); it != _fingerImageList.end();
-        it++)
+    for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
     {
-        (*it)->onRender();
+        (*it)->getImage()->onRender();
     }
 
     //

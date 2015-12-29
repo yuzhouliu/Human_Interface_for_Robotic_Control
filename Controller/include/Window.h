@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 
+#include "Finger.h"
 #include "Image.h"
 #include "IObservable.h"
 
@@ -37,7 +38,7 @@ private:
     unsigned short _width;
     unsigned short _height;
     std::unique_ptr<Image> _baseImage;
-    std::vector<std::unique_ptr<Image>> _fingerImageList;
+    std::vector<std::unique_ptr<Finger>> _fingerList;
 
     /* Methods */
     bool _initialize();

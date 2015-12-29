@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="include\AddressBase.h" />
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Finger.h" />
     <ClInclude Include="include\FrameRateManager.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\IObservable.h" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Finger.cpp" />
     <ClCompile Include="src\FrameRateManager.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\IPv4Address.cpp" />

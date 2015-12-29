@@ -19,10 +19,10 @@
 
 #include "Leap.h"
 
-typedef struct
+struct LeapDataStruct
 {
     
-} LeapDataStruct;
+};
 
 class LeapMotionManager
 {
