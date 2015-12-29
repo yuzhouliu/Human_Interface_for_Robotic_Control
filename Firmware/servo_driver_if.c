@@ -101,5 +101,6 @@ void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
             break;
         default:
             //UART_PRINT("[MoveServo] Invalid Finger input\n");
+        	return;
     }
 }
