@@ -20,13 +20,11 @@
 #include <memory>
 
 #include "IObserver.h"
-#include "Window.h"
 
 class Application : public IObserver
 {
 private:
     /* Fields */
-    Window *_window;
     bool _exit;
 
     /* Methods */

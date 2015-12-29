@@ -13,10 +13,14 @@
   <ItemGroup>
     <ClInclude Include="include\AddressBase.h" />
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Finger.h" />
     <ClInclude Include="include\FrameRateManager.h" />
     <ClInclude Include="include\Image.h" />
+    <ClInclude Include="include\IObservable.h" />
     <ClInclude Include="include\IObserver.h" />
     <ClInclude Include="include\IPv4Address.h" />
+    <ClInclude Include="include\IRenderable.h" />
+    <ClInclude Include="include\LeapMotionManager.h" />
     <ClInclude Include="include\Network.h" />
     <ClInclude Include="include\SocketBase.h" />
     <ClInclude Include="include\TCPSocket.h" />
@@ -25,9 +29,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Finger.cpp" />
     <ClCompile Include="src\FrameRateManager.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\IPv4Address.cpp" />
+    <ClCompile Include="src\LeapMotionManager.cpp" />
     <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\TCPSocket.cpp" />
     <ClCompile Include="src\Timer.cpp" />
@@ -62,20 +68,21 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VS Development Libraries\LeapSDK\include;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <ExecutablePath>C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)data\gfx\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;Leap.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

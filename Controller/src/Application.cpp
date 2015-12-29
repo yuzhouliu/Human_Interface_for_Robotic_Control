@@ -22,7 +22,9 @@
 #include <SDL_image.h>
 
 #include "FrameRateManager.h"
+#include "LeapMotionManager.h"
 #include "Network.h"
+#include "Window.h"
 
 //*****************************************************************************
 //
@@ -74,6 +76,15 @@ Application::~Application()
 int Application::run()
 {
     FrameRateManager fpsManager;
+    LeapMotionManager leap;
+    Window window;
+    const unsigned short _MAX_PAYLOAD = 256;
+    char data[_MAX_PAYLOAD];
+
+    //
+    // Register this object to be notified by window
+    //
+    window.addObserver(this);
 
     //
     // Main program logic
@@ -85,8 +96,20 @@ int Application::run()
         //
         fpsManager.beginFrame();
 
-        // TODO (Brandon): Main program logic
-        _window->update();
+        //
+        // Fetches relevent data from Leap Motion Controller
+        //
+        leap.processFrame(data, _MAX_PAYLOAD);
+
+        //
+        // TODO (Brandon): Send data to remote host
+        //
+
+
+        //
+        // Updates GUI
+        //
+        window.update();
 
         //
         // Ends frame and blocks until FPS elapses
@@ -148,16 +171,6 @@ bool Application::_initialize()
     }
 
     //
-    // Consructs a window to render images on
-    //
-    _window = new Window();
-
-    //
-    // Register this object to be notified by window
-    //
-    _window->addObserver(this);
-
-    //
     // Initializes socket API
     //
     if (!network::initialize())
@@ -182,11 +195,6 @@ bool Application::_initialize()
 void Application::_terminate()
 {
     network::terminate();
-
-    if (_window != NULL)
-    {
-        delete _window;
-    }
 
     IMG_Quit();
     SDL_Quit();

@@ -17,10 +17,12 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
+#include <memory>
 #include <vector>
 
+#include "Finger.h"
 #include "Image.h"
-#include "IObserver.h"
+#include "IObservable.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;
@@ -35,7 +37,8 @@ private:
     SDL_Renderer *_renderer;
     unsigned short _width;
     unsigned short _height;
-    std::vector<Image> _renderList;
+    std::unique_ptr<Image> _baseImage;
+    std::vector<std::unique_ptr<Finger>> _fingerList;
 
     /* Methods */
     bool _initialize();
@@ -43,6 +46,7 @@ private:
     void _processInput();
     void _update();
     void _render();
+    void _centreImage(const std::unique_ptr<Image> &image);
 
 public:
     /* Constructor */
