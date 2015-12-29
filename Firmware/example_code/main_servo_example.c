@@ -100,9 +100,7 @@ BoardInit(void)
 void main()
 {
 
-    //
     // Board Initialisation
-    //
     BoardInit();
     
     PinMuxConfig();
@@ -112,24 +110,28 @@ void main()
     
     while(1)
     {
-    	MoveServo(0, FINGER_INDEX);
-    	MoveServo(45, FINGER_THUMB);
-    	MoveServo(0, FINGER_MIDDLE);
-    	MoveServo(45, FINGER_RING);
-    	MAP_UtilsDelay(20000000);
+        MoveServo(0, FINGER_INDEX);
+        MoveServo(45, FINGER_THUMB);
+        MoveServo(0, FINGER_MIDDLE);
+        MoveServo(45, FINGER_RING);
+        //MoveServo(0, FINGER_PINKY);
+        //MoveServo(180, WRIST);
+        MAP_UtilsDelay(20000000);
 
-    	MoveServo(90, FINGER_INDEX);
-    	MoveServo(135, FINGER_THUMB);
-    	MoveServo(180, FINGER_MIDDLE);
-    	MoveServo(90, FINGER_RING);
-    	MAP_UtilsDelay(20000000);
+        MoveServo(90, FINGER_INDEX);
+        MoveServo(135, FINGER_THUMB);
+        MoveServo(180, FINGER_MIDDLE);
+        MoveServo(90, FINGER_RING);
+        //MoveServo(180, FINGER_PINKY);
+        //MoveServo(0, WRIST);
+        MAP_UtilsDelay(20000000);
       
     }
 
     //
     // De-Init peripherals - will not reach here...
     //
-    //DeInitPWMModules();
+    //DisableServos();
 }
 
 

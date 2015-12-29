@@ -49,20 +49,18 @@ void PinMuxConfig(void)
     // Configure PIN_21 for TimerPWM2 GT_PWM02
     MAP_PinTypeTimer(PIN_21, PIN_MODE_9);
 
-    /*TODO Pin 17/19 are muxed with JTAG, so cannot use CCS debug concurrently
-     * with PWM. Must flash with Uniflash.
+    //TODO Pin 17/19 are muxed with JTAG, must use Uniflash
+    // with PWM. Must flash with Uniflash.
     // Configure PIN_19 for TimerPWM3 GT_PWM03
     //MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
 
     // Configure PIN_17 for TimerPWM0 GT_PWM00
     //MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
-    */
 
-    /* TODO Pin 57 is muxed with UART0 RX, so cannot use UART to debug
-     * while using ADC_CH0 (PIN_57).
+    // TODO Pin 57 is muxed with UART0 RX, so cannot use UART to debug
+    // while using ADC_CH0 (PIN_57).
     // Configure PIN_57 for ADC0 ADC_CH0
     //MAP_PinTypeADC(PIN_57, PIN_MODE_255);
-     */
 
     // Configure PIN_58 for ADC0 ADC_CH1
     MAP_PinTypeADC(PIN_58, PIN_MODE_255);
