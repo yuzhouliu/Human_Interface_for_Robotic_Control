@@ -36,7 +36,8 @@ private:
     SDL_Renderer *_renderer;
     unsigned short _width;
     unsigned short _height;
-    std::vector<std::unique_ptr<Image>> _renderList;
+    std::unique_ptr<Image> _baseImage;
+    std::vector<std::unique_ptr<Image>> _fingerImageList;
 
     /* Methods */
     bool _initialize();

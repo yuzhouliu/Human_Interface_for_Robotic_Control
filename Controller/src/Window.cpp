@@ -44,14 +44,24 @@ Window::Window()
     }
 
     //
-    // Add images to render list
+    // Creates base hand image
     //
-    _renderList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_base.png")));
+    _baseImage = std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_base.png"));
+
+    //
+    // Creates and add images to finger image list
+    //
+    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_thumb.png")));
+    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_index.png")));
+    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_middle.png")));
+    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_ring.png")));
+    _fingerImageList.push_back(std::unique_ptr<Image>(new Image(_renderer, "data/gfx/hand_right_pinky.png")));
 
     //
     // Centre all images for aesthetic purposes
     //
-    for (auto it = _renderList.begin(); it != _renderList.end(); it++)
+    _centreImage(_baseImage);
+    for (auto it = _fingerImageList.begin(); it != _fingerImageList.end(); it++)
     {
         _centreImage(*it);
     }
@@ -236,7 +246,9 @@ void Window::_render()
     //
     // Renders all images to screen
     //
-    for (auto it = _renderList.begin(); it != _renderList.end(); it++)
+    _baseImage->onRender();
+    for (auto it = _fingerImageList.begin(); it != _fingerImageList.end();
+        it++)
     {
         (*it)->onRender();
     }

@@ -123,6 +123,18 @@ bool Image::setTexture(std::string path)
     }
 
     //
+    // Color key surface (Cyan: 0, 255, 255)
+    //
+    if (SDL_SetColorKey(surface, true, SDL_MapRGB(surface->format, 0, 0xFF,
+        0xFF)) < 0)
+    {
+        std::cerr << "[ERROR] Image::setTexture(): Unable to color key image "\
+            "from " << path.c_str() << "! SDL Error: " << SDL_GetError() <<
+            std::endl;
+        return false;
+    }
+
+    //
     // Creates texture from surface
     //
     texture = SDL_CreateTextureFromSurface(_renderer, surface);
