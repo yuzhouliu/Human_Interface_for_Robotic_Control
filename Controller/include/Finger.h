@@ -22,6 +22,8 @@
 
 #include "Image.h"
 
+#define NUM_FINGERS 5
+
 enum class FingerType : unsigned char
 {
     THUMB   = 0,

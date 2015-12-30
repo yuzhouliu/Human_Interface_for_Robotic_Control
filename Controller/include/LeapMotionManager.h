@@ -19,7 +19,7 @@
 
 #include "Leap.h"
 
-#define NUM_FINGERS 5
+#include "Finger.h" /* NUM_FINGERS */
 
 struct LeapDataStruct
 {

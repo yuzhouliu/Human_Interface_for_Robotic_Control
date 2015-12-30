@@ -11,12 +11,13 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 29, 2015
 //
 //*****************************************************************************
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
+#include <memory>
 #include <string>
 #include <SDL.h>
 
@@ -63,6 +64,10 @@ public:
 
     /* IRenderable virtual methods */
     void onRender();
+
+    /* Static methods */
+    static void centreImage(const std::unique_ptr<Image> &image,
+        unsigned short screenWidth, unsigned short screenHeight);
 };
 
 #endif /* _IMAGE_H_ */

@@ -22,6 +22,7 @@
 #include <SDL_image.h>
 
 #include "FrameRateManager.h"
+#include "Hand.h"   /* FingerPressureStruct */
 #include "LeapMotionManager.h"
 #include "Network.h"
 #include "Window.h"
@@ -80,6 +81,7 @@ int Application::run()
     Window window;
     const unsigned short _MAX_PAYLOAD = 256;
     unsigned char data[_MAX_PAYLOAD];
+    FingerPressureStruct fingerPressures;
 
     //
     // Register this object to be notified by window
@@ -109,7 +111,7 @@ int Application::run()
         //
         // Updates GUI
         //
-        window.update();
+        window.update(&fingerPressures);
 
         //
         // Ends frame and blocks until FPS elapses

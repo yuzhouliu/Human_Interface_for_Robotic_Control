@@ -376,6 +376,26 @@ void Image::onRender()
 
 //*****************************************************************************
 //
+//! Centre the image on the screen.
+//!
+//! \param image the image to be centred.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Image::centreImage(const std::unique_ptr<Image> &image,
+    unsigned short screenWidth, unsigned short screenHeight)
+{
+    SDL_Rect centredRect;
+    centredRect.w = image->getWidth();
+    centredRect.h = image->getHeight();
+    centredRect.x = (screenWidth - centredRect.w) / 2;
+    centredRect.y = (screenHeight - centredRect.h) / 2;
+    image->setRenderRect(&centredRect);
+}
+
+//*****************************************************************************
+//
 //! Sets the texture that the class will manage.
 //!
 //! \param texture to set.
