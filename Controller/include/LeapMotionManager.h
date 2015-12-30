@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// December 29, 2015
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -19,9 +19,11 @@
 
 #include "Leap.h"
 
+#define NUM_FINGERS 5
+
 struct LeapDataStruct
 {
-    
+    unsigned short totalAngle[NUM_FINGERS];
 };
 
 class LeapMotionManager
@@ -31,6 +33,8 @@ private:
     Leap::Controller _controller;
 
     /* Methods */
+    float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
+    float _radiansToDegrees(float angle);
     void _serialize(LeapDataStruct &leapData, char *buf, unsigned int buflen);
 
 public:
@@ -41,7 +45,7 @@ public:
     ~LeapMotionManager();
 
     /* Methods */
-    void processFrame(char *buf, unsigned int buflen);
+    bool processFrame(char *buf, unsigned int buflen);
 };
 
 #endif /* _LEAPMOTIONMANAGER_H_ */
