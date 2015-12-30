@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 29, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "TCPSocket.h"
@@ -152,10 +152,17 @@ bool TCPSocket::connect(AddressBase<unsigned int> *address)
 //! false otherwise.
 //
 //*****************************************************************************
-bool TCPSocket::send(char *message)
+bool TCPSocket::send(unsigned char *message, unsigned short len)
 {
     // TODO (Brandon): Implement
-    return false;
+    if (::send(_sockfd, reinterpret_cast<char*>(message), len, 0) == -1)
+    {
+        close();
+        std::cerr << "[ERROR] TCPSocket::send(): send failed." << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 //*****************************************************************************
@@ -168,7 +175,7 @@ bool TCPSocket::send(char *message)
 //! false otherwise.
 //
 //*****************************************************************************
-bool TCPSocket::recv(char *message)
+bool TCPSocket::recv(unsigned char *message, unsigned short len)
 {
     // TODO (Brandon): Implement
     return false;

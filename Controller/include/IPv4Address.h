@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _IPV4ADDRESS_H_
@@ -25,6 +25,7 @@ public:
     /* Constructor */
     IPv4Address();
     IPv4Address(unsigned int address, unsigned short port);
+    IPv4Address(char *address, unsigned short port);
 
     /* Destructor */
     ~IPv4Address();

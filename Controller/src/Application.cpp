@@ -23,8 +23,10 @@
 #include <SDL_image.h>
 
 #include "FrameRateManager.h"
+#include "IPv4Address.h"
 #include "LeapMotionManager.h"
 #include "Network.h"
+#include "TCPSocket.h"
 #include "Window.h"
 
 //*****************************************************************************
@@ -78,14 +80,37 @@ int Application::run()
 {
     FrameRateManager fpsManager;
     LeapMotionManager leap;
-    Window window;
     const unsigned short _MAX_PAYLOAD = 256;
     unsigned char data[_MAX_PAYLOAD];
     FingerPressureStruct fingerPressures;
 
     //
-    // Register this object to be notified by window
+    // Receive IPv4 address and port as input from user
     //
+    /*std::cout << "Enter the target IPv4 address: ";
+    char addressInput[16];
+    std::cin >> addressInput;
+
+    std::cout << "Enter the target port: ";
+    unsigned short port;
+    std::cin >> port;
+
+    //
+    // Constructs an IPv4 address using user input
+    //
+    IPv4Address address(addressInput, port);
+
+    //
+    // Constructs a TCP socket and connects to IPv4 address
+    //
+    TCPSocket tcpsocket;
+    tcpsocket.open();
+    tcpsocket.connect(&address);*/
+
+    //
+    // Create window and register this object to be notified by window
+    //
+    Window window;
     window.addObserver(this);
 
     //
@@ -104,8 +129,9 @@ int Application::run()
         leap.processFrame(data, _MAX_PAYLOAD);
 
         //
-        // TODO (Brandon): Send data to remote host
+        // Send data to remote host
         //
+        /*tcpsocket.send(data, _MAX_PAYLOAD);*/
 
         //
         // Populates FingerPressureStruct with finger pressure information

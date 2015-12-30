@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _SOCKETBASE_H_
@@ -34,8 +34,8 @@ public:
     virtual bool open() = 0;
     virtual void close() = 0;
     virtual bool connect(AddressBase<unsigned int> *address) = 0;
-    virtual bool send(char *message) = 0;
-    virtual bool recv(char *message) = 0;
+    virtual bool send(unsigned char *message, unsigned short len) = 0;
+    virtual bool recv(unsigned char *message, unsigned short len) = 0;
 };
 
 #endif /* _SOCKETBASE_H_ */

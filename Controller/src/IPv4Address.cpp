@@ -11,10 +11,12 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "IPv4Address.h"
+
+#include "Network.h"
 
 //*****************************************************************************
 //
@@ -25,7 +27,7 @@
 //! \return None.
 //
 //*****************************************************************************
-IPv4Address::IPv4Address()
+IPv4Address::IPv4Address() : IPv4Address((unsigned int)0, 0)
 {
 
 }
@@ -42,6 +44,22 @@ IPv4Address::IPv4Address()
 IPv4Address::IPv4Address(unsigned int address, unsigned short port)
 {
     setAddress(address);
+    setPort(port);
+}
+
+//*****************************************************************************
+//
+//! Constructor for IPv4Address. Converts ascii address to unsigned in and sets
+//! the destination address.
+//!
+//! \param address of the recipient.
+//!
+//! \return None.
+//
+//*****************************************************************************
+IPv4Address::IPv4Address(char *address, unsigned short port)
+{
+    setAddress(ntohl(inet_addr(address)));
     setPort(port);
 }
 

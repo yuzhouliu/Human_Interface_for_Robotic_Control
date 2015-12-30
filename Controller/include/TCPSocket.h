@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _TCPSOCKET_H_
@@ -33,8 +33,8 @@ public:
     bool open();
     void close();
     bool connect(AddressBase<unsigned int> *address);
-    bool send(char *message);
-    bool recv(char *message);
+    bool send(unsigned char *message, unsigned short len);
+    bool recv(unsigned char *message, unsigned short len);
 };
 
 #endif /* _TCPSOCKET_H_ */

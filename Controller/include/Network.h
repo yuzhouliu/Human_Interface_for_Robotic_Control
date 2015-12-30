@@ -11,11 +11,15 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
+
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+#include <winsock2.h>
 
 typedef int socklen_t;
 typedef int ssize_t;

@@ -123,7 +123,7 @@ float GetSensorReading(enum Finger_Type eFinger)
             uiChannel = ADC_CH_3;    // Pin_60
             break;
         default:
-            break;
+            return -1.000;
     }
 
     // Initialize Counter and Sum of Samples to 0
