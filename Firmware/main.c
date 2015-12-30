@@ -46,8 +46,9 @@
 #include "uart_if.h"
 #endif
 
-#include "pinmux.h"
-
+//#include "pinmux.h"
+#include "pin_mux_config.h"
+#include "servo_driver_if.h"
 
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
@@ -133,15 +134,22 @@ static void BoardInit(void)
 //****************************************************************************
 void main()
 {
-    long lRetVal = -1;
-    int data = 0;
+    long lRetVal = 0;
+    char data[BUF_SIZE];
+    int i;
 
     // Board Initialization
     BoardInit();
+
     // Configure the pinmux settings for the peripherals exercised
     PinMuxConfig();
+
+    // Initialize the PWM outputs on the board
+    InitServos();
+
     // Configuring UART
     InitTerm();
+
     // Display banner
     DisplayBanner(APPLICATION_NAME);
 
@@ -152,10 +160,13 @@ void main()
     BsdTcpServerSetup(PORT_NUM);
 
     // Recieve Data
-    while (1)
+    while (lRetVal >= 0)
     {
-    	BsdTcpServerReceive(&data);
-    	UART_PRINT("Data: %d.\n\r", data);
+    	lRetVal = BsdTcpServerReceive(data);
+    	for (i = 0; i<NUM_FINGERS; i++)
+    	{
+    		MoveServo((unsigned char)data[i], (enum Finger_Type)i);
+    	}
     }
     UART_PRINT("Exiting Application ...\n\r");
 

@@ -20,14 +20,17 @@
 //
 //*****************************************************************************
 
+// Define number of finters
+#define NUM_FINGERS 6
+
 // Defines for fingers
 enum Finger_Type {
-    FINGER_THUMB,
-    FINGER_INDEX,
-    FINGER_MIDDLE,
-    FINGER_RING,
-    FINGER_PINKY,
-    WRIST
+    FINGER_THUMB=0,
+    FINGER_INDEX=1,
+    FINGER_MIDDLE=2,
+    FINGER_RING=3,
+    FINGER_PINKY=4,
+    WRIST=5
 };
 
 //****************************************************************************

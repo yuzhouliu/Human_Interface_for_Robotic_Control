@@ -47,7 +47,7 @@ long WlanStart();//start the Wlan
 long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
-int BsdTcpServerReceive(int *data);//Recieve data
+int BsdTcpServerReceive(char *data);//Recieve data
 int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
 
