@@ -41,7 +41,7 @@
 /***************************END OF TCP CONFIG ************************************/
 
 //****************************************************************************
-//                      INTERFACE FUNCTIONS
+//         	                    INTERFACE FUNCTIONS
 //****************************************************************************
 long WlanStart();//start the Wlan
 long WlanConnect(char *cSSID, char *cSecurityType, \
@@ -52,7 +52,7 @@ int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
 
 //*****************************************************************************
-//						CALLBACK FUNCTIONS
+//                               CALLBACK FUNCTIONS
 //*****************************************************************************
 void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent);
 void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent);
