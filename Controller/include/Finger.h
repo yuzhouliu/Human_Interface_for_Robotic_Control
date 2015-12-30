@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _FINGER_H_
@@ -38,7 +38,8 @@ class Finger
 private:
     /* Fields */
     FingerType _type;
-    std::unique_ptr<Image> image;
+    std::unique_ptr<Image> _image;
+    unsigned char _pressure;
 
 public:
     /* Constructor */
@@ -49,6 +50,8 @@ public:
 
     /* Methods */
     const std::unique_ptr<Image> &getImage();
+    void setPressure(unsigned char pressure);
+    void render();
 };
 
 //*****************************************************************************

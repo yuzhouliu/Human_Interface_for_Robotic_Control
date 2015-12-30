@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 29, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "Window.h"
@@ -207,9 +207,7 @@ void Window::_processInput()
 //*****************************************************************************
 void Window::_update(FingerPressureStruct *fingerPressures)
 {
-    //
-    // TODO (Brandon): Implement
-    //
+    _hand->update(fingerPressures);
 }
 
 //*****************************************************************************

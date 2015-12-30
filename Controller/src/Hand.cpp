@@ -55,8 +55,6 @@ Hand::Hand(SDL_Renderer *renderer, unsigned short screenWidth,
     for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
     {
         Image::centreImage((*it)->getImage(), screenWidth, screenHeight);
-        (*it)->getImage()->enableAlphaBlend();
-        (*it)->getImage()->setAlphaBlend(0);
     }
 }
 
@@ -86,8 +84,14 @@ Hand::~Hand()
 void Hand::update(FingerPressureStruct *fingerPressures)
 {
     //
-    // TODO (Brandon): Implementation
+    // Updates finger pressures
     //
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        FingerType type = static_cast<FingerType>(i);
+        auto pressureToSet = fingerPressures->pressure[i];
+        _fingerList[+type]->setPressure(pressureToSet);
+    }
 }
 
 //*****************************************************************************
@@ -107,6 +111,6 @@ void Hand::render()
     _baseImage->onRender();
     for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
     {
-        (*it)->getImage()->onRender();
+        (*it)->render();
     }
 }
