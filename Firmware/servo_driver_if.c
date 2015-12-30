@@ -4,16 +4,34 @@
 //
 // High-Level servo driver for CC3200-LAUNCHXL
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // Project: Human Interface for Robotic Control
 //
 // Created:
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 
+// Driverlib includes
+#include "hw_types.h"
+#include "hw_ints.h"
+#include "hw_memmap.h"
+#include "hw_apps_rcm.h"
+#include "hw_common_reg.h"
+#include "timer.h"
+#include "utils.h"
+#include "prcm.h"
+#include "uart.h"
+
+#include "servo_driver_if.h"
+
+// Low-level Servo driver include
+#include "servo_driver.h"
 
 //****************************************************************************
 //
@@ -53,30 +71,36 @@ void DisableServos()
 // \return None.
 //
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum_Finger_Type eFinger)
+void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
 {
-    uint16_t matchVal;
-    uint8_t prescaleVal;
+    unsigned short usMatchVal;
+    unsigned char usPrescaleVal;
 
-    Convert_Degrees_To_Match(usDegrees, &matchVal, &prescaleVal);
+    Convert_Degrees_To_Match(usDegrees, &usMatchVal, &usPrescaleVal);
 
     switch(eFinger) {
-        case finger_thumb:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_A, matchVal, prescaleVal);
+        case FINGER_THUMB:
+            UpdatePWM_Match(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
-        case finger_index:
-            UpdatePWM_Match(TIMERA2_BASE, TIMER_B, matchVal, prescaleVal);
+        case FINGER_INDEX:
+            UpdatePWM_Match(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case finger_middle:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_B, matchVal, prescaleVal);
+        case FINGER_MIDDLE:
+            UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case finger_ring:
+        case FINGER_RING:
+            UpdatePWM_Match(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
+            break;
+        case FINGER_PINKY:
             // TODO map to appropriate pin
+        	UpdatePWM_Match(TIMERA1_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case finger_pinky:
-            // TODo map to appropriate pin
+        case WRIST:
+            // TODO map to appropriate pin
+        	UpdatePWM_Match(TIMERA0_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         default:
-            UART_PRINT("[MoveServo] Invalid Finger input\n");
+            //UART_PRINT("[MoveServo] Invalid Finger input\n");
+        	return;
     }
 }

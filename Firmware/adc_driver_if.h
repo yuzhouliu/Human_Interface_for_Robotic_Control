@@ -1,11 +1,11 @@
-#ifndef __SERVO_DRIVER_IF_H__
-#define __SERVO_DRIVER_IF_H__
+#ifndef __ADC_DRIVER_IF_H__
+#define __ADC_DRIVER_IF_H__
 
 //*****************************************************************************
 //
-// servo_driver_if.h
+// adc_driver_if.h
 //
-// Header file for high-level Servo driver for CC3200-LAUNCHXL
+// Header file for high-level ADC driver for CC3200-LAUNCHXL
 //
 // Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
 // This code is licensed under BSD license (see LICENSE.txt for details)
@@ -13,36 +13,35 @@
 // Project: Human Interface for Robotic Control
 //
 // Created:
-// December 20, 2015
+// December 28, 2015
 //
 // Modified:
 // December 28, 2015
 //
 //*****************************************************************************
 
-// Defines for fingers
+// Defines for fingertip sensors
 enum Finger_Type {
     FINGER_THUMB,
     FINGER_INDEX,
     FINGER_MIDDLE,
-    FINGER_RING,
-    FINGER_PINKY,
-    WRIST
+    FINGER_RING
 };
 
 //****************************************************************************
-// Initializes the Servo motors for operation
+// Initializes the Sensor ADCs for operation
 //****************************************************************************
-void InitServos();
+void InitSensorADC(void);
 
 //****************************************************************************
-// Disables the Servo motors
+// Disables the Sensor ADCs
 //****************************************************************************
-void DisableServos();
+void DisableSensorADC(void);
 
-//****************************************************************************
-// Moves the servo motor by degrees on the finger specified
-//****************************************************************************
-void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger);
+//*****************************************************************************
+// Gets the Sensor Reading from Finger-Tip sensors using ADC
+// Returns a float ranging from 0 - 1.4V
+//*****************************************************************************
+float GetSensorReading(enum Finger_Type eFinger);
 
-#endif //  __SERVO_DRIVER_IF_H__
+#endif //  __ADC_DRIVER_IF_H__

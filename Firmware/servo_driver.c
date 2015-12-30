@@ -5,6 +5,9 @@
 //
 // Low-level Servo driver for CC3200-LAUNCHXL
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // This source file uses code snippets from Texas Instruments Incorporated's
 // CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
 // this file.
@@ -15,7 +18,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 20, 2015
+// December 28, 2015
 //
 //*****************************************************************************
 
@@ -38,10 +41,9 @@
 #include "utils.h"
 #include "prcm.h"
 
-// Servo driver header
-#include "servo_driver.h"
-// Servo pinmux inludes
 #include "pin_mux_config.h"
+#include "servo_driver.h"
+
 
 //*****************************************************************************
 // Sets up the Timer for PWM mode
@@ -100,12 +102,29 @@ void InitPWMModules()
     SetupTimerPWMMode(TIMERA3_BASE, TIMER_B,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
 
-    //TODO setup the rest of the PWM modules!!!
+    // TIMERA1 (TIMER A), Pin 21 as Ring
+    // SOP2 --> PWM_2
+    SetupTimerPWMMode(TIMERA1_BASE, TIMER_A,
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+
+    //TODO setup the rest of the PWM modules, Problem at the moment with PinMuxConfig!!!
+    // TIMERA1 (TIMER B), Pin 19 as Pinky
+    // TCK --> PWM_3
+    //SetupTimerPWMMode(TIMERA1_BASE, TIMER_B,
+    //        (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+
+    // TIMERA0 (TIMER B), Pin 17 as Wrist
+    // TDO --> PWM_0
+    //SetupTimerPWMMode(TIMERA0_BASE, TIMER_A,
+    //        (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
 
     // Enable the timers
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_B);
+    MAP_TimerEnable(TIMERA1_BASE,TIMER_A);
+    //MAP_TimerEnable(TIMERA1_BASE,TIMER_B);
+    //MAP_TimerEnable(TIMERA0_BASE,TIMER_A);
 }
 
 //****************************************************************************
@@ -138,10 +157,10 @@ void DeInitPWMModules()
 //
 //****************************************************************************
 void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
-                     uint16_t matchVal, uint8_t prescaleVal)
+                     unsigned short usMatchVal, unsigned char ucPrescaleVal)
 {
-    MAP_TimerMatchSet(ulBase, ulTimer, matchVal);
-    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, prescaleVal);
+    MAP_TimerMatchSet(ulBase, ulTimer, usMatchVal);
+    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, ucPrescaleVal);
 }
 
 //*****************************************************************************
@@ -153,14 +172,14 @@ void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
 //
 // \return None. (all values updated by reference)
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned short usDegrees, uint16_t *matchVal, 
-                              uint8_t *prescaleVal)
+void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal,
+                              unsigned char *ucPrescaleVal)
 {
-    uint32_t degrees_to_match;
-    degrees_to_match = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
+    unsigned int uiDegreesToMatch;
+    uiDegreesToMatch = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
 
-    *matchVal = degrees_to_match & 0xFFFF;
-    *prescaleVal = (degrees_to_match & 0xFF0000) >> 16;
+    *usMatchVal = uiDegreesToMatch & 0xFFFF;
+    *ucPrescaleVal = (uiDegreesToMatch >> 16) & 0xFF;
 
     return;
 }
