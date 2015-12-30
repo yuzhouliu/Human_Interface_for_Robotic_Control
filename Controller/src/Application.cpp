@@ -80,20 +80,14 @@ int Application::run()
 {
     FrameRateManager fpsManager;
     LeapMotionManager leap;
-    Window window;
     const unsigned short _MAX_PAYLOAD = 256;
     unsigned char data[_MAX_PAYLOAD];
     FingerPressureStruct fingerPressures;
 
     //
-    // Register this object to be notified by window
-    //
-    window.addObserver(this);
-
-    //
     // Receive IPv4 address and port as input from user
     //
-    std::cout << "Enter the target IPv4 address: ";
+    /*std::cout << "Enter the target IPv4 address: ";
     char addressInput[16];
     std::cin >> addressInput;
 
@@ -111,7 +105,13 @@ int Application::run()
     //
     TCPSocket tcpsocket;
     tcpsocket.open();
-    tcpsocket.connect(&address);
+    tcpsocket.connect(&address);*/
+
+    //
+    // Create window and register this object to be notified by window
+    //
+    Window window;
+    window.addObserver(this);
 
     //
     // Main program logic
@@ -131,7 +131,7 @@ int Application::run()
         //
         // Send data to remote host
         //
-        tcpsocket.send(data, _MAX_PAYLOAD);
+        /*tcpsocket.send(data, _MAX_PAYLOAD);*/
 
         //
         // Populates FingerPressureStruct with finger pressure information
