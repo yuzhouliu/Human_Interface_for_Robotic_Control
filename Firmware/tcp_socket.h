@@ -20,15 +20,13 @@
 // Modified: Dec 28 2015
 //
 //****************************************************************************
-
-/* Config for the TCP application*/
-#define APPLICATION_NAME        "TCP Socket"
-#define APPLICATION_VERSION     "1.1.1"
-#define DBG_PRINT               Report
+// simplelink includes
+#include "simplelink.h"
+#include "wlan.h"
 
 /* Config for the WLAN */
 #define SSID_NAME           "Minh's iPhone"    /* AP SSID */
-#define SECURITY_TYPE       SL_SEC_TYPE_WPA/* Security type (OPEN or WEP or WPA*/
+#define SECURITY_TYPE       SL_SEC_TYPE_WPA /* Security type (OPEN or WEP or WPA)*/
 #define SECURITY_KEY        "minh1234"              /* Password of the secured AP */
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6
@@ -43,12 +41,25 @@
 /***************************END OF TCP CONFIG ************************************/
 
 //****************************************************************************
-//                      INTERFACE FUNCTIONS
+//         	                    INTERFACE FUNCTIONS
 //****************************************************************************
-long WlanConnect(signed char *cSSID, signed char *cSecurityType, \
-                    signed char*cSecurityKey); //connect to the WIFI network
+long WlanStart();//start the Wlan
+long WlanConnect(char *cSSID, char *cSecurityType, \
+                    char*cSecurityKey); //connect to the WIFI network
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
+int BsdTcpServerReceive(int *data);//Recieve data
+int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
+
+//*****************************************************************************
+//                               CALLBACK FUNCTIONS
+//*****************************************************************************
+void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent);
+void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent);
+void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent);
+void SimpleLinkSockEventHandler(SlSockEvent_t *pSock);
+void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pHttpEvent,
+                                  SlHttpServerResponse_t *pHttpResponse);
 //*****************************************************************************
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
