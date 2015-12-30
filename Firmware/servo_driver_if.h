@@ -43,6 +43,6 @@ void DisableServos();
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger);
+void MoveServo(unsigned char ucDegrees, enum Finger_Type eFinger);
 
 #endif //  __SERVO_DRIVER_IF_H__

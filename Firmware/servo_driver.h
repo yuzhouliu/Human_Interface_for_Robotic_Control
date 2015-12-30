@@ -75,7 +75,7 @@ void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
 //*****************************************************************************
 // Converts the input of degrees to a Match value and Prescale value
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal, 
+void Convert_Degrees_To_Match(unsigned char ucDegrees, unsigned short *usMatchVal,
                               unsigned char *ucPrescaleVal);
 
 #endif //  __SERVO_DRIVER_H__

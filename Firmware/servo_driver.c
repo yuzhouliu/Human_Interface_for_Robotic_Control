@@ -172,11 +172,11 @@ void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
 //
 // \return None. (all values updated by reference)
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned short usDegrees, unsigned short *usMatchVal,
+void Convert_Degrees_To_Match(unsigned char ucDegrees, unsigned short *usMatchVal,
                               unsigned char *ucPrescaleVal)
 {
     unsigned int uiDegreesToMatch;
-    uiDegreesToMatch = PWM_0_DEGREES + usDegrees * PWM_MATCH_PER_DEGREE;
+    uiDegreesToMatch = PWM_0_DEGREES + ucDegrees * PWM_MATCH_PER_DEGREE;
 
     *usMatchVal = uiDegreesToMatch & 0xFFFF;
     *ucPrescaleVal = (uiDegreesToMatch >> 16) & 0xFF;

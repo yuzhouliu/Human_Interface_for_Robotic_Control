@@ -71,12 +71,12 @@ void DisableServos()
 // \return None.
 //
 //****************************************************************************
-void MoveServo(unsigned short usDegrees, enum Finger_Type eFinger)
+void MoveServo(unsigned char ucDegrees, enum Finger_Type eFinger)
 {
     unsigned short usMatchVal;
     unsigned char usPrescaleVal;
 
-    Convert_Degrees_To_Match(usDegrees, &usMatchVal, &usPrescaleVal);
+    Convert_Degrees_To_Match(ucDegrees, &usMatchVal, &usPrescaleVal);
 
     switch(eFinger) {
         case FINGER_THUMB:
