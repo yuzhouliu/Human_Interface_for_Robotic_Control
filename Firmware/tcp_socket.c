@@ -19,7 +19,6 @@
 //*****************************************************************************
 
 #include "tcp_socket.h"
-
 // Standard includes
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +49,6 @@
 #endif
 
 #include "pinmux.h"
-
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
@@ -81,14 +79,6 @@ unsigned char  g_ucConnectionStatus = 0;
 unsigned char  g_ucSimplelinkstarted = 0;
 unsigned long  g_ulIpAddr = 0;
 char g_cBsdBuf[BUF_SIZE];
-
-#if defined(ccs) || defined (gcc)
-extern void (* const g_pfnVectors[])(void);
-#endif
-#if defined(ewarm)
-extern uVectorEntry __vector_table;
-#endif
-
 int ServerSockID; //Hold Server Socket ID
 int ServerNewSockID; // Hold New Server Socket ID for Client
 //*****************************************************************************
@@ -98,13 +88,36 @@ int ServerNewSockID; // Hold New Server Socket ID for Client
 //*****************************************************************************
 //                  HELPER FUNCTIONS -- Start
 //*****************************************************************************
-static void DisplayBanner();
 static void SetSocketVariables();
 static long ConfigureSimpleLinkToDefaultState();
 static inline _u8 SecurityTypeParser(char * cSecurityType);
 //*****************************************************************************
 //                  HELPER FUNCTIONS -- End
 //*****************************************************************************
+
+//****************************************************************************
+//
+// Start the SimpleLink in Station Mode in order to connect to a WIFI Router
+//!
+//! \return     0 on success, -1 on error.
+//!
+//****************************************************************************
+long WlanStart()
+{
+    long lRetVal;
+    // Asumption is that the device is configured in station mode already
+    // and it is in its default state
+    //
+    lRetVal = sl_Start(0, 0, 0);
+    if (lRetVal < 0)
+    {
+        UART_PRINT("Failed to start the device \n\r");
+        LOOP_FOREVER();
+    }
+
+    UART_PRINT("Device started as STATION \n\r");
+    return SUCCESS;
+}
 
 //****************************************************************************
 //
@@ -124,15 +137,18 @@ static inline _u8 SecurityTypeParser(char * cSecurityType);
 //!            address, It will be stuck in this function forever.
 //
 //****************************************************************************
-long WlanConnect(signed char *cSSID, signed char *cSecurityType, signed char*cSecurityKey)
+long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 {
     SlSecParams_t secParams = {0};// Hold WLAN informations
     long lRetVal = 0;
 
+
+    UART_PRINT("Connecting to AP: %s ...\r\n",SSID_NAME);
+
     //Reset the simplelink before connecting the the network
     lRetVal = ConfigureSimpleLinkToDefaultState();
 
-    if (ucSSID == NULL || ucSecurityType == NULL || ucPassword == NULL)
+    if (cSSID == NULL || cSecurityType == NULL || cSecurityKey == NULL)
     { // if user did not give the network info, use the default info
         secParams.Key = (signed char*)SECURITY_KEY;
         secParams.KeyLen = strlen(SECURITY_KEY);
@@ -142,10 +158,10 @@ long WlanConnect(signed char *cSSID, signed char *cSecurityType, signed char*cSe
     }
     else
     { // if user provide network info
-        secParams.Key = cSecurityKey;
+        secParams.Key = (signed char*)cSecurityKey;
         secParams.KeyLen = strlen(cSecurityKey);
         secParams.Type = SecurityTypeParser(cSecurityType);
-        lRetVal = sl_WlanConnect(cSSID, strlen(cSSID), 0, &secParams, 0);
+        lRetVal = sl_WlanConnect((signed char*)cSSID, strlen(cSSID), 0, &secParams, 0);
     }
 
     ASSERT_ON_ERROR(lRetVal);
@@ -159,8 +175,13 @@ long WlanConnect(signed char *cSSID, signed char *cSecurityType, signed char*cSe
 #endif
     }
 
+    UART_PRINT("Connected to AP: %s \n\r",SSID_NAME);
+    UART_PRINT("Device IP: %d.%d.%d.%d\n\r\n\r",
+                      SL_IPV4_BYTE(g_ulIpAddr,3),
+                      SL_IPV4_BYTE(g_ulIpAddr,2),
+                      SL_IPV4_BYTE(g_ulIpAddr,1),
+                      SL_IPV4_BYTE(g_ulIpAddr,0));
     return SUCCESS;
-
 }
 //****************************************************************************
 //
@@ -184,7 +205,7 @@ int BsdTcpServerSetup(unsigned short usPort)
     long            lNonBlocking = 1;
 
     //Set variables for the socket
-    SetVariables();
+    SetSocketVariables();
 
     // filling the buffer
     for (iCounter=0 ; iCounter<BUF_SIZE ; iCounter++)
@@ -256,6 +277,54 @@ int BsdTcpServerSetup(unsigned short usPort)
 
     return SUCCESS;
 }
+
+//****************************************************************************
+//
+//! \brief Recieving data from the client
+//!
+//! \param [in]: pointer to data, the recieving packet will be store in data
+//!
+//! \return     0 on success, -1 on error.
+//!
+//****************************************************************************
+int BsdTcpServerReceive(int *data)
+{
+    int iStatus;
+
+    iStatus = sl_Recv(ServerNewSockID, g_cBsdBuf, BUF_SIZE, 0);
+    if( iStatus <= 0 )
+    {
+       // error
+       sl_Close(ServerNewSockID);
+       sl_Close(ServerSockID);
+       ASSERT_ON_ERROR(RECV_ERROR);
+    }
+    else
+    {
+        UART_PRINT("BUFF:%s\n",g_cBsdBuf);
+        *data = atoi(g_cBsdBuf);
+    }
+    return SUCCESS;
+}
+
+//****************************************************************************
+//
+//! \brief Close the TCP socket
+//!
+//! \return     0 on success, -1 on error.
+//!
+//****************************************************************************
+int BsdTcpServerClose()
+{
+	int iStatus;
+    // close the connected socket after receiving from connected TCP client
+    iStatus = sl_Close(ServerNewSockID);
+    ASSERT_ON_ERROR(iStatus);
+    // close the listening socket
+    iStatus = sl_Close(ServerSockID);
+    ASSERT_ON_ERROR(iStatus);
+    return SUCCESS;
+}
 //****************************************************************************
 //                          UTILITY FUNCTIONS
 //****************************************************************************
@@ -320,26 +389,8 @@ static inline _u8 SecurityTypeParser(char * cSecurityType)
     if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PBC")) return SL_SEC_TYPE_P2P_PBC;
     if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_KEYPAD")) return SL_SEC_TYPE_P2P_PIN_KEYPAD;
     if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_DISPLAY")) return SL_SEC_TYPE_P2P_PIN_DISPLAY;
+    return SL_SEC_TYPE_OPEN;
 }
-//*****************************************************************************
-//
-//! Application startup display on UART
-//!
-//! \param  none
-//!
-//! \return none
-//!
-//*****************************************************************************
-static void DisplayBanner(char * AppName)
-{
-
-    Report("\n\n\n\r");
-    Report("\t\t *************************************************\n\r");
-    Report("\t\t      CC3200 %s Application       \n\r", AppName);
-    Report("\t\t *************************************************\n\r");
-    Report("\n\n\n\r");
-}
-
 //*****************************************************************************
 //
 //! This function set the socket variables
@@ -502,7 +553,7 @@ static long ConfigureSimpleLinkToDefaultState()
     lRetVal = sl_Stop(SL_STOP_TIMEOUT);
     ASSERT_ON_ERROR(lRetVal);
 
-    InitializeAppVariables();
+    SetSocketVariables();
     
     return lRetVal; // Success
 }
@@ -725,6 +776,22 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
           break;
     }
 
+}
+//*****************************************************************************
+//
+//! \brief This function handles HTTP server events
+//!
+//! \param[in]  pServerEvent - Contains the relevant event information
+//! \param[in]    pServerResponse - Should be filled by the user with the
+//!                                      relevant response information
+//!
+//! \return None
+//!
+//****************************************************************************
+void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pHttpEvent,
+                                  SlHttpServerResponse_t *pHttpResponse)
+{
+    // Unused in this application
 }
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- End
