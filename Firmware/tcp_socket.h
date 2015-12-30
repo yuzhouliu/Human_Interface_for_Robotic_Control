@@ -23,7 +23,7 @@
 
 /* Config for the WLAN */
 #define SSID_NAME           "Minh's iPhone"    /* AP SSID */
-#define SECURITY_TYPE       SL_SEC_TYPE_WPA/* Security type (OPEN or WEP or WPA*/
+#define SECURITY_TYPE       SL_SEC_TYPE_WPA /* Security type (OPEN or WEP or WPA)*/
 #define SECURITY_KEY        "minh1234"              /* Password of the secured AP */
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6

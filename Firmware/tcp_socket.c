@@ -142,11 +142,13 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
     SlSecParams_t secParams = {0};// Hold WLAN informations
     long lRetVal = 0;
 
-
-    UART_PRINT("Connecting to AP: %s ...\r\n",SSID_NAME);
-
     //Reset the simplelink before connecting the the network
     lRetVal = ConfigureSimpleLinkToDefaultState();
+
+    // Start WLAN
+    WlanStart();
+
+    UART_PRINT("Connecting to AP: %s ...\r\n",SSID_NAME);
 
     if (cSSID == NULL || cSecurityType == NULL || cSecurityKey == NULL)
     { // if user did not give the network info, use the default info
@@ -255,6 +257,9 @@ int BsdTcpServerSetup(unsigned short usPort)
     }
     ServerNewSockID = SL_EAGAIN;
 
+    UART_PRINT("SERVER SOCKET CREATED AT PORT: %d, SOCKID: %d.\n\r", usPort, ServerSockID);
+    UART_PRINT("WAIT FOR CLIENT TO CONNECT....\n\r");
+
     // waiting for an incoming TCP connection
     while( ServerNewSockID < 0 )
     {
@@ -262,6 +267,7 @@ int BsdTcpServerSetup(unsigned short usPort)
         // otherwise returns SL_EAGAIN
     	ServerNewSockID = sl_Accept(ServerSockID, ( struct SlSockAddr_t *)&sAddr,
                                 (SlSocklen_t*)&iAddrSize);
+
         if( ServerNewSockID == SL_EAGAIN )
         {
            MAP_UtilsDelay(10000);
@@ -274,7 +280,7 @@ int BsdTcpServerSetup(unsigned short usPort)
             ASSERT_ON_ERROR(ACCEPT_ERROR);
         }
     }
-
+    UART_PRINT("CLIENT CONNECTED. new SOCKID: %d.\n\r",ServerNewSockID);
     return SUCCESS;
 }
 
