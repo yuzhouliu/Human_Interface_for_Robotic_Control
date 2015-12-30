@@ -11,7 +11,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// December 29, 2015
 //
 //*****************************************************************************
 #include "Application.h"
@@ -79,7 +79,7 @@ int Application::run()
     LeapMotionManager leap;
     Window window;
     const unsigned short _MAX_PAYLOAD = 256;
-    char data[_MAX_PAYLOAD];
+    unsigned char data[_MAX_PAYLOAD];
 
     //
     // Register this object to be notified by window

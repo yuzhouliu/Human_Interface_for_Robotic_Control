@@ -16,6 +16,8 @@
 //*****************************************************************************
 #include "LeapMotionManager.h"
 
+#include <cassert>
+
 //*****************************************************************************
 //
 //! Empty constructor for LeapMotionManager.
@@ -55,7 +57,7 @@ LeapMotionManager::~LeapMotionManager()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool LeapMotionManager::processFrame(char *buf, unsigned int buflen)
+bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
 {
     LeapDataStruct leapData;
     Leap::Frame frame = _controller.frame();
@@ -90,13 +92,13 @@ bool LeapMotionManager::processFrame(char *buf, unsigned int buflen)
     {
         Leap::Finger finger = (*it);
         Leap::Vector direction[4];
-        for (auto b = 0; b < 4; b++)
+        for (auto b=0; b<4; b++)
         {
             Leap::Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
             Leap::Bone bone = finger.bone(boneType);
             direction[b] = bone.direction();
         }
-        leapData.totalAngle[finger.type()] = (unsigned short)
+        leapData.totalAngle[finger.type()] = (unsigned char)
             (_radiansToDegrees(_calculateTotalAngle(direction, 4)));
     }
 
@@ -123,7 +125,7 @@ float LeapMotionManager::_calculateTotalAngle(Leap::Vector *vectors,
 {
     float angle = 0;
 
-    for (unsigned int i = 0; i < size-1; i++)
+    for (unsigned int i=0; i<size-1; i++)
     {
         float temp = vectors[i].angleTo(vectors[i+1]);
         angle += temp;
@@ -134,7 +136,7 @@ float LeapMotionManager::_calculateTotalAngle(Leap::Vector *vectors,
 
 //*****************************************************************************
 //
-//! Converts an angle in radians to an angle in degrees
+//! Converts an angle in radians to an angle in degrees.
 //!
 //! \param angle the angle in radians to convert.
 //!
@@ -158,10 +160,29 @@ float LeapMotionManager::_radiansToDegrees(float angle)
 //! \return None.
 //
 //*****************************************************************************
-void LeapMotionManager::_serialize(LeapDataStruct &leapData, char *buf,
-    unsigned int buflen)
+void LeapMotionManager::_serialize(LeapDataStruct &leapData,
+    unsigned char *buf, unsigned int buflen)
 {
     //
-    // TODO (Brandon): Figure out serialization format and serialize data
+    // Buffer needs to be at least this size
     //
+    const int BITS_PER_BYTE = 8;
+    int angleSize = sizeof(leapData.totalAngle[0]);
+    assert(buflen >= angleSize*NUM_FINGERS);
+
+    //
+    // Serialize data
+    //
+    unsigned int bufIndex = 0;
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        auto angle = leapData.totalAngle[i];
+
+        //
+        // Stores angle sequentially in buf
+        //
+        buf[bufIndex++] = angle;
+        std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
+    }
+    std::cout << std::endl;
 }

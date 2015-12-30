@@ -23,7 +23,7 @@
 
 struct LeapDataStruct
 {
-    unsigned short totalAngle[NUM_FINGERS];
+    unsigned char totalAngle[NUM_FINGERS];
 };
 
 class LeapMotionManager
@@ -35,7 +35,8 @@ private:
     /* Methods */
     float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
     float _radiansToDegrees(float angle);
-    void _serialize(LeapDataStruct &leapData, char *buf, unsigned int buflen);
+    void _serialize(LeapDataStruct &leapData, unsigned char *buf,
+        unsigned int buflen);
 
 public:
     /* Constructor */
@@ -45,7 +46,7 @@ public:
     ~LeapMotionManager();
 
     /* Methods */
-    bool processFrame(char *buf, unsigned int buflen);
+    bool processFrame(unsigned char *buf, unsigned int buflen);
 };
 
 #endif /* _LEAPMOTIONMANAGER_H_ */
