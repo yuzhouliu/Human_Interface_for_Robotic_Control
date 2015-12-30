@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "Window.h"
@@ -22,7 +22,8 @@
 
 //*****************************************************************************
 //
-//! Constructor for Window. Acquires resources for window and renderer.
+//! Constructor for Window. Acquires resources for window, renderer, and hand
+//! model
 //!
 //! \param None.
 //!
@@ -44,35 +45,9 @@ Window::Window()
     }
 
     //
-    // Creates base hand image
+    // Creates hand model
     //
-    _baseImage = std::unique_ptr<Image>(new Image(_renderer,
-        "data/gfx/hand_base.png"));
-
-    //
-    // Creates and add fingers to list
-    //
-    _fingerList.push_back(std::unique_ptr<Finger>(
-        new Finger(FingerType::THUMB, _renderer)));
-    _fingerList.push_back(std::unique_ptr<Finger>(
-        new Finger(FingerType::INDEX, _renderer)));
-    _fingerList.push_back(std::unique_ptr<Finger>(
-        new Finger(FingerType::MIDDLE, _renderer)));
-    _fingerList.push_back(std::unique_ptr<Finger>(
-        new Finger(FingerType::RING, _renderer)));
-    _fingerList.push_back(std::unique_ptr<Finger>(
-        new Finger(FingerType::PINKY, _renderer)));
-
-    //
-    // Centre all images for aesthetic purposes
-    //
-    _centreImage(_baseImage);
-    for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
-    {
-        _centreImage((*it)->getImage());
-        (*it)->getImage()->enableAlphaBlend();
-        (*it)->getImage()->setAlphaBlend(0);
-    }
+    _hand = std::unique_ptr<Hand>(new Hand(_renderer, _width, _height));
 }
 
 //*****************************************************************************
@@ -98,10 +73,10 @@ Window::~Window()
 //! \return None.
 //
 //*****************************************************************************
-void Window::update()
+void Window::update(FingerPressureStruct *fingerPressures)
 {
     _processInput();
-    _update();
+    _update(fingerPressures);
     _render();
 }
 
@@ -230,9 +205,9 @@ void Window::_processInput()
 //! \return None.
 //
 //*****************************************************************************
-void Window::_update()
+void Window::_update(FingerPressureStruct *fingerPressures)
 {
-    // TODO (Brandon): Implement
+    _hand->update(fingerPressures);
 }
 
 //*****************************************************************************
@@ -254,33 +229,10 @@ void Window::_render()
     //
     // Renders all images to screen
     //
-    _baseImage->onRender();
-    for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
-    {
-        (*it)->getImage()->onRender();
-    }
+    _hand->render();
 
     //
     // Updates screen (swaps screen buffers)
     //
     SDL_RenderPresent(_renderer);
-}
-
-//*****************************************************************************
-//
-//! Centre the image on the screen.
-//!
-//! \param image the image to be centred.
-//!
-//! \return None.
-//
-//*****************************************************************************
-void Window::_centreImage(const std::unique_ptr<Image> &image)
-{
-    SDL_Rect centredRect;
-    centredRect.w = image->getWidth();
-    centredRect.h = image->getHeight();
-    centredRect.x = (_width - centredRect.w) / 2;
-    centredRect.y = (_height - centredRect.h) / 2;
-    image->setRenderRect(&centredRect);
 }

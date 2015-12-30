@@ -37,4 +37,3 @@ public:
 };
 
 #endif /* _ADDRESSBASE_H_ */
-

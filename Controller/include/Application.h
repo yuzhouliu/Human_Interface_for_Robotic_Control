@@ -11,7 +11,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #ifndef _APPLICATION_H_
@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include "Hand.h"   /* FingerPressureStruct */
 #include "IObserver.h"
 
 class Application : public IObserver
@@ -30,6 +31,8 @@ private:
     /* Methods */
     bool _initialize();
     void _terminate();
+    bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
+        unsigned char *buf, unsigned int buflen);
 
 public:
     /* Constructor */

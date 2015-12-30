@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 29, 2015
 //
 //*****************************************************************************
 #include "TCPSocket.h"
@@ -78,6 +78,8 @@ bool TCPSocket::open()
             << std::endl;
         return false;
     }
+
+    return true;
 }
 
 //*****************************************************************************
@@ -136,6 +138,8 @@ bool TCPSocket::connect(AddressBase<unsigned int> *address)
         close();
         return false;
     }
+
+    return true;
 }
 
 //*****************************************************************************

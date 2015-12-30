@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "Finger.h"
@@ -38,7 +38,9 @@ Finger::Finger(FingerType type, SDL_Renderer *renderer)
         "data/gfx/hand_right_pinky.png"
     };
 
-    image = std::unique_ptr<Image>(new Image(renderer, fingerPaths[+type]));
+    _image = std::unique_ptr<Image>(new Image(renderer, fingerPaths[+type]));
+    _image->enableAlphaBlend();
+    _image->setAlphaBlend(0);
 }
 
 //*****************************************************************************
@@ -66,5 +68,34 @@ Finger::~Finger()
 //*****************************************************************************
 const std::unique_ptr<Image> &Finger::getImage()
 {
-    return image;
+    return _image;
+}
+
+//*****************************************************************************
+//
+//! Sets the finger pressure.
+//!
+//! \param pressure the new pressure to set.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Finger::setPressure(unsigned char pressure)
+{
+    _pressure = pressure;
+}
+
+//*****************************************************************************
+//
+//! Renders finger to screen.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Finger::render()
+{
+    _image->setAlphaBlend(_pressure);
+    _image->onRender();
 }

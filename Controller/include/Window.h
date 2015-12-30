@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// December 29, 2015
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -20,7 +20,7 @@
 #include <memory>
 #include <vector>
 
-#include "Finger.h"
+#include "Hand.h"
 #include "Image.h"
 #include "IObservable.h"
 
@@ -37,16 +37,14 @@ private:
     SDL_Renderer *_renderer;
     unsigned short _width;
     unsigned short _height;
-    std::unique_ptr<Image> _baseImage;
-    std::vector<std::unique_ptr<Finger>> _fingerList;
+    std::unique_ptr<Hand> _hand;
 
     /* Methods */
     bool _initialize();
     void _terminate();
     void _processInput();
-    void _update();
+    void _update(FingerPressureStruct *fingerPressures);
     void _render();
-    void _centreImage(const std::unique_ptr<Image> &image);
 
 public:
     /* Constructor */
@@ -56,7 +54,7 @@ public:
     ~Window();
 
     /* Methods */
-    void update();
+    void update(FingerPressureStruct *fingerPressures);
 };
 
 #endif /* _WINDOW_H_ */

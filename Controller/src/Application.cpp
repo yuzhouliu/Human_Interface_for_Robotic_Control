@@ -11,11 +11,12 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// December 30, 2015
 //
 //*****************************************************************************
 #include "Application.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <SDL.h>
@@ -79,7 +80,8 @@ int Application::run()
     LeapMotionManager leap;
     Window window;
     const unsigned short _MAX_PAYLOAD = 256;
-    char data[_MAX_PAYLOAD];
+    unsigned char data[_MAX_PAYLOAD];
+    FingerPressureStruct fingerPressures;
 
     //
     // Register this object to be notified by window
@@ -105,11 +107,18 @@ int Application::run()
         // TODO (Brandon): Send data to remote host
         //
 
+        //
+        // Populates FingerPressureStruct with finger pressure information
+        // TODO (Brandon): As of now, this populates structure with angle
+        // information. Must change to pressure information once we establish
+        // communication to microcontroller and receive feedback from sensors.
+        //
+        _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
 
         //
         // Updates GUI
         //
-        window.update();
+        window.update(&fingerPressures);
 
         //
         // Ends frame and blocks until FPS elapses
@@ -198,6 +207,40 @@ void Application::_terminate()
 
     IMG_Quit();
     SDL_Quit();
+}
+
+//*****************************************************************************
+//
+//! Populates structure with pressure information decoded from buf.
+//!
+//! \param fingerPressures structure for storing results.
+//! \param buf buffer with encoded pressure data.
+//! \param buflen the size of the buffer.
+//!
+//! \return Returns \b true if the structure was populated successfully and
+//! \b false otherwise.
+//
+//*****************************************************************************
+bool Application::_populateFingerPressureStruct(FingerPressureStruct
+    &fingerPressures, unsigned char *buf, unsigned int buflen)
+{
+    //
+    // Buffer needs to be at least this size
+    //
+    const int BITS_PER_BYTE = 8;
+    int pressureSize = sizeof(fingerPressures.pressure[0]);
+    assert(buflen >= pressureSize*NUM_FINGERS);
+
+    //
+    // Parses through buf and populate structure
+    //
+    unsigned int bufIndex = 0;
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        fingerPressures.pressure[i] = buf[bufIndex++];
+    }
+
+    return true;
 }
 
 //*****************************************************************************
