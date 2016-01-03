@@ -296,7 +296,7 @@ int BsdTcpServerSetup(unsigned short usPort)
 //! \return     0 on success, -1 on error.
 //!
 //****************************************************************************
-int BsdTcpServerReceive(int *data)
+int BsdTcpServerReceive(char *data)
 {
     int iStatus;
 
@@ -310,8 +310,8 @@ int BsdTcpServerReceive(int *data)
     }
     else
     {
-        UART_PRINT("BUFF:%s\n",g_cBsdBuf);
-        *data = atoi(g_cBsdBuf);
+        UART_PRINT("RECEIVED BUFF:%s\n", g_cBsdBuf);
+        strcpy(data, g_cBsdBuf);
     }
     return SUCCESS;
 }
