@@ -27,6 +27,7 @@
     <ClInclude Include="include\TCPSocket.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Window.h" />
+    <ClInclude Include="res\res.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -40,6 +41,9 @@
     <ClCompile Include="src\TCPSocket.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\res.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{510DB082-CAC7-40F8-8B02-AB4E353D4128}</ProjectGuid>
@@ -70,7 +74,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Acer\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\LeapSDK\include;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;C:\VS Development Libraries\SDL2\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Acer\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\res;C:\Users\Acer\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\LeapSDK\include;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\res;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;C:\VS Development Libraries\SDL2\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;C:\VS Development Libraries\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <ExecutablePath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(ExecutablePath)</ExecutablePath>
