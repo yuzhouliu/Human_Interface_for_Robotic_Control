@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 30, 2015
+// January 3, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -19,6 +19,9 @@
 #include <iostream>
 
 #include <SDL.h>
+#include <SDL_syswm.h>
+
+#include "res.h"
 
 //*****************************************************************************
 //
@@ -31,8 +34,8 @@
 //
 //*****************************************************************************
 Window::Window()
-    : _window(nullptr), _renderer(nullptr), _width(_DEFAULT_WIDTH),
-      _height(_DEFAULT_HEIGHT)
+    : _window(nullptr), _menu(nullptr), _renderer(nullptr),
+      _width(_DEFAULT_WIDTH), _height(_DEFAULT_HEIGHT)
 {
     //
     // Initialize window
@@ -102,10 +105,35 @@ bool Window::_initialize()
         SDL_WINDOW_SHOWN);
     if (_window == nullptr)
     {
-        std::cerr << "[ERROR] Window::_initialize(): SDL_CreateWindow() "\
-            "failed. SDL Error " << SDL_GetError() << std::endl;
+        std::cerr << "[ERROR] Window::_initialize(): Could not create window "\
+            ". SDL Error " << SDL_GetError() << std::endl;
         return false;
     }
+
+    //
+    // Receive HWND information from window in order to create menu bar
+    //
+    SDL_SysWMinfo windowInfo;
+    SDL_VERSION(&windowInfo.version);
+    if (!SDL_GetWindowWMInfo(_window, &windowInfo))
+    {
+        std::cerr << "[ERROR] Window::_initialize(): Could not query window "\
+            "information. SDL Error " << SDL_GetError() << std::endl;
+        return false;
+    }
+    _windowHandle = windowInfo.info.win.window;
+
+    //
+    // Creates and attaches menu bar to window
+    //
+    _menu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MENU));
+    if (_menu == nullptr)
+    {
+        std::cerr << "[ERROR] Window::_initialize(): Could not create menu. "\
+            "SDL Error " << SDL_GetError() << std::endl;
+        return false;
+    }
+    SetMenu(_windowHandle, _menu);
 
     //
     // Creates renderer
@@ -143,6 +171,14 @@ bool Window::_initialize()
         return false;
     }
 
+    //
+    // The system window manager event contains a pointer to system-specific
+    // information about unknown window manager events. If you enable this
+    // event using SDL_EventState(), it will be generated whenever unhandled
+    // events are received from the window manager.
+    //
+    SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+
     return true;
 }
 
@@ -160,6 +196,11 @@ void Window::_terminate()
     if (_renderer != nullptr)
     {
         SDL_DestroyRenderer(_renderer);
+    }
+
+    if (_menu != nullptr)
+    {
+        DestroyMenu(_menu);
     }
 
     if (_window != nullptr)
@@ -186,12 +227,63 @@ void Window::_processInput()
     //
     while (SDL_PollEvent(&event))
     {
-        //
-        // Notifies the Application class that the user wants to quit
-        //
-        if (event.type == SDL_QUIT)
+        switch (event.type)
         {
+        case SDL_QUIT:
+            //
+            // Notifies the Application class that the user wants to quit
+            //
             notify(SDL_QUIT);
+            break;
+
+        case SDL_SYSWMEVENT:
+            //
+            // Native Win32 system event
+            //
+            switch (event.syswm.msg->msg.win.msg)
+            {
+            case WM_COMMAND:
+                //
+                // Menu bar event
+                //
+                switch (LOWORD(event.syswm.msg->msg.win.wParam))
+                {
+                case IDM_CONNECT:
+                    //
+                    // File -> Connect
+                    //
+                    MessageBox(_windowHandle, "Not implemented",
+                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    break;
+                case IDM_DISCONNECT:
+                    //
+                    // File -> Disconnect
+                    //
+                    MessageBox(_windowHandle, "Not implemented",
+                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    break;
+                case IDM_QUIT:
+                    //
+                    // File -> Quit
+                    //
+                    notify(SDL_QUIT);
+                    break;
+                case IDM_RECORD:
+                    //
+                    // Options -> Record
+                    //
+                    MessageBox(_windowHandle, "Not implemented",
+                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    break;
+                default:
+                    break;
+                }
+                break;
+            default:
+                break;
+            }
+        default:
+            break;
         }
     }
 }

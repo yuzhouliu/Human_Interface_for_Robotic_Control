@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 29, 2015
+// January 3, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <vector>
+#include <windows.h>
 
 #include "Hand.h"
 #include "Image.h"
@@ -34,6 +35,8 @@ private:
     const int _DEFAULT_WIDTH = 640;
     const int _DEFAULT_HEIGHT = 480;
     SDL_Window *_window;
+    HWND _windowHandle;
+    HMENU _menu;
     SDL_Renderer *_renderer;
     unsigned short _width;
     unsigned short _height;

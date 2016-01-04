@@ -11,7 +11,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 30, 2015
+// January 3, 2016
 //
 //*****************************************************************************
 #include "Application.h"
@@ -31,7 +31,7 @@
 
 //*****************************************************************************
 //
-//! Constructor for Image. Acquires resources for SDL and window.
+//! Constructor for Application. Acquires resources for SDL and window.
 //!
 //! \param None.
 //!
