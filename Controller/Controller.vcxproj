@@ -23,6 +23,7 @@
     <ClInclude Include="include\IRenderable.h" />
     <ClInclude Include="include\LeapMotionManager.h" />
     <ClInclude Include="include\Network.h" />
+    <ClInclude Include="include\Panel.h" />
     <ClInclude Include="include\SocketBase.h" />
     <ClInclude Include="include\TCPSocket.h" />
     <ClInclude Include="include\Timer.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="src\IPv4Address.cpp" />
     <ClCompile Include="src\LeapMotionManager.cpp" />
     <ClCompile Include="src\Network.cpp" />
+    <ClCompile Include="src\Panel.cpp" />
     <ClCompile Include="src\TCPSocket.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Window.cpp" />

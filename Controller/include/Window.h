@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 3, 2016
+// January 4, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -23,12 +23,14 @@
 
 #include "Hand.h"
 #include "Image.h"
-#include "IObservable.h"
+#include "Panel.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;
 
-class Window : public IObservable
+void panelTask(std::shared_ptr<Panel> panel);
+
+class Window
 {
 private:
     /* Fields */
@@ -37,19 +39,19 @@ private:
     SDL_Window *_window;
     HWND _windowHandle;
     HMENU _menu;
-    SDL_Renderer *_renderer;
+    std::shared_ptr<Panel> _panel;
     unsigned short _width;
     unsigned short _height;
-    std::unique_ptr<Hand> _hand;
 
     /* Methods */
     bool _initialize();
     void _terminate();
     void _processInput();
-    void _update(FingerPressureStruct *fingerPressures);
-    void _render();
 
 public:
+    /* Fields */
+    static bool gExit;
+
     /* Constructor */
     Window();
 
@@ -57,7 +59,7 @@ public:
     ~Window();
 
     /* Methods */
-    void update(FingerPressureStruct *fingerPressures);
+    bool run();
 };
 
 #endif /* _WINDOW_H_ */

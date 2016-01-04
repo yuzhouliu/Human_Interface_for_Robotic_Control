@@ -11,22 +11,27 @@
 // December 27, 2015
 //
 // Modified:
-// January 3, 2016
+// January 4, 2016
 //
 //*****************************************************************************
 #include "Window.h"
 
 #include <iostream>
+#include <thread>
 
 #include <SDL.h>
 #include <SDL_syswm.h>
 
 #include "res.h"
 
+//
+// Initialize static variable
+//
+bool Window::gExit = false;
+
 //*****************************************************************************
 //
-//! Constructor for Window. Acquires resources for window, renderer, and hand
-//! model
+//! Constructor for Window. Acquires resources for window.
 //!
 //! \param None.
 //!
@@ -34,8 +39,8 @@
 //
 //*****************************************************************************
 Window::Window()
-    : _window(nullptr), _menu(nullptr), _renderer(nullptr),
-      _width(_DEFAULT_WIDTH), _height(_DEFAULT_HEIGHT)
+    : _window(nullptr), _menu(nullptr), _width(_DEFAULT_WIDTH),
+      _height(_DEFAULT_HEIGHT)
 {
     //
     // Initialize window
@@ -46,16 +51,11 @@ Window::Window()
             std::endl;
         return;
     }
-
-    //
-    // Creates hand model
-    //
-    _hand = std::unique_ptr<Hand>(new Hand(_renderer, _width, _height));
 }
 
 //*****************************************************************************
 //
-//! Destructor for Window. Releases resources used by window and renderer.
+//! Destructor for Window. Releases resources used by window.
 //!
 //! \param None.
 //!
@@ -69,18 +69,40 @@ Window::~Window()
 
 //*****************************************************************************
 //
-//! Updates the window. Called once every frame.
+//! Starts the window.
 //!
 //! \param None.
 //!
-//! \return None.
+//! \return Returns \b true if the window was run successfully and \b
+//! false otherwise.
 //
 //*****************************************************************************
-void Window::update(FingerPressureStruct *fingerPressures)
+bool Window::run()
 {
-    _processInput();
-    _update(fingerPressures);
-    _render();
+    //
+    // Creates panel
+    //
+    _panel = std::shared_ptr<Panel>(new Panel(_window));
+
+    //
+    // Creates thread
+    //
+    std::thread panelThread(panelTask, _panel);
+
+    //
+    // Process inputs until user quits
+    //
+    while (!gExit)
+    {
+        _processInput();
+    }
+
+    //
+    // Wait for thread to finish
+    //
+    panelThread.join();
+
+    return true;
 }
 
 //*****************************************************************************
@@ -95,8 +117,6 @@ void Window::update(FingerPressureStruct *fingerPressures)
 //*****************************************************************************
 bool Window::_initialize()
 {
-    int iRetVal = 0;
-
     //
     // Creates OpenGL context
     //
@@ -136,42 +156,6 @@ bool Window::_initialize()
     SetMenu(_windowHandle, _menu);
 
     //
-    // Creates renderer
-    //
-    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED |
-        SDL_RENDERER_TARGETTEXTURE);
-    if (_renderer == nullptr)
-    {
-        std::cerr << "[ERROR] Window::_initialize(): SDL_CreateRenderer() "\
-            "failed. SDL Error " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    //
-    // Sets renderer to default to an Opqaue White color on screen clear
-    //
-    iRetVal = SDL_SetRenderDrawColor(_renderer, 0xFF, 0xFF, 0xFF,
-        SDL_ALPHA_OPAQUE);
-    if (iRetVal < 0)
-    {
-        std::cerr << "[ERROR] Window::_initialize(): SDL_SetRenderDrawColor()"\
-            " failed. SDL Error " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    //
-    // Sets a device independent resolution for rendering
-    //
-    iRetVal = SDL_RenderSetLogicalSize(_renderer, _width, _height);
-    if (iRetVal < 0)
-    {
-        std::cerr << "[ERROR] Window::_initialize(): "\
-            "SDL_RenderSetLogicalSize() failed. SDL Error " << SDL_GetError()
-            << std::endl;
-        return false;
-    }
-
-    //
     // The system window manager event contains a pointer to system-specific
     // information about unknown window manager events. If you enable this
     // event using SDL_EventState(), it will be generated whenever unhandled
@@ -193,11 +177,6 @@ bool Window::_initialize()
 //*****************************************************************************
 void Window::_terminate()
 {
-    if (_renderer != nullptr)
-    {
-        SDL_DestroyRenderer(_renderer);
-    }
-
     if (_menu != nullptr)
     {
         DestroyMenu(_menu);
@@ -231,9 +210,9 @@ void Window::_processInput()
         {
         case SDL_QUIT:
             //
-            // Notifies the Application class that the user wants to quit
+            // User wants to quit
             //
-            notify(SDL_QUIT);
+            gExit = true;
             break;
 
         case SDL_SYSWMEVENT:
@@ -266,7 +245,7 @@ void Window::_processInput()
                     //
                     // File -> Quit
                     //
-                    notify(SDL_QUIT);
+                    gExit = true;
                     break;
                 case IDM_RECORD:
                     //
@@ -290,41 +269,15 @@ void Window::_processInput()
 
 //*****************************************************************************
 //
-//! Updates program logic. Called once per frame by update().
+//! Thread function responsible for running the panel concurrently with the
+//! application to bypass the modal windows event loop.
 //!
-//! \param None.
-//!
-//! \return None.
-//
-//*****************************************************************************
-void Window::_update(FingerPressureStruct *fingerPressures)
-{
-    _hand->update(fingerPressures);
-}
-
-//*****************************************************************************
-//
-//! Renders frame. Called once per frame by update().
-//!
-//! \param None.
+//! \param panel the Panel that this thread function will run.
 //!
 //! \return None.
 //
 //*****************************************************************************
-void Window::_render()
+void panelTask(std::shared_ptr<Panel> panel)
 {
-    //
-    // Clears screen
-    //
-    SDL_RenderClear(_renderer);
-
-    //
-    // Renders all images to screen
-    //
-    _hand->render();
-
-    //
-    // Updates screen (swaps screen buffers)
-    //
-    SDL_RenderPresent(_renderer);
+    panel->run();
 }
