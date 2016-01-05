@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Acer\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\LeapSDK\include;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;C:\VS Development Libraries\SDL2\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Yuzhou\Desktop\Uni\Human_Interface_for_Robotic_Control\Controller\include;C:\Users\Acer\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\LeapSDK\include;C:\Users\brandonto\cpp-workspace\Human_Interface_for_Robotic_Control\Controller\include;C:\VS Development Libraries\SDL2-2.0.3\include;C:\VS Development Libraries\SDL2\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;C:\VS Development Libraries\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <ExecutablePath>C:\VS Development Libraries\LeapSDK\lib\x86;C:\VS Development Libraries\SDL2-2.0.3\lib\x86;$(ExecutablePath)</ExecutablePath>
