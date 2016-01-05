@@ -18,7 +18,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 
@@ -156,7 +156,7 @@ void DeInitPWMModules()
 // \return None.
 //
 //****************************************************************************
-void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
+void UpdatePWM_DutyCycle(unsigned long ulBase, unsigned long ulTimer,
                      unsigned short usMatchVal, unsigned char ucPrescaleVal)
 {
     MAP_TimerMatchSet(ulBase, ulTimer, usMatchVal);
@@ -172,7 +172,7 @@ void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
 //
 // \return None. (all values updated by reference)
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned char ucDegrees, unsigned short *usMatchVal,
+void Convert_Degrees_To_DutyCycle(unsigned char ucDegrees, unsigned short *usMatchVal,
                               unsigned char *ucPrescaleVal)
 {
     unsigned int uiDegreesToMatch;

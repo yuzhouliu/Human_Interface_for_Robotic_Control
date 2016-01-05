@@ -16,7 +16,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 
@@ -69,13 +69,13 @@ void DeInitPWMModules();
 //*****************************************************************************
 // Updates the TimerMatch and PrescaleMatch for specified Timer PWM
 //*****************************************************************************
-void UpdatePWM_Match(unsigned long ulBase, unsigned long ulTimer,
+void UpdatePWM_DutyCycle(unsigned long ulBase, unsigned long ulTimer,
                      unsigned short usMatchVal, unsigned char ucPrescaleVal);
 
 //*****************************************************************************
 // Converts the input of degrees to a Match value and Prescale value
 //*****************************************************************************
-void Convert_Degrees_To_Match(unsigned char ucDegrees, unsigned short *usMatchVal,
+void Convert_Degrees_To_DutyCycle(unsigned char ucDegrees, unsigned short *usMatchVal,
                               unsigned char *ucPrescaleVal);
 
 #endif //  __SERVO_DRIVER_H__

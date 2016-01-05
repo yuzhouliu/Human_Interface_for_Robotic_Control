@@ -13,7 +13,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 
@@ -76,28 +76,51 @@ void MoveServo(unsigned char ucDegrees, enum Finger_Type eFinger)
     unsigned short usMatchVal;
     unsigned char usPrescaleVal;
 
-    Convert_Degrees_To_Match(ucDegrees, &usMatchVal, &usPrescaleVal);
+    /*
+    // Check if Degrees input is within max of the finger/wrist type
+    switch(eFinger) {
+        case FINGER_THUMB:
+        case FINGER_INDEX:
+        case FINGER_MIDDLE:
+        case FINGER_RING:
+        case FINGER_PINKY:
+        	if (ucDegrees > FINGER_MAX_POSITION)
+        	{
+        		ucDegrees = FINGER_MAX_POSITION;
+        	}
+        	break;
+        case WRIST:
+        	if (ucDegrees > WRIST_MAX_POSITION)
+        	{
+        		ucDegrees = WRIST_MAX_POSITION;
+        	}
+            break;
+        default:
+        	//UART_PRINT("[MoveServo] Invalid Finger input\n");
+            return;
+    }
+    */
+
+    Convert_Degrees_To_DutyCycle(ucDegrees, &usMatchVal, &usPrescaleVal);
 
     switch(eFinger) {
         case FINGER_THUMB:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
+            UpdatePWM_DutyCycle(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         case FINGER_INDEX:
-            UpdatePWM_Match(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
+            UpdatePWM_DutyCycle(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case FINGER_MIDDLE:
-            UpdatePWM_Match(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
+            UpdatePWM_DutyCycle(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case FINGER_RING:
-            UpdatePWM_Match(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
+            UpdatePWM_DutyCycle(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         case FINGER_PINKY:
-            // TODO map to appropriate pin
-        	UpdatePWM_Match(TIMERA1_BASE, TIMER_B, usMatchVal, usPrescaleVal);
+        	UpdatePWM_DutyCycle(TIMERA1_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
         case WRIST:
-            // TODO map to appropriate pin
-        	UpdatePWM_Match(TIMERA0_BASE, TIMER_A, usMatchVal, usPrescaleVal);
+        	UpdatePWM_DutyCycle(TIMERA0_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         default:
             //UART_PRINT("[MoveServo] Invalid Finger input\n");

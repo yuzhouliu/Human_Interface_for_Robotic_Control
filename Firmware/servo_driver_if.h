@@ -16,12 +16,16 @@
 // December 20, 2015
 //
 // Modified:
-// December 28, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 
-// Define number of finters
+// Define number of fingers
 #define NUM_FINGERS 6
+
+// Define max position for wrist and fingers
+#define WRIST_MAX_POSITION 180
+#define FINGER_MAX_POSITION 90
 
 // Defines for fingers
 enum Finger_Type {
