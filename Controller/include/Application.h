@@ -2,7 +2,7 @@
 //
 // Application.h
 //
-// Core class that contains the high level application logic.
+// Class responsible for initializing components and integrating them together.
 //
 // Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
 // This code is licensed under BSD license (see LICENSE.txt for details)
@@ -11,7 +11,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 30, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 #ifndef _APPLICATION_H_
@@ -19,20 +19,12 @@
 
 #include <memory>
 
-#include "Hand.h"   /* FingerPressureStruct */
-#include "IObserver.h"
-
-class Application : public IObserver
+class Application
 {
 private:
-    /* Fields */
-    bool _exit;
-
     /* Methods */
     bool _initialize();
     void _terminate();
-    bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
-        unsigned char *buf, unsigned int buflen);
 
 public:
     /* Constructor */
@@ -43,9 +35,6 @@ public:
 
     /* Methods */
     int run();
-
-    /* IObserver virtual methods */
-    void onNotify(int event);
 };
 
 #endif /* _APPLICATION_H_ */
