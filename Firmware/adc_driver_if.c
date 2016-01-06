@@ -47,7 +47,7 @@
 #include "pin_mux_config.h"
 #include "adc_driver_if.h"
 #include "uart_if.h"
-
+#include "finger.h"
 #define FOREVER 1
 #define NO_OF_SAMPLES 4
 
@@ -122,7 +122,7 @@ unsigned short GetSensorReading(enum Finger_Type eFinger)
             uiChannel = ADC_CH_3;    // Pin_60
             break;
         default:
-            return -1.000;
+            return 0;
     }
 
     // Initialize Counter and Sum of Samples to 0

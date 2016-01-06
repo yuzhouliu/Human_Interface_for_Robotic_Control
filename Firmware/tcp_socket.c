@@ -151,8 +151,6 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
     // Start WLAN
     WlanStart();
 
-    UART_PRINT("Connecting to AP: %s ...\r\n",SSID_NAME);
-
     if (cSSID == NULL || cSecurityType == NULL || cSecurityKey == NULL)
     { // if user did not give the network info, use the default info
         secParams.Key = (signed char*)SECURITY_KEY;
@@ -160,6 +158,8 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
         secParams.Type = SECURITY_TYPE;
         lRetVal = sl_WlanConnect((signed char*)SSID_NAME, \
                                     strlen(SSID_NAME), 0, &secParams, 0);
+        UART_PRINT("Connecting to AP: %s ...\r\n",SSID_NAME);
+
     }
     else
     { // if user provide network info
@@ -167,6 +167,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
         secParams.KeyLen = strlen(cSecurityKey);
         secParams.Type = SecurityTypeParser(cSecurityType);
         lRetVal = sl_WlanConnect((signed char*)cSSID, strlen(cSSID), 0, &secParams, 0);
+        UART_PRINT("Connecting to AP: %s ...\r\n",cSSID);
     }
 
     ASSERT_ON_ERROR(lRetVal);
@@ -310,10 +311,24 @@ int BsdTcpServerReceive(char *data)
     }
     else
     {
-        UART_PRINT("RECEIVED BUFF:%s\n", g_cBsdBuf);
+        UART_PRINT("RECEIVED BUFF:%s\n\r", g_cBsdBuf);
         strcpy(data, g_cBsdBuf);
     }
     return SUCCESS;
+}
+
+//****************************************************************************
+//
+//! \brief Sending data to the client
+//!
+//! \param [in]: pointer to data that need to be sent, length of data to be sent
+//!
+//! \return     0 on success, -1 on error.
+//!
+//****************************************************************************
+int BsdTcpServerSend(char *data, int length)
+{
+	return sl_Send(ServerNewSockID, data, length, 0);
 }
 
 //****************************************************************************
@@ -389,15 +404,16 @@ int IpAddressParser(char *ucCMD)
 //*****************************************************************************
 static inline _u8 SecurityTypeParser(char * cSecurityType)
 {
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_OPEN")) return SL_SEC_TYPE_OPEN;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WEP")) return SL_SEC_TYPE_WEP;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_WPA2")) return SL_SEC_TYPE_WPA_WPA2;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PBC")) return SL_SEC_TYPE_WPS_PBC;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PIN")) return SL_SEC_TYPE_WPS_PIN;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_ENT")) return SL_SEC_TYPE_WPA_ENT;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PBC")) return SL_SEC_TYPE_P2P_PBC;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_KEYPAD")) return SL_SEC_TYPE_P2P_PIN_KEYPAD;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_DISPLAY")) return SL_SEC_TYPE_P2P_PIN_DISPLAY;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_OPEN") == 0) return SL_SEC_TYPE_OPEN;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_WEP") == 0) return SL_SEC_TYPE_WEP;
+    if (strcmp(cSecurityType, "SL_SEC_TYPE_WPA") == 0) return SL_SEC_TYPE_WPA;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_WPA2") == 0) return SL_SEC_TYPE_WPA_WPA2;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PBC") == 0) return SL_SEC_TYPE_WPS_PBC;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PIN") == 0) return SL_SEC_TYPE_WPS_PIN;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_ENT") == 0) return SL_SEC_TYPE_WPA_ENT;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PBC") == 0) return SL_SEC_TYPE_P2P_PBC;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_KEYPAD") == 0) return SL_SEC_TYPE_P2P_PIN_KEYPAD;
+    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_DISPLAY") == 0) return SL_SEC_TYPE_P2P_PIN_DISPLAY;
     return SL_SEC_TYPE_OPEN;
 }
 //*****************************************************************************

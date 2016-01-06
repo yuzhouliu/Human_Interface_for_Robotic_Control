@@ -49,7 +49,9 @@
 //#include "pinmux.h"
 #include "pin_mux_config.h"
 #include "servo_driver_if.h"
-
+#include "adc_driver_if.h"
+#include "msg_util_if.h"
+#include "finger.h"
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
 #define APPLICATION_VERSION     "0.0.1"
@@ -136,8 +138,11 @@ void main()
 {
     long lRetVal = 0;
     char data[BUF_SIZE];
+    char sent_data[BUF_SIZE];
+    unsigned char highByte, lowByte;
     int i;
 
+    memset(sent_data, 0, 10);
     // Board Initialization
     BoardInit();
 
@@ -147,6 +152,9 @@ void main()
     // Initialize the PWM outputs on the board
     InitServos();
 
+    // Initialize the sensor ADC
+    InitSensorADC();
+
     // Configuring UART
     InitTerm();
 
@@ -154,7 +162,8 @@ void main()
     DisplayBanner(APPLICATION_NAME);
 
     // Connect to WIFI using default info
-    WlanConnect(NULL, NULL, NULL);
+    //WlanConnect(NULL, NULL, NULL);
+    WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
 
     // Setup the TCP Server Socket
     BsdTcpServerSetup(PORT_NUM);
@@ -163,10 +172,21 @@ void main()
     while (lRetVal >= 0)
     {
     	lRetVal = BsdTcpServerReceive(data);
+    	/*
     	for (i = 0; i<NUM_FINGERS; i++)
     	{
     		MoveServo((unsigned char)data[i], (enum Finger_Type)i);
     	}
+    	*/
+    	for (i = 0; i< NUM_FINGERS; i++)
+    	{
+        	UnsignedShort_to_UnsignedChar(GetSensorReading((enum Finger_Type)i), &highByte, &lowByte);
+        	sent_data[i*2] = (char)highByte;
+        	sent_data[i*2+1] = (char)lowByte;
+    	}
+    	lRetVal = BsdTcpServerSend(sent_data, 10);
+    	UART_PRINT("Sent 10 bytes to client.\n\r");
+
     }
     UART_PRINT("Exiting Application ...\n\r");
 

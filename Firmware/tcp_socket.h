@@ -24,9 +24,12 @@
 #include "simplelink.h"
 #include "wlan.h"
 
-/* Config for the WLAN */
+//
+// Values for below macros shall be modified as per access-point(AP) properties
+// SimpleLink device will connect to following AP when application is executed
+//
 #define SSID_NAME           "Minh's iPhone"    /* AP SSID */
-#define SECURITY_TYPE       SL_SEC_TYPE_WPA /* Security type (OPEN or WEP or WPA)*/
+#define SECURITY_TYPE       SL_SEC_TYPE_WPA/* Security type (OPEN or WEP or WPA*/
 #define SECURITY_KEY        "minh1234"              /* Password of the secured AP */
 #define SSID_LEN_MAX        32
 #define BSSID_LEN_MAX       6
@@ -48,6 +51,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
 int BsdTcpServerReceive(char *data);//Recieve data
+int BsdTcpServerSend(char *data, int length); //send data
 int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
 

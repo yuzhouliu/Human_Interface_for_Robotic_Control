@@ -22,20 +22,12 @@
 
 // Define number of fingers
 #define NUM_FINGERS 6
-
+#include "finger.h"
 // Define max position for wrist and fingers
 #define WRIST_MAX_POSITION 180
 #define FINGER_MAX_POSITION 90
 
-// Defines for fingers
-enum Finger_Type {
-    FINGER_THUMB=0,
-    FINGER_INDEX=1,
-    FINGER_MIDDLE=2,
-    FINGER_RING=3,
-    FINGER_PINKY=4,
-    WRIST=5
-};
+
 
 //****************************************************************************
 // Initializes the Servo motors for operation

@@ -1,6 +1,6 @@
 #ifndef __ADC_DRIVER_IF_H__
 #define __ADC_DRIVER_IF_H__
-
+#include "finger.h"
 //*****************************************************************************
 //
 // adc_driver_if.h
@@ -19,14 +19,6 @@
 // December 28, 2015
 //
 //*****************************************************************************
-
-// Defines for fingertip sensors
-enum Finger_Type {
-    FINGER_THUMB,
-    FINGER_INDEX,
-    FINGER_MIDDLE,
-    FINGER_RING
-};
 
 //****************************************************************************
 // Initializes the Sensor ADCs for operation
