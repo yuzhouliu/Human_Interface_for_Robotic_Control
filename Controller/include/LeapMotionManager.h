@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 29, 2015
+// January 4, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -24,6 +24,7 @@
 struct LeapDataStruct
 {
     unsigned char totalAngle[NUM_FINGERS];
+    unsigned char wristAngle;
 };
 
 class LeapMotionManager

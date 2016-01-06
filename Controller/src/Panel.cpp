@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 4, 2016
+// January 5, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -110,6 +110,7 @@ void Panel::run()
     //
     // Main panel logic
     //
+    fpsManager.setFPS(5);
     while (!Window::gExit)
     {
         //
