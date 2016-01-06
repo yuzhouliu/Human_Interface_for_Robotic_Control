@@ -43,6 +43,7 @@
 #include "pin_mux_config.h"
 #include "adc_driver_if.h"
 #include "uart_if.h"
+#include "msg_util_if.h"
 
 #define UART_PRINT Report
 #define FOREVER 1
@@ -92,6 +93,9 @@ static void BoardInit(void)
 
 void main()
 {
+	unsigned short sensorReading, regeneratedVal;
+	unsigned char highByte, lowByte;
+
     // Initialize Board configurations
     BoardInit();
 
@@ -109,7 +113,13 @@ void main()
         //PIN_57 is muxed between UART0 RX and ADC0, cannot do both at same time
         //UART_PRINT("FINGER_THUMB: %f (V)\n\r", GetSensorReading(FINGER_THUMB));
 
-        UART_PRINT("FINGER_INDEX: %f (V)\n\r", GetSensorReading(FINGER_INDEX));
+    	sensorReading = GetSensorReading(FINGER_INDEX);
+    	UnsignedShort_to_UnsignedChar(sensorReading, &highByte, &lowByte);
+    	UnsignedChar_to_UnsignedShort(highByte, lowByte, &regeneratedVal);
+    	UART_PRINT("SensorReading: %d. HighByte: %d, LowByte: %d\n\r", sensorReading, (unsigned int) highByte, (unsigned int) lowByte);
+    	UART_PRINT("Reconstructed: %d\n\r", regeneratedVal);
+    	UART_PRINT("In Volts: %f\n\r", (sensorReading*1.4)/4096);
+        //UART_PRINT("FINGER_INDEX: %f (V)\n\r", GetSensorReading(FINGER_INDEX));
 
         UART_PRINT("FINGER_MIDDLE: %f (V)\n\r", GetSensorReading(FINGER_MIDDLE));
 

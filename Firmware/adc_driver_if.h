@@ -42,6 +42,6 @@ void DisableSensorADC(void);
 // Gets the Sensor Reading from Finger-Tip sensors using ADC
 // Returns a float ranging from 0 - 1.4V
 //*****************************************************************************
-float GetSensorReading(enum Finger_Type eFinger);
+unsigned short GetSensorReading(enum Finger_Type eFinger);
 
 #endif //  __ADC_DRIVER_IF_H__

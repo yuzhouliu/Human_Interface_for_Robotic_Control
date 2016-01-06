@@ -1,8 +1,8 @@
 //*****************************************************************************
 //
-// adc_driver_if.c
+// msg_util_if.c
 //
-// High-level ADC driver for CC3200-LAUNCHXL
+// Functions for converting various types to proper message buffer format
 //
 // Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
 // This code is licensed under BSD license (see LICENSE.txt for details)
@@ -14,10 +14,10 @@
 // Project: Human Interface for Robotic Control
 //
 // Created:
-// December 28, 2015
+// January 6, 2015
 //
 // Modified:
-// December 28, 2015
+// January 6, 2015
 //
 //*****************************************************************************
 
@@ -26,120 +26,26 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-// Driverlib includes
-#include "utils.h"
-#include "hw_memmap.h"
-#include "hw_common_reg.h"
-#include "hw_types.h"
-#include "hw_adc.h"
-#include "hw_ints.h"
-#include "hw_gprcm.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "interrupt.h"
-#include "prcm.h"
-#include "uart.h"
-#include "pin.h"
-#include "adc.h"
-
-#include "pin_mux_config.h"
-#include "adc_driver_if.h"
-#include "uart_if.h"
-
-#define FOREVER 1
-#define NO_OF_SAMPLES 4
+#include "msg_util_if.h"
 
 //****************************************************************************
-// Initializes the Sensor ADCs for operation
-//
-// \param None.
-//
-// \return None.
+// Converts 16-bit unsigned short to 2 8-bit unsigned chars
 //****************************************************************************
-void InitSensorADC(void)
-{
-    // Enable ADC module
-    MAP_ADCEnable(ADC_BASE);
-
-    // Enable ADC channel
-    //MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);    // NOTE: Cannot enabled concurrently with UART0 RX
-    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_1);
-    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_2);
-    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_3);
+void UnsignedShort_to_UnsignedChar(unsigned short input_16_bits, unsigned char *highByte, unsigned char *lowByte)
+{    
+    *highByte = (input_16_bits >> 8) & 0xFF;         // MSB
+    *lowByte = input_16_bits & 0xFF;                 // LSB
+    return;
 }
 
 //****************************************************************************
-// Disables the Sensor ADCs
-//
-// \param None.
-//
-// \return None.
+// Converts 2 8-bit unsigned chars to 16-bit unsigned short
 //****************************************************************************
-void DisableSensorADC(void)
+void UnsignedChar_to_UnsignedShort(unsigned char highByte, unsigned char lowByte, unsigned short *output_16_bits)
 {
-    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_0);
-    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_1);
-    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_2);
-    MAP_ADCChannelDisable(ADC_BASE, ADC_CH_3);
-}
-
-//*****************************************************************************
-// Gets the Sensor Reading from Finger-Tip sensors using ADC
-//
-// \param eFinger -> finger type (ex: FINGER_THUMB, FINGER_INDEX, etc)
-//
-// \return A float value ranging from 0 - 1.4V
-//*****************************************************************************
-unsigned short GetSensorReading(enum Finger_Type eFinger)
-{
-    unsigned int uiChannel;
-    unsigned char ucCount;
-    unsigned long ulSampleTotal;
-
-#ifdef CC3200_ES_1_2_1
-    // Enable ADC clocks.###IMPORTANT###Need to be removed for PG 1.32
-    HWREG(GPRCM_BASE + GPRCM_O_ADC_CLK_CONFIG) = 0x00000043;
-    HWREG(ADC_BASE + ADC_O_ADC_CTRL) = 0x00000004;
-    HWREG(ADC_BASE + ADC_O_ADC_SPARE0) = 0x00000100;
-    HWREG(ADC_BASE + ADC_O_ADC_SPARE1) = 0x0355AA00;
-#endif
-
-    // Convert pin number to channel number
-    switch(eFinger)
-    {
-        case FINGER_THUMB:
-            uiChannel = ADC_CH_0;    // Pin_57
-            break;
-        case FINGER_INDEX:
-            uiChannel = ADC_CH_1;    // Pin_58
-            break;
-        case FINGER_MIDDLE:
-            uiChannel = ADC_CH_2;    // Pin_59
-            break;
-        case FINGER_RING:
-            uiChannel = ADC_CH_3;    // Pin_60
-            break;
-        default:
-            return -1.000;
-    }
-
-    // Initialize Counter and Sum of Samples to 0
-    ucCount = 0;
-    ulSampleTotal = 0;
-
-    while(ucCount < NO_OF_SAMPLES)
-    {
-        if(MAP_ADCFIFOLvlGet(ADC_BASE, uiChannel))
-        {
-            ulSampleTotal += (MAP_ADCFIFORead(ADC_BASE, uiChannel) >> 2) & 0x0FFF;
-            ucCount++;
-        }
-    }
-
-    //return (float) ((ulSampleTotal/NO_OF_SAMPLES)*1.4)/4096;
-    return (unsigned short) ulSampleTotal/NO_OF_SAMPLES;
+	*output_16_bits = (unsigned short) ((unsigned short)highByte)<<8 + lowByte;
+    return;
 }
 
 //*****************************************************************************
