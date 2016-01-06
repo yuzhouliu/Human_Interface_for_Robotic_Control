@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 4, 2016
+// January 6, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -22,7 +22,7 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
-#include "res.h"
+#include "resource.h"
 
 //
 // Initialize static variable
@@ -146,7 +146,7 @@ bool Window::_initialize()
     //
     // Creates and attaches menu bar to window
     //
-    _menu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MENU));
+    _menu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MENU1));
     if (_menu == nullptr)
     {
         std::cerr << "[ERROR] Window::_initialize(): Could not create menu. "\
@@ -227,29 +227,36 @@ void Window::_processInput()
                 //
                 switch (LOWORD(event.syswm.msg->msg.win.wParam))
                 {
-                case IDM_CONNECT:
+                case ID_FILE_CONNECT:
                     //
                     // File -> Connect
                     //
                     MessageBox(_windowHandle, "Not implemented",
                         "Not implemented", MB_ICONINFORMATION | MB_OK);
                     break;
-                case IDM_DISCONNECT:
+                case ID_FILE_DISCONNECT:
                     //
                     // File -> Disconnect
                     //
                     MessageBox(_windowHandle, "Not implemented",
                         "Not implemented", MB_ICONINFORMATION | MB_OK);
                     break;
-                case IDM_QUIT:
+                case ID_FILE_QUIT:
                     //
                     // File -> Quit
                     //
                     gExit = true;
                     break;
-                case IDM_RECORD:
+                case ID_OPTIONS_STARTRECORDING:
                     //
-                    // Options -> Record
+                    // Options -> Start Recording
+                    //
+                    MessageBox(_windowHandle, "Not implemented",
+                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    break;
+                case ID_OPTIONS_STOPRECORDING:
+                    //
+                    // Options -> Stop Recording
                     //
                     MessageBox(_windowHandle, "Not implemented",
                         "Not implemented", MB_ICONINFORMATION | MB_OK);

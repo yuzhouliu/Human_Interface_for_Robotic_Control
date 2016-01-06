@@ -28,7 +28,7 @@
     <ClInclude Include="include\TCPSocket.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Window.h" />
-    <ClInclude Include="res\res.h" />
+    <ClInclude Include="res\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -45,7 +45,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="res\res.rc" />
+    <ResourceCompile Include="res\resource.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{510DB082-CAC7-40F8-8B02-AB4E353D4128}</ProjectGuid>

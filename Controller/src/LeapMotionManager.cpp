@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 29, 2015
+// January 5, 2016
 //
 //*****************************************************************************
 #include "LeapMotionManager.h"
@@ -81,11 +81,12 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
     //
     if (!hand.isValid() || !hand.isRight())
     {
+        std::cout << "No hand detected." << std::endl;
         return false;
     }
 
     //
-    // Populates LeapDataStruct structure with relevent info
+    // Populates LeapDataStruct structure with finger info
     //
     Leap::FingerList fingers = hand.fingers();
     for (auto it = fingers.begin(); it != fingers.end(); it++)
@@ -101,6 +102,23 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
         leapData.totalAngle[finger.type()] = (unsigned char)
             (_radiansToDegrees(_calculateTotalAngle(direction, 4)));
     }
+
+    //
+    // Populates LeapDataStruct structure with wrist info
+    //
+    Leap::Vector palmNormal = hand.palmNormal();
+    float rollInRadians = palmNormal.roll();
+    float rollInDegrees = _radiansToDegrees(rollInRadians);
+    float wristAngle = rollInDegrees + 90;
+    if (wristAngle > 180)
+    {
+        wristAngle = 180;
+    }
+    else if (wristAngle < 0)
+    {
+        wristAngle = 0;
+    }
+    leapData.wristAngle = (unsigned char)(wristAngle);
 
     //
     // Serialize data
@@ -168,7 +186,8 @@ void LeapMotionManager::_serialize(LeapDataStruct &leapData,
     //
     const int BITS_PER_BYTE = 8;
     int angleSize = sizeof(leapData.totalAngle[0]);
-    assert(buflen >= angleSize*NUM_FINGERS);
+    int wristSize = sizeof(leapData.wristAngle);
+    assert(buflen >= (angleSize*NUM_FINGERS + wristSize));
 
     //
     // Serialize data
@@ -184,5 +203,7 @@ void LeapMotionManager::_serialize(LeapDataStruct &leapData,
         buf[bufIndex++] = angle;
         std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
     }
+    buf[bufIndex++] = leapData.wristAngle;
+    std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
     std::cout << std::endl;
 }
