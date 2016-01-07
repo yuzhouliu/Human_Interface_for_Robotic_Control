@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 4, 2016
+// January 7, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -29,6 +29,8 @@ extern struct SDL_Window;
 extern struct SDL_Renderer;
 
 void panelTask(std::shared_ptr<Panel> panel);
+BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam);
 
 class Window
 {

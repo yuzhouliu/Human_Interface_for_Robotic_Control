@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 6, 2016
+// January 7, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -231,8 +231,8 @@ void Window::_processInput()
                     //
                     // File -> Connect
                     //
-                    MessageBox(_windowHandle, "Not implemented",
-                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    DialogBox(GetModuleHandle(NULL), 
+                        MAKEINTRESOURCE(IDD_CONNECT), NULL, ConnectDlgProc);
                     break;
                 case ID_FILE_DISCONNECT:
                     //
@@ -272,6 +272,51 @@ void Window::_processInput()
             break;
         }
     }
+}
+
+//*****************************************************************************
+//
+//! Dialog function for File->Connect dialog box.
+//!
+//! \param hwnd handle to the dialog box.
+//! \param msg the message command received.
+//! \param wParam notification message in high byte and control identifier of
+//!     the control that sent the message in low byte.
+//! \param lParam window handle to the control that sent the message.
+//!
+//! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
+//
+//*****************************************************************************
+BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+    case WM_INITDIALOG:
+        break;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_CONNECT:
+        {
+            HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
+            int len = GetWindowTextLength(hComboBox);
+            std::cout << len << std::endl;
+            EndDialog(hwnd, 0);
+            break;
+        }
+        case IDCANCEL:
+            EndDialog(hwnd, 0);
+            break;
+        }
+        break;
+    case WM_CLOSE:
+        EndDialog(hwnd, 0);
+        break;
+    default:
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 //*****************************************************************************
