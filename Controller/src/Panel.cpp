@@ -87,7 +87,7 @@ void Panel::run()
     //
     // Receive IPv4 address and port as input from user
     //
-    /*std::cout << "Enter the target IPv4 address: ";
+    std::cout << "Enter the target IPv4 address: ";
     char addressInput[16];
     std::cin >> addressInput;
 
@@ -105,7 +105,7 @@ void Panel::run()
     //
     TCPSocket tcpsocket;
     tcpsocket.open();
-    tcpsocket.connect(&address);*/
+    tcpsocket.connect(&address);
 
     //
     // Main panel logic
@@ -126,7 +126,12 @@ void Panel::run()
         //
         // Send data to remote host
         //
-        /*tcpsocket.send(data, _MAX_PAYLOAD);*/
+        tcpsocket.send(data, _MAX_PAYLOAD);
+
+        //
+        // Receive data from remote host
+        //
+        tcpsocket.recv(data, _MAX_PAYLOAD);
 
         //
         // Populates FingerPressureStruct with finger pressure information
@@ -277,7 +282,8 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     // Buffer needs to be at least this size
     //
     const int BITS_PER_BYTE = 8;
-    int pressureSize = sizeof(fingerPressures.pressure[0]);
+    //int pressureSize = sizeof(fingerPressures.pressure[0]);
+    int pressureSize = sizeof(unsigned short);
     assert(buflen >= pressureSize*NUM_FINGERS);
 
     //
@@ -286,7 +292,15 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     unsigned int bufIndex = 0;
     for (int i=0; i<NUM_FINGERS; i++)
     {
-        fingerPressures.pressure[i] = buf[bufIndex++];
+        //fingerPressures.pressure[i] = buf[bufIndex++];
+        unsigned short encodedPressure = 0;
+        encodedPressure += buf[bufIndex++];
+        encodedPressure <<= BITS_PER_BYTE;
+        encodedPressure += buf[bufIndex++];
+        assert((encodedPressure >= 0) && (encodedPressure <= 4096));
+        float multiplier = (float)(1) - (float)(encodedPressure)/4096;
+        fingerPressures.pressure[i] = static_cast<unsigned char>(multiplier*255);
+        std::cout << "pressure = " << static_cast<unsigned int>(fingerPressures.pressure[i]) << std::endl;
     }
 
     return true;
