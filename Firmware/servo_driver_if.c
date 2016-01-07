@@ -13,7 +13,7 @@
 // December 20, 2015
 //
 // Modified:
-// January 4, 2016
+// January 6, 2015
 //
 //*****************************************************************************
 
@@ -72,25 +72,24 @@ void DisableServos()
 // \return None.
 //
 //****************************************************************************
-void MoveServo(unsigned char ucDegrees, enum Finger_Type eFinger)
+void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint)
 {
     unsigned short usMatchVal;
     unsigned char usPrescaleVal;
 
-    /*
     // Check if Degrees input is within max of the finger/wrist type
-    switch(eFinger) {
-        case FINGER_THUMB:
-        case FINGER_INDEX:
-        case FINGER_MIDDLE:
-        case FINGER_RING:
-        case FINGER_PINKY:
+    switch(eServoJoint) {
+        case SERVO_FINGER_THUMB:
+        case SERVO_FINGER_INDEX:
+        case SERVO_FINGER_MIDDLE:
+        case SERVO_FINGER_RING:
+        case SERVO_FINGER_PINKY:
         	if (ucDegrees > FINGER_MAX_POSITION)
         	{
         		ucDegrees = FINGER_MAX_POSITION;
         	}
         	break;
-        case WRIST:
+        case SERVO_WRIST:
         	if (ucDegrees > WRIST_MAX_POSITION)
         	{
         		ucDegrees = WRIST_MAX_POSITION;
@@ -100,27 +99,26 @@ void MoveServo(unsigned char ucDegrees, enum Finger_Type eFinger)
         	//UART_PRINT("[MoveServo] Invalid Finger input\n");
             return;
     }
-    */
 
     Convert_Degrees_To_DutyCycle(ucDegrees, &usMatchVal, &usPrescaleVal);
 
-    switch(eFinger) {
-        case FINGER_THUMB:
+    switch(eServoJoint) {
+        case SERVO_FINGER_THUMB:
             UpdatePWM_DutyCycle(TIMERA3_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
-        case FINGER_INDEX:
+        case SERVO_FINGER_INDEX:
             UpdatePWM_DutyCycle(TIMERA2_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case FINGER_MIDDLE:
+        case SERVO_FINGER_MIDDLE:
             UpdatePWM_DutyCycle(TIMERA3_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case FINGER_RING:
+        case SERVO_FINGER_RING:
             UpdatePWM_DutyCycle(TIMERA1_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
-        case FINGER_PINKY:
+        case SERVO_FINGER_PINKY:
         	UpdatePWM_DutyCycle(TIMERA1_BASE, TIMER_B, usMatchVal, usPrescaleVal);
             break;
-        case WRIST:
+        case SERVO_WRIST:
         	UpdatePWM_DutyCycle(TIMERA0_BASE, TIMER_A, usMatchVal, usPrescaleVal);
             break;
         default:

@@ -1,6 +1,5 @@
 #ifndef __ADC_DRIVER_IF_H__
 #define __ADC_DRIVER_IF_H__
-#include "finger.h"
 //*****************************************************************************
 //
 // adc_driver_if.h
@@ -16,9 +15,21 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// January 6, 2015
 //
 //*****************************************************************************
+
+// Defines number of sensors
+#define NUM_SENSORS 5
+
+// Defines for finger-tip sensors
+enum Fingertip_Sensor_Type {
+    SENSOR_FINGER_THUMB=0,
+	SENSOR_FINGER_INDEX,
+	SENSOR_FINGER_MIDDLE,
+	SENSOR_FINGER_RING,
+	SENSOR_FINGER_PINKY
+};
 
 //****************************************************************************
 // Initializes the Sensor ADCs for operation
@@ -32,8 +43,14 @@ void DisableSensorADC(void);
 
 //*****************************************************************************
 // Gets the Sensor Reading from Finger-Tip sensors using ADC
-// Returns a float ranging from 0 - 1.4V
+// Returns the raw ADC value from 0 to 4096
 //*****************************************************************************
-unsigned short GetSensorReading(enum Finger_Type eFinger);
+unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor);
+
+//*****************************************************************************
+// Converts raw ADC value (0 to 4096) to the associated voltage (0 to 1.4V)
+// Returns a float value ranging from 0 - 1.4V
+//*****************************************************************************
+float ConvertADCtoVolts(unsigned short input_raw_adc);
 
 #endif //  __ADC_DRIVER_IF_H__

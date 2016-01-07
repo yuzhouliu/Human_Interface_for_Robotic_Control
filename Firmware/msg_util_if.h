@@ -25,9 +25,4 @@
 //****************************************************************************
 void UnsignedShort_to_UnsignedChar(unsigned short input_16_bits, unsigned char *highByte, unsigned char *lowByte);
 
-//****************************************************************************
-// Converts 2 8-bit unsigned chars to 16-bit unsigned short
-//****************************************************************************
-void UnsignedChar_to_UnsignedShort(unsigned char highByte, unsigned char lowByte, unsigned short *output_16_bits);
-
 #endif //  __MSG_UTIL_IF_H__

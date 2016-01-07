@@ -17,7 +17,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// January 6, 2015
 //
 //*****************************************************************************
 
@@ -47,9 +47,9 @@
 #include "pin_mux_config.h"
 #include "adc_driver_if.h"
 #include "uart_if.h"
-#include "finger.h"
+
 #define FOREVER 1
-#define NO_OF_SAMPLES 4
+#define NO_OF_SAMPLES 2
 
 //****************************************************************************
 // Initializes the Sensor ADCs for operation
@@ -92,7 +92,7 @@ void DisableSensorADC(void)
 //
 // \return A float value ranging from 0 - 1.4V
 //*****************************************************************************
-unsigned short GetSensorReading(enum Finger_Type eFinger)
+unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
 {
     unsigned int uiChannel;
     unsigned char ucCount;
@@ -107,22 +107,22 @@ unsigned short GetSensorReading(enum Finger_Type eFinger)
 #endif
 
     // Convert pin number to channel number
-    switch(eFinger)
+    switch(eFingerSensor)
     {
-        case FINGER_THUMB:
+        case SENSOR_FINGER_THUMB:
             uiChannel = ADC_CH_0;    // Pin_57
             break;
-        case FINGER_INDEX:
+        case SENSOR_FINGER_INDEX:
             uiChannel = ADC_CH_1;    // Pin_58
             break;
-        case FINGER_MIDDLE:
+        case SENSOR_FINGER_MIDDLE:
             uiChannel = ADC_CH_2;    // Pin_59
             break;
-        case FINGER_RING:
+        case SENSOR_FINGER_RING:
             uiChannel = ADC_CH_3;    // Pin_60
             break;
         default:
-            return 0;
+            return (unsigned short) 0;
     }
 
     // Initialize Counter and Sum of Samples to 0
@@ -138,8 +138,19 @@ unsigned short GetSensorReading(enum Finger_Type eFinger)
         }
     }
 
-    //return (float) ((ulSampleTotal/NO_OF_SAMPLES)*1.4)/4096;
     return (unsigned short) ulSampleTotal/NO_OF_SAMPLES;
+}
+
+//*****************************************************************************
+// Converts raw ADC value (0 to 4096) to the associated voltage (0 to 1.4V)
+//
+// \param input_raw_adc -> raw ADC value from 0 to 4096
+//
+// \return A float value ranging from 0 - 1.4V
+//*****************************************************************************
+float ConvertADCtoVolts(unsigned short input_raw_adc)
+{
+	return (float) (input_raw_adc*1.4)/4096;
 }
 
 //*****************************************************************************

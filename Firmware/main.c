@@ -11,7 +11,7 @@
 //
 // Created: Dec 21 2015
 //
-// Modified: Dec 21 2015
+// Modified: January 6, 2015
 //
 //*****************************************************************************
 
@@ -51,7 +51,7 @@
 #include "servo_driver_if.h"
 #include "adc_driver_if.h"
 #include "msg_util_if.h"
-#include "finger.h"
+
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
 #define APPLICATION_VERSION     "0.0.1"
@@ -173,14 +173,14 @@ void main()
     {
     	lRetVal = BsdTcpServerReceive(data);
     	/*
-    	for (i = 0; i<NUM_FINGERS; i++)
+    	for (i = 0; i<NUM_SERVOS; i++)
     	{
-    		MoveServo((unsigned char)data[i], (enum Finger_Type)i);
+    		MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
     	}
     	*/
-    	for (i = 0; i< NUM_FINGERS; i++)
+    	for (i = 0; i< NUM_SENSORS; i++)
     	{
-        	UnsignedShort_to_UnsignedChar(GetSensorReading((enum Finger_Type)i), &highByte, &lowByte);
+        	UnsignedShort_to_UnsignedChar(GetSensorReading((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
         	sent_data[i*2] = (char)highByte;
         	sent_data[i*2+1] = (char)lowByte;
     	}

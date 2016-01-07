@@ -14,7 +14,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 28, 2015
+// January 6, 2015
 //
 //*****************************************************************************
 
@@ -93,7 +93,7 @@ static void BoardInit(void)
 
 void main()
 {
-	unsigned short sensorReading, regeneratedVal;
+	unsigned short sensorReading;
 	unsigned char highByte, lowByte;
 
     // Initialize Board configurations
@@ -113,19 +113,25 @@ void main()
         //PIN_57 is muxed between UART0 RX and ADC0, cannot do both at same time
         //UART_PRINT("FINGER_THUMB: %f (V)\n\r", GetSensorReading(FINGER_THUMB));
 
-    	sensorReading = GetSensorReading(FINGER_INDEX);
+    	sensorReading = GetSensorReading(SENSOR_FINGER_INDEX);
     	UnsignedShort_to_UnsignedChar(sensorReading, &highByte, &lowByte);
-    	UnsignedChar_to_UnsignedShort(highByte, lowByte, &regeneratedVal);
-    	UART_PRINT("SensorReading: %d. HighByte: %d, LowByte: %d\n\r", sensorReading, (unsigned int) highByte, (unsigned int) lowByte);
-    	UART_PRINT("Reconstructed: %d\n\r", regeneratedVal);
-    	UART_PRINT("In Volts: %f\n\r", (sensorReading*1.4)/4096);
-        //UART_PRINT("FINGER_INDEX: %f (V)\n\r", GetSensorReading(FINGER_INDEX));
+    	UART_PRINT("FINGER_INDEX - ");
+    	UART_PRINT("SensorReading: %d. In volts: %f.", sensorReading, ConvertADCtoVolts(sensorReading));
+    	UART_PRINT("HighByte: %d, LowByte: %d\n\r", (unsigned int) highByte, (unsigned int) lowByte);
 
-        UART_PRINT("FINGER_MIDDLE: %f (V)\n\r", GetSensorReading(FINGER_MIDDLE));
+    	sensorReading = GetSensorReading(SENSOR_FINGER_MIDDLE);
+    	UnsignedShort_to_UnsignedChar(sensorReading, &highByte, &lowByte);
+    	UART_PRINT("FINGER_MIDDLE - ");
+    	UART_PRINT("SensorReading: %d. In volts: %f.", sensorReading, ConvertADCtoVolts(sensorReading));
+    	UART_PRINT("HighByte: %d, LowByte: %d\n\r", (unsigned int) highByte, (unsigned int) lowByte);
 
-        UART_PRINT("FINGER_RING: %f (V)\n\r", GetSensorReading(FINGER_RING));
+    	sensorReading = GetSensorReading(SENSOR_FINGER_RING);
+    	UnsignedShort_to_UnsignedChar(sensorReading, &highByte, &lowByte);
+    	UART_PRINT("FINGER_RING - ");
+    	UART_PRINT("SensorReading: %d. In volts: %f.", sensorReading, ConvertADCtoVolts(sensorReading));
+    	UART_PRINT("HighByte: %d, LowByte: %d\n\r", (unsigned int) highByte, (unsigned int) lowByte);
 
-        MAP_UtilsDelay(30000000);
+        MAP_UtilsDelay(20000000);
         UART_PRINT("=========================================\n\r");
     }
 }

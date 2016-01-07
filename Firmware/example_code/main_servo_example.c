@@ -14,7 +14,7 @@
 // December 20, 2015
 //
 // Modified:
-// December 27, 2015
+// January 6, 2015
 //
 //*****************************************************************************
 
@@ -110,22 +110,21 @@ void main()
     
     while(1)
     {
-        MoveServo(0, FINGER_INDEX);
-        MoveServo(45, FINGER_THUMB);
-        MoveServo(0, FINGER_MIDDLE);
-        MoveServo(45, FINGER_RING);
-        //MoveServo(0, FINGER_PINKY);
-        //MoveServo(180, WRIST);
+        MoveServo(0, SERVO_FINGER_INDEX);
+        MoveServo(45, SERVO_FINGER_THUMB);
+        MoveServo(0, SERVO_FINGER_MIDDLE);
+        MoveServo(45, SERVO_FINGER_RING);
+        //MoveServo(0, SERVO_FINGER_PINKY);
+        //MoveServo(180, SERVO_WRIST);
         MAP_UtilsDelay(20000000);
 
-        MoveServo(90, FINGER_INDEX);
-        MoveServo(135, FINGER_THUMB);
-        MoveServo(180, FINGER_MIDDLE);
-        MoveServo(90, FINGER_RING);
-        //MoveServo(180, FINGER_PINKY);
-        //MoveServo(0, WRIST);
+        MoveServo(90, SERVO_FINGER_INDEX);
+        MoveServo(135, SERVO_FINGER_THUMB);
+        MoveServo(180, SERVO_FINGER_MIDDLE);
+        MoveServo(90, SERVO_FINGER_RING);
+        //MoveServo(180, SERVO_FINGER_PINKY);
+        //MoveServo(0, SERVO_WRIST);
         MAP_UtilsDelay(20000000);
-      
     }
 
     //
@@ -133,7 +132,6 @@ void main()
     //
     //DisableServos();
 }
-
 
 //*****************************************************************************
 //

@@ -31,20 +31,12 @@
 
 //****************************************************************************
 // Converts 16-bit unsigned short to 2 8-bit unsigned chars
+// highByte is MSB, lowByte is LSB following Big Endian notation
 //****************************************************************************
 void UnsignedShort_to_UnsignedChar(unsigned short input_16_bits, unsigned char *highByte, unsigned char *lowByte)
 {    
     *highByte = (input_16_bits >> 8) & 0xFF;         // MSB
     *lowByte = input_16_bits & 0xFF;                 // LSB
-    return;
-}
-
-//****************************************************************************
-// Converts 2 8-bit unsigned chars to 16-bit unsigned short
-//****************************************************************************
-void UnsignedChar_to_UnsignedShort(unsigned char highByte, unsigned char lowByte, unsigned short *output_16_bits)
-{
-	*output_16_bits = (unsigned short) ((unsigned short)highByte)<<8 + lowByte;
     return;
 }
 
