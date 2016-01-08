@@ -27,7 +27,6 @@
 #include "utils.h"
 #include "prcm.h"
 #include "uart.h"
-#include "finger.h"
 
 #include "servo_driver_if.h"
 
