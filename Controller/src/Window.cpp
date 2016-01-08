@@ -292,6 +292,7 @@ BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_INITDIALOG:
+        CenterWindow(hwnd);
         break;
     case WM_COMMAND:
         switch (LOWORD(wParam))
@@ -300,7 +301,11 @@ BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
             int len = GetWindowTextLength(hComboBox);
-            std::cout << len << std::endl;
+            std::cout << "length = " << len << std::endl;
+            if (len > 0)
+            {
+                // TODO (Brandon):
+            }
             EndDialog(hwnd, 0);
             break;
         }
@@ -332,4 +337,45 @@ BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void panelTask(std::shared_ptr<Panel> panel)
 {
     panel->run();
+}
+
+//*****************************************************************************
+//
+//! Moves window to center of screen.
+//!
+//! \param hwnd handle to the window.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void CenterWindow(HWND hwnd)
+{
+     RECT rectWindow, rectDesktop;
+ 
+     //
+     // Make the window relative to its Desktop
+     //
+     GetWindowRect(hwnd, &rectWindow);
+     GetWindowRect(GetDesktopWindow(), &rectDesktop);
+
+     int nWidth = rectWindow.right - rectWindow.left;
+     int nHeight = rectWindow.bottom - rectWindow.top;
+
+     int nX = ((rectDesktop.right - rectDesktop.left) - nWidth) / 2
+         + rectDesktop.left;
+     int nY = ((rectDesktop.bottom - rectDesktop.top) - nHeight) / 2
+         + rectDesktop.top;
+
+     int nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+     int nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+     //
+     // Make sure that the dialog box never moves outside of the screen
+     //
+     if (nX < 0) nX = 0;
+     if (nY < 0) nY = 0;
+     if (nX + nWidth > nScreenWidth) nX = nScreenWidth - nWidth;
+     if (nY + nHeight > nScreenHeight) nY = nScreenHeight - nHeight;
+
+     MoveWindow(hwnd, nX, nY, nWidth, nHeight, FALSE);
 }

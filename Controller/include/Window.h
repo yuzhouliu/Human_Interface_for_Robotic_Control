@@ -31,6 +31,7 @@ extern struct SDL_Renderer;
 void panelTask(std::shared_ptr<Panel> panel);
 BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
     LPARAM lParam);
+void CenterWindow(HWND hwnd);
 
 class Window
 {
