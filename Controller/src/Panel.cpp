@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 5, 2016
+// January 8, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -25,6 +25,8 @@
 #include "Network.h"
 #include "TCPSocket.h"
 #include "Window.h"
+
+#include "resource.h"
 
 //*****************************************************************************
 //
@@ -110,7 +112,7 @@ void Panel::run()
     //
     // Main panel logic
     //
-    fpsManager.setFPS(5);
+    //fpsManager.setFPS(5);
     while (!Window::gExit)
     {
         //
@@ -304,4 +306,100 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     }
 
     return true;
+}
+
+//*****************************************************************************
+//
+//! Dialog function for File->Connect dialog box.
+//!
+//! \param hwnd handle to the dialog box.
+//! \param msg the message command received.
+//! \param wParam notification message in high byte and control identifier of
+//!     the control that sent the message in low byte.
+//! \param lParam window handle to the control that sent the message.
+//!
+//! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
+//
+//*****************************************************************************
+BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+    case WM_INITDIALOG:
+        CenterWindow(hwnd);
+        break;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_CONNECT:
+        {
+            HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
+            int len = GetWindowTextLength(hComboBox);
+            std::cout << "length = " << len << std::endl;
+            if (len > 0)
+            {
+                // TODO (Brandon): Implement connection
+            }
+            EndDialog(hwnd, 0);
+            break;
+        }
+        case IDCANCEL:
+            EndDialog(hwnd, 0);
+            break;
+        }
+        break;
+    case WM_CLOSE:
+        EndDialog(hwnd, 0);
+        break;
+    default:
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+//*****************************************************************************
+//
+//! Static DlgProc router function that routes the event to the correct DlgProc
+//! for further processing.
+//!
+//! \param hwnd handle to the dialog box.
+//! \param msg the message command received.
+//! \param wParam notification message in high byte and control identifier of
+//!     the control that sent the message in low byte.
+//! \param lParam window handle to the control that sent the message.
+//!
+//! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
+//
+//*****************************************************************************
+BOOL CALLBACK Panel::DlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam)
+{
+    //
+    // The pointer to the panel class is passed in lParam on dialog
+    // initialization
+    //
+    if (msg == WM_INITDIALOG)
+    {
+        //
+        // Store the pointer to the panel class as user data in the dialog box
+        //
+        SetWindowLong(hwnd, GWL_USERDATA,
+            long((LPCREATESTRUCT(lParam))->lpCreateParams));
+    }
+
+    //
+    // Fetch the pointer to the panel class from the dialog box
+    //
+    Panel *panel = reinterpret_cast<Panel*>(GetWindowLong(hwnd, GWL_USERDATA));
+
+    //
+    // Delegate the call of the DlgProc function to the correct class
+    //
+    if (panel)
+    {
+        return panel->ConnectDlgProc(hwnd, msg, wParam, lParam);
+    }
+
+    return FALSE;
 }
