@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 6, 2016
+// January 9, 2016
 //
 //*****************************************************************************
 #include "TCPSocket.h"
@@ -104,6 +104,7 @@ void TCPSocket::close()
     //
     ::close(_sockfd);
 #endif
+    _sockfd = 0;
 }
 
 //*****************************************************************************
@@ -147,6 +148,7 @@ bool TCPSocket::connect(AddressBase<unsigned int> *address)
 //! Sends the entire message to remote host.
 //!
 //! \param message buffer containing message to send.
+//! \param len length of the buffer.
 //!
 //! \return Returns \b true if the message was sent successfully and \b
 //! false otherwise.
@@ -170,6 +172,7 @@ bool TCPSocket::send(unsigned char *message, unsigned short len)
 //! Receives the entire message from remote host.
 //!
 //! \param message buffer to store message to be received.
+//! \param len length of the buffer.
 //!
 //! \return Returns \b true if the message was received successfully and \b
 //! false otherwise.
