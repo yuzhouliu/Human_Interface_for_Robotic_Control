@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 30, 2015
+// January 6, 2016
 //
 //*****************************************************************************
 #include "TCPSocket.h"
@@ -178,5 +178,12 @@ bool TCPSocket::send(unsigned char *message, unsigned short len)
 bool TCPSocket::recv(unsigned char *message, unsigned short len)
 {
     // TODO (Brandon): Implement
-    return false;
+    if (::recv(_sockfd, reinterpret_cast<char*>(message), len, 0) == -1)
+    {
+        close();
+        std::cerr << "[ERROR] TCPSocket::recv(): recv failed." << std::endl;
+        return false;
+    }
+
+    return true;
 }

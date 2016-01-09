@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 6, 2016
+// January 8, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -231,8 +231,9 @@ void Window::_processInput()
                     //
                     // File -> Connect
                     //
-                    MessageBox(_windowHandle, "Not implemented",
-                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    DialogBoxParam(GetModuleHandle(NULL),
+                        MAKEINTRESOURCE(IDD_CONNECT), NULL,
+                        Panel::DlgProcRouter, (LPARAM)(_panel.get()));
                     break;
                 case ID_FILE_DISCONNECT:
                     //
@@ -277,7 +278,7 @@ void Window::_processInput()
 //*****************************************************************************
 //
 //! Thread function responsible for running the panel concurrently with the
-//! application to bypass the modal windows event loop.
+//! application in order to bypass the modal windows event loop.
 //!
 //! \param panel the Panel that this thread function will run.
 //!
@@ -287,4 +288,45 @@ void Window::_processInput()
 void panelTask(std::shared_ptr<Panel> panel)
 {
     panel->run();
+}
+
+//*****************************************************************************
+//
+//! Moves window to center of screen.
+//!
+//! \param hwnd handle to the window.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void CenterWindow(HWND hwnd)
+{
+     RECT rectWindow, rectDesktop;
+ 
+     //
+     // Make the window relative to its Desktop
+     //
+     GetWindowRect(hwnd, &rectWindow);
+     GetWindowRect(GetDesktopWindow(), &rectDesktop);
+
+     int nWidth = rectWindow.right - rectWindow.left;
+     int nHeight = rectWindow.bottom - rectWindow.top;
+
+     int nX = ((rectDesktop.right - rectDesktop.left) - nWidth) / 2
+         + rectDesktop.left;
+     int nY = ((rectDesktop.bottom - rectDesktop.top) - nHeight) / 2
+         + rectDesktop.top;
+
+     int nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+     int nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+     //
+     // Make sure that the dialog box never moves outside of the screen
+     //
+     if (nX < 0) nX = 0;
+     if (nY < 0) nY = 0;
+     if (nX + nWidth > nScreenWidth) nX = nScreenWidth - nWidth;
+     if (nY + nHeight > nScreenHeight) nY = nScreenHeight - nHeight;
+
+     MoveWindow(hwnd, nX, nY, nWidth, nHeight, FALSE);
 }

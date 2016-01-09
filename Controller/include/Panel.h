@@ -11,20 +11,23 @@
 // January 3, 2016
 //
 // Modified:
-// January 4, 2016
+// January 8, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
 #define _PANEL_H_
 
+#define WIN32_LEAN_AND_MEAN
+
 #include <memory>
+#include <windows.h>
 
 #include <SDL.h>
 
 #include "Hand.h"
 #include "IObservable.h"
 
-class Panel : public IObservable
+class Panel
 {
 private:
     /* Fields */
@@ -48,6 +51,12 @@ public:
 
     /* Methods */
     void run();
+    BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+        LPARAM lParam);
+
+    /* Static methods */
+    static BOOL CALLBACK DlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
+        LPARAM lParam);
 };
 
 #endif /* _PANEL_H_ */

@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 4, 2016
+// January 8, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -29,6 +29,7 @@ extern struct SDL_Window;
 extern struct SDL_Renderer;
 
 void panelTask(std::shared_ptr<Panel> panel);
+void CenterWindow(HWND hwnd);
 
 class Window
 {
