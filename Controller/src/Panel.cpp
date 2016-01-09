@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 8, 2016
+// January 9, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -38,7 +38,7 @@
 //
 //*****************************************************************************
 Panel::Panel(SDL_Window *window)
-    : _window(window), _renderer(nullptr)
+    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false)
 {
     //
     // Initialize panel
@@ -115,49 +115,90 @@ void Panel::run()
     //fpsManager.setFPS(5);
     while (!Window::gExit)
     {
-        //
-        // Begins tracking fps
-        //
-        fpsManager.beginFrame();
+        /*while ()
+        {*/
+            //
+            // Begins tracking fps
+            //
+            fpsManager.beginFrame();
 
-        //
-        // Fetches relevent data from Leap Motion Controller
-        //
-        leap.processFrame(data, _MAX_PAYLOAD);
+            //
+            // Fetches relevent data from Leap Motion Controller
+            //
+            leap.processFrame(data, _MAX_PAYLOAD);
 
-        //
-        // Send data to remote host
-        //
-        tcpsocket.send(data, _MAX_PAYLOAD);
+            //
+            // Send data to remote host
+            //
+            tcpsocket.send(data, _MAX_PAYLOAD);
 
-        //
-        // Receive data from remote host
-        //
-        tcpsocket.recv(data, _MAX_PAYLOAD);
+            //
+            // Receive data from remote host
+            //
+            tcpsocket.recv(data, _MAX_PAYLOAD);
 
-        //
-        // Populates FingerPressureStruct with finger pressure information
-        // TODO (Brandon): As of now, this populates structure with angle
-        // information. Must change to pressure information once we establish
-        // communication to microcontroller and receive feedback from sensors.
-        //
-        _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
+            //
+            // Populates FingerPressureStruct with finger pressure information
+            // TODO (Brandon): As of now, this populates structure with angle
+            // information. Must change to pressure information once we establish
+            // communication to microcontroller and receive feedback from sensors.
+            //
+            _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
 
-        //
-        // Updates model
-        //
-        _update(&fingerPressures);
+            //
+            // Updates model
+            //
+            _update(&fingerPressures);
 
-        //
-        // Updates GUI
-        //
-        _render();
+            //
+            // Updates GUI
+            //
+            _render();
 
-        //
-        // Ends frame and blocks until FPS elapses
-        //
-        fpsManager.endFrame();
+            //
+            // Ends frame and blocks until FPS elapses
+            //
+            fpsManager.endFrame();
+        //}
     }
+}
+
+//*****************************************************************************
+//
+//! Connects to remote host.
+//!
+//! \param ipAddress the IPv4 address of the remote host.
+//!
+//! \return Returns \b true if the connection was established successfully and
+//! \b false otherwise.
+//
+//*****************************************************************************
+bool Panel::connect(char *ipAddress)
+{
+    //
+    // TODO(Brandon): Implement
+    //
+    return false;
+}
+
+//*****************************************************************************
+//
+//! Terminates connection to remote host.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if the connection was closed successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
+bool Panel::disconnect()
+{
+    if (_connected)
+    {
+        _connected = false;
+        return true;
+    }
+    return false;
 }
 
 //*****************************************************************************
@@ -321,7 +362,8 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
 //! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
 //
 //*****************************************************************************
-BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam)
 {
     switch (msg)
     {
@@ -334,13 +376,29 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
         case IDC_CONNECT:
         {
             HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
+            char addressInput[IPv4Address::MAX_IP_ADDR_BUF_LEN];
             int len = GetWindowTextLength(hComboBox);
-            std::cout << "length = " << len << std::endl;
-            if (len > 0)
+            if ((len >= IPv4Address::MIN_IP_ADDR_LEN) &&
+                (len <= IPv4Address::MAX_IP_ADDR_LEN))
             {
-                // TODO (Brandon): Implement connection
+                GetDlgItemText(hwnd, IDC_COMBO, addressInput,
+                    IPv4Address::MAX_IP_ADDR_LEN);
+                if (IPv4Address::validateIPAddress(addressInput))
+                {
+                    connect(addressInput);
+                    EndDialog(hwnd, 0);
+                }
+                else
+                {
+                    MessageBox(hwnd, "Invalid IP address",
+                        "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+                }
             }
-            EndDialog(hwnd, 0);
+            else
+            {
+                MessageBox(hwnd, "Invalid IP address",
+                    "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+            }
             break;
         }
         case IDCANCEL:

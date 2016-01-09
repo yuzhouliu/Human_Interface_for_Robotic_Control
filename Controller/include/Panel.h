@@ -11,12 +11,13 @@
 // January 3, 2016
 //
 // Modified:
-// January 8, 2016
+// January 9, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
 #define _PANEL_H_
 
+#define WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 
 #include <memory>
@@ -34,6 +35,7 @@ private:
     SDL_Window *_window;
     SDL_Renderer *_renderer;
     std::unique_ptr<Hand> _hand;
+    bool _connected;
 
     /* Methods */
     bool _initialize();
@@ -51,6 +53,8 @@ public:
 
     /* Methods */
     void run();
+    bool connect(char *ipAddress);
+    bool disconnect();
     BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
         LPARAM lParam);
 
