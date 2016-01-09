@@ -1,11 +1,11 @@
 //*********************
 // Project Tasks
 //*********************
-1. Assemble Servos onto H/W (Awaiting 5 servos from HobbyKing. ETA: unknown due to customs)
-2. Assemble finger-tip sensors onto H/W 
-3. Build playback feature
-4. Look into external expansion board allowing for 5 or more ADCs
-5. Look into external expansion board allowing for 7 or more PWMs
+1. Buy proper battery case (4 batteries in series). Buy wires to connect to servos.
+2. Assemble finger-tip sensors onto H/W. Determine why UART doesn't work after Uniflash (Yuzhou)
+3. Build playback feature, and support disconnect (Brandon)
+4. Configure External ADC expansion board (Minh)
+5. Look into external expansion board allowing for more PWMs
 
 //*********************
 // Admin Tasks

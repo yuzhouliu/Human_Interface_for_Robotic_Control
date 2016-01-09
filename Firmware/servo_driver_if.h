@@ -25,7 +25,8 @@
 
 // Define max position for wrist and fingers
 #define WRIST_MAX_POSITION 180
-#define FINGER_MAX_POSITION 90
+//#define FINGER_MAX_POSITION 90
+#define FINGER_MAX_POSITION 180
 
 // Defines for fingers
 enum Servo_Joint_Type {

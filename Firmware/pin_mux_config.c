@@ -52,10 +52,10 @@ void PinMuxConfig(void)
     //TODO Pin 17/19 are muxed with JTAG, must use Uniflash
     // with PWM. Must flash with Uniflash.
     // Configure PIN_19 for TimerPWM3 GT_PWM03
-    //MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
+    MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
 
     // Configure PIN_17 for TimerPWM0 GT_PWM00
-    //MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
+    MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
 
     // TODO Pin 57 is muxed with UART0 RX, so cannot use UART to debug
     // while using ADC_CH0 (PIN_57).
