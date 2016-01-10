@@ -116,16 +116,16 @@ void main()
         MoveServo(0, SERVO_FINGER_RING);
         MoveServo(0, SERVO_FINGER_PINKY);
         MoveServo(180, SERVO_WRIST);
-        MAP_UtilsDelay(20000000);
+        MAP_UtilsDelay(100000000);
 
-        MoveServo(113, SERVO_FINGER_INDEX);
-        MoveServo(113, SERVO_FINGER_THUMB);
-        MoveServo(113, SERVO_FINGER_MIDDLE);
-        MoveServo(113, SERVO_FINGER_RING);
-        MoveServo(113, SERVO_FINGER_PINKY);
+        MoveServo(100, SERVO_FINGER_INDEX);
+        MoveServo(100, SERVO_FINGER_THUMB);
+        MoveServo(100, SERVO_FINGER_MIDDLE);
+        MoveServo(100, SERVO_FINGER_RING);
+        MoveServo(100, SERVO_FINGER_PINKY);
         MoveServo(0, SERVO_WRIST);
 
-        MAP_UtilsDelay(20000000);
+        MAP_UtilsDelay(100000000);
     }
 
     //

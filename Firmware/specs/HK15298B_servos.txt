@@ -1,0 +1,6 @@
+HK15298B: 0 to 100 degrees
+1100 us is 0 degrees
+1900 us is 100 degrees
+
+Stall current: ~3A (untested)
+6V operating voltage recommended.
