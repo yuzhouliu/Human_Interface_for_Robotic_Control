@@ -11,21 +11,25 @@
 // January 3, 2016
 //
 // Modified:
-// January 8, 2016
+// January 9, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
 #define _PANEL_H_
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 
 #include <memory>
+#include <mutex>
 #include <windows.h>
 
 #include <SDL.h>
 
 #include "Hand.h"
 #include "IObservable.h"
+#include "Network.h"
+#include "TCPSocket.h"
 
 class Panel
 {
@@ -34,6 +38,9 @@ private:
     SDL_Window *_window;
     SDL_Renderer *_renderer;
     std::unique_ptr<Hand> _hand;
+    std::unique_ptr<TCPSocket> _socket;
+    std::mutex _socket_mutex;
+    bool _connected;
 
     /* Methods */
     bool _initialize();
@@ -51,6 +58,10 @@ public:
 
     /* Methods */
     void run();
+    bool connect(char *ipAddressString);
+    bool disconnect();
+    bool send(unsigned char *message, unsigned short len);
+    bool recv(unsigned char *message, unsigned short len);
     BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
         LPARAM lParam);
 

@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 8, 2016
+// January 9, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -22,8 +22,6 @@
 #include "FrameRateManager.h"
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
-#include "Network.h"
-#include "TCPSocket.h"
 #include "Window.h"
 
 #include "resource.h"
@@ -38,7 +36,7 @@
 //
 //*****************************************************************************
 Panel::Panel(SDL_Window *window)
-    : _window(window), _renderer(nullptr)
+    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false)
 {
     //
     // Initialize panel
@@ -87,34 +85,16 @@ void Panel::run()
     FingerPressureStruct fingerPressures;
 
     //
-    // Receive IPv4 address and port as input from user
-    //
-    std::cout << "Enter the target IPv4 address: ";
-    char addressInput[16];
-    std::cin >> addressInput;
-
-    std::cout << "Enter the target port: ";
-    unsigned short port;
-    std::cin >> port;
-
-    //
-    // Constructs an IPv4 address using user input
-    //
-    IPv4Address address(addressInput, port);
-
-    //
-    // Constructs a TCP socket and connects to IPv4 address
-    //
-    TCPSocket tcpsocket;
-    tcpsocket.open();
-    tcpsocket.connect(&address);
-
-    //
     // Main panel logic
     //
     //fpsManager.setFPS(5);
     while (!Window::gExit)
     {
+        if (!_connected)
+        {
+            continue;
+        }
+
         //
         // Begins tracking fps
         //
@@ -128,12 +108,18 @@ void Panel::run()
         //
         // Send data to remote host
         //
-        tcpsocket.send(data, _MAX_PAYLOAD);
+        if (!send(data, _MAX_PAYLOAD))
+        {
+            continue;
+        }
 
         //
         // Receive data from remote host
         //
-        tcpsocket.recv(data, _MAX_PAYLOAD);
+        if (!recv(data, _MAX_PAYLOAD))
+        {
+            continue;
+        }
 
         //
         // Populates FingerPressureStruct with finger pressure information
@@ -159,6 +145,152 @@ void Panel::run()
         fpsManager.endFrame();
     }
 }
+
+//*****************************************************************************
+//
+//! Connects to remote host. Synchronized by mutex.
+//!
+//! \param ipAddress the IPv4 address of the remote host.
+//!
+//! \return Returns \b true if the connection was established successfully and
+//! \b false otherwise.
+//
+//*****************************************************************************
+bool Panel::connect(char *ipAddressString)
+{
+    const int PORT = 5001;
+
+    if (_connected)
+    {
+        std::cout << "Already connected." << std::endl;
+        return false;
+    }
+
+    //
+    // Constructs an IPv4 address from ip string
+    //
+    IPv4Address address(ipAddressString, PORT);
+
+    //
+    // Locks mutex protecting socket
+    //
+    std::lock_guard<std::mutex> lock(_socket_mutex);
+
+    //
+    // Opens socket and connects to remote host
+    //
+    if (!_socket->open())
+    {
+        return false;
+    }
+
+    if (!_socket->connect(&address))
+    {
+        std::cout << "Unable to connect to " << ipAddressString << std::endl;
+        return false;
+    }
+    _connected = true;
+    std::cout << "Connected to " << ipAddressString << std::endl;
+
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Terminates connection to remote host. Synchronized by mutex.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if the connection was closed successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
+bool Panel::disconnect()
+{
+    if (_connected)
+    {
+        //
+        // Locks mutex protecting socket
+        //
+        std::lock_guard<std::mutex> lock(_socket_mutex);
+
+        _socket->close();
+        _connected = false;
+
+        std::cout << "Disconnected from socket." << std::endl;
+
+        return true;
+    }
+    std::cout << "Not connected." << std::endl;
+    return false;
+}
+
+//*****************************************************************************
+//
+//! Sends data to remote host. Synchronized by mutex.
+//!
+//! \param message buffer containing message to send.
+//! \param len length of the buffer
+//!
+//! \return Returns \b true if the connection was closed successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
+bool Panel::send(unsigned char *message, unsigned short len)
+{
+    if (_connected)
+    {
+        //
+        // Locks mutex protecting socket
+        //
+        std::lock_guard<std::mutex> lock(_socket_mutex);
+
+        if (!_socket->send(message, len))
+        {
+            std::cout << "Send failed." << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    std::cout << "Not connected." << std::endl;
+    return false;
+}
+
+//*****************************************************************************
+//
+//! Sends data to remote host. Synchronized by mutex.
+//!
+//! \param message buffer to store message to be received.
+//! \param len length of the buffer.
+//!
+//! \return Returns \b true if the connection was closed successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
+bool Panel::recv(unsigned char *message, unsigned short len)
+{
+    if (_connected)
+    {
+        //
+        // Locks mutex protecting socket
+        //
+        std::lock_guard<std::mutex> lock(_socket_mutex);
+
+        if (!_socket->recv(message, len))
+        {
+            std::cout << "Receive failed." << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    std::cout << "Not connected." << std::endl;
+    return false;
+}
+
 
 //*****************************************************************************
 //
@@ -220,6 +352,11 @@ bool Panel::_initialize()
     // Creates hand model
     //
     _hand = std::unique_ptr<Hand>(new Hand(_renderer, width, height));
+
+    //
+    // Creates socket
+    //
+    _socket = std::unique_ptr<TCPSocket>(new TCPSocket());
 
     return true;
 }
@@ -321,7 +458,8 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
 //! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
 //
 //*****************************************************************************
-BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam)
 {
     switch (msg)
     {
@@ -334,13 +472,29 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
         case IDC_CONNECT:
         {
             HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
+            char addressInput[IPv4Address::MAX_IP_ADDR_BUF_LEN];
             int len = GetWindowTextLength(hComboBox);
-            std::cout << "length = " << len << std::endl;
-            if (len > 0)
+            if ((len >= IPv4Address::MIN_IP_ADDR_LEN) &&
+                (len <= IPv4Address::MAX_IP_ADDR_LEN))
             {
-                // TODO (Brandon): Implement connection
+                GetDlgItemText(hwnd, IDC_COMBO, addressInput,
+                    IPv4Address::MAX_IP_ADDR_LEN);
+                if (IPv4Address::validateIPAddress(addressInput))
+                {
+                    connect(addressInput);
+                    EndDialog(hwnd, 0);
+                }
+                else
+                {
+                    MessageBox(hwnd, "Invalid IP address",
+                        "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+                }
             }
-            EndDialog(hwnd, 0);
+            else
+            {
+                MessageBox(hwnd, "Invalid IP address",
+                    "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+            }
             break;
         }
         case IDCANCEL:
@@ -375,23 +529,27 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
 BOOL CALLBACK Panel::DlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
     LPARAM lParam)
 {
+    Panel *panel;
+
     //
     // The pointer to the panel class is passed in lParam on dialog
     // initialization
     //
     if (msg == WM_INITDIALOG)
     {
+        panel = reinterpret_cast<Panel*>(lParam);
+
         //
         // Store the pointer to the panel class as user data in the dialog box
         //
         SetWindowLong(hwnd, GWL_USERDATA,
-            long((LPCREATESTRUCT(lParam))->lpCreateParams));
+            reinterpret_cast<LONG_PTR>(panel));
     }
 
     //
     // Fetch the pointer to the panel class from the dialog box
     //
-    Panel *panel = reinterpret_cast<Panel*>(GetWindowLong(hwnd, GWL_USERDATA));
+    panel = reinterpret_cast<Panel*>(GetWindowLong(hwnd, GWL_USERDATA));
 
     //
     // Delegate the call of the DlgProc function to the correct class

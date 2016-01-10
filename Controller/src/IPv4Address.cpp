@@ -11,10 +11,12 @@
 // December 27, 2015
 //
 // Modified:
-// December 30, 2015
+// January 9, 2016
 //
 //*****************************************************************************
 #include "IPv4Address.h"
+
+#include <Ws2tcpip.h>
 
 #include "Network.h"
 
@@ -131,4 +133,21 @@ unsigned short IPv4Address::getPort()
 void IPv4Address::setPort(unsigned short port)
 {
     _port = port;
+}
+
+//*****************************************************************************
+//
+//! Checks if the IP address supplied is valid.
+//!
+//! \param ipAddress the NULL-terminated c-string containing IP address.
+//!
+//! \return Returns \b true if the IP address is well-formed and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool IPv4Address::validateIPAddress(char *ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+    return (result != 0);
 }

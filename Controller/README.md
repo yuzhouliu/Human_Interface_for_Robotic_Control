@@ -1,6 +1,6 @@
 Controller
 ========
-(last updated README.md on December 27, 2015)
+(last updated README.md on January 9, 2016)
 
 Application for Windows for interfacing with the Leap Motion Controller to
 control the InMoov Hand over IP to the CC3200-LAUNCHXL microcontroller. A
@@ -15,5 +15,5 @@ SDL2_image (SDL2_image.lib): https://www.libsdl.org/projects/SDL_image/
 
 Leap Motion SDK (Leap.lib): https://developer.leapmotion.com/downloads
 
-WSock32 (wsock32.lib): Should be installed on Windows.
+WSock32 (wsock32.lib & Ws2_32.lib): Should be installed on Windows.
 
