@@ -1,6 +1,7 @@
 # Created by https://www.gitignore.io/api/visualstudio,windows
 #
 
+*.swp
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
