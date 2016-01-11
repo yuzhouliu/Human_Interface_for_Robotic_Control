@@ -1,0 +1,20 @@
+Human Interface for Robotic Control Group
+Carleton University
+January 11, 2016
+
+                 The HIRC Communication Protocol (Revision 1)
+
+Copyright Notice
+
+    Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. All rights
+    reserved.
+
+Summary
+
+    HIRCCP is a very simple protocol used by the Human Interface for Robotic
+    Control group at Carleton University for communication between HIRC desktop
+    controller application and firmware on ARM Cortex-M4 based CC3200-LAUNCHXL
+    microcontroller. This document describes the protocol and it's types of
+    packets. The document also explains the reasons behind some of the design
+    decisions.
+
