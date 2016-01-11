@@ -6,8 +6,11 @@ January 11, 2016
 
 Copyright Notice
 
-    Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. All rights
-    reserved.
+    Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. The contents of
+    this file is licensed under BSD license (see LICENSE.txt for details). In
+    short, you may use, copy, modify, or distribute this protocol provided
+    that the names of the authors are not used to endorse any work that is
+    derived from this.
 
 Summary
 
@@ -17,4 +20,22 @@ Summary
     microcontroller. This document describes the protocol and it's types of
     packets. The document also explains the reasons behind some of the design
     decisions.
+
+1. Purpose
+
+    HIRCCP is a simple protocol to transfer servo motor position data from
+    controller application to microcontroller and transfer pressure data from
+    microcontroller to controller application. It is an application layer
+    protocol that is implemented on top of Internet Transmission Control
+    protocol (TCP). This should not exclude the possibility of implementing
+    HIRCCP on top of other transmission protocols like UDP, provided that a
+    separate reliability layer exists. It is designed for a very specific
+    application. Therefore, it lacks many features present in other haptics
+    communication protocols. It can support connection, disconnection,
+    rotation streaming (live and recorded), and pressure feedback.
+
+2. Overview of the Protocol
+
+    TODO (Brandon)
+
 
