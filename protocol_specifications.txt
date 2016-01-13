@@ -2,7 +2,7 @@ Human Interface for Robotic Control Group
 Carleton University
 January 11, 2016
 
-                 The HIRC Communication Protocol (Revision 1)
+                        The HIRC Protocol (Revision 1)
 
 Copyright Notice
 
@@ -14,7 +14,7 @@ Copyright Notice
 
 Summary
 
-    HIRCCP is a very simple protocol used by the Human Interface for Robotic
+    HIRCP is a very simple protocol used by the Human Interface for Robotic
     Control group at Carleton University for communication between HIRC desktop
     controller application and firmware on ARM Cortex-M4 based CC3200-LAUNCHXL
     microcontroller. This document describes the protocol and it's types of
@@ -36,6 +36,27 @@ Summary
 
 2. Overview of the Protocol
 
-    TODO (Brandon)
+    Connection begins with controller application sending a connection request
+    packet to the microcontroller acting as a server. If the server grants the
+    request, it sends an acknowledgement packet to signal that it is ready to
+    receive position data packets. Every position data packet is acknowledged
+    by a pressure packet. Connection is terminated by sending a disconnection
+    request packet to the microcotroller. Connection can also be terminated
+    by detecting an error and sending an error packet.
 
+    As previously mentioned, HIRCP is an application layer protocol. This means
+    that a HIRCP header will be between the TCP header and the data as shown in
+    Figure 2-1. More information on the HIRCP header will be discused later in
+    the document.
+
+                ----------------------------------------------
+                | Ethernet |   IP   |  TCP   | HIRCP  | Data |
+                |  header  | Header | Header | Header |      |
+                ----------------------------------------------
+
+                  Figure 2-1: Packet encapsulation structure
+
+3. HIRCP Packets
+
+    TODO (Brandon)
 
