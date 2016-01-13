@@ -38,25 +38,65 @@ Summary
 
     Connection begins with controller application sending a connection request
     packet to the microcontroller acting as a server. If the server grants the
-    request, it sends an acknowledgement packet to signal that it is ready to
-    receive position data packets. Every position data packet is acknowledged
-    by a pressure packet. Connection is terminated by sending a disconnection
-    request packet to the microcotroller. Connection can also be terminated
-    by detecting an error and sending an error packet.
+    request, it sends a connection acknowledgement packet to signal that it is
+    ready to receive data packets. Every data packet is acknowledged by a data
+    acknowledgement packet. Connection is terminated by sending a termination
+    request packet to the microcotroller. Connection can also be terminated on
+    error detection by sending an error packet.
 
     As previously mentioned, HIRCP is an application layer protocol. This means
     that a HIRCP header will be between the TCP header and the data as shown in
     Figure 2-1. More information on the HIRCP header will be discused later in
     the document.
 
-                ----------------------------------------------
+                 --------------------------------------------
                 | Ethernet |   IP   |  TCP   | HIRCP  | Data |
-                |  header  | Header | Header | Header |      |
-                ----------------------------------------------
+                |  Header  | Header | Header | Header |      |
+                 --------------------------------------------
 
-                  Figure 2-1: Packet encapsulation structure
+                   Figure 2-1: Encapsulated packet structure
 
 3. HIRCP Packets
 
-    TODO (Brandon)
+    HIRCP supports seven types of packets:
+
+        opcode  operation
+          1     Connection request (CRQ)
+          2     Connection acknowledgement (CACK)
+          3     Data (DATA)
+          4     Data acknowledgement (DACK)
+          5     Termination request (TRQ)
+          6     Termination acknowledgement (TACK)
+          7     Error (ERR)
+
+3.1 Connection/Termination Request and Acknowledgement Packets
+
+                                4 bytes      1 byte
+                           -------------------------
+                          | HIRCP constant | Opcode |
+                           -------------------------
+
+                     Figure 3-1: CRQ/CACK/TRQ/TACK packet
+
+    CRQ, CACK, TRQ, and TACK packets (opcodes 1, 2, 5 and 6 respectively) have
+    the format shown in Figure 3-1. The HIRCP constant is a sequence of bytes
+    with ascii values 'H', 'I', 'R' and 'C', in that order. The HIRCP constant
+    is used to identify that this packet is an HIRCP packet. Any packet that
+    does not have this constant in the header should be discarded and ignored
+    by the application implementing this protocol.
+
+3.2 Data Packets
+
+           4 bytes      1 byte  1 byte  1 byte  1 byte   1 byte  1 byte
+      ------------------------------------------------------------------
+     | HIRCP constant | Opcode | Thumb | Index | Middle | Ring  | Pinky |
+      ------------------------------------------------------------------
+
+                            Figure 3-2: DATA packet
+
+    DATA packets (opcode 3) have the format shown in Figure 3-2. Finger
+    rotation in degrees for each of the five fingers of the right hand are
+    encoded into their corresponding fields.
+
+
 
