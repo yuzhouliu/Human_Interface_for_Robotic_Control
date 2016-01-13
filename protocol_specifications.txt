@@ -134,10 +134,24 @@ Summary
 
 4. Initial Connection
 
-    TODO (Brandon)
+    A connection is established by sending a connection request from the
+    controller application to the microcontroller, and receiving a connection
+    acknowledgment in response. If an error was received in response, then the
+    request has been denied.
 
 
 5. Normal Termination
+
+    A connection is terminated by sending a termination request from the
+    controller application to the microcontroller, and receiving a termination
+    acknowledgment in response. If an error was received in response, then the
+    request has been denied. If a request has been denied for any reason, the
+    controller application can terminate the connection and wait for the
+    microcontroller to time out due to inactivity before attempting another
+    connection. See Section-6 on premature termination for ore details.
+
+
+6. Premature Termination
 
     TODO (Brandon)
 
