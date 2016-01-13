@@ -4,6 +4,7 @@ January 11, 2016
 
                         The HIRC Protocol (Revision 1)
 
+
 Copyright Notice
 
     Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. The contents of
@@ -11,6 +12,7 @@ Copyright Notice
     short, you may use, copy, modify, or distribute this protocol provided
     that the names of the authors are not used to endorse any work that is
     derived from this.
+
 
 Summary
 
@@ -20,6 +22,7 @@ Summary
     microcontroller. This document describes the protocol and it's types of
     packets. The document also explains the reasons behind some of the design
     decisions.
+
 
 1. Purpose
 
@@ -33,6 +36,7 @@ Summary
     application. Therefore, it lacks many features present in other haptics
     communication protocols. It can support connection, disconnection,
     rotation streaming (live and recorded), and pressure feedback.
+
 
 2. Overview of the Protocol
 
@@ -55,6 +59,7 @@ Summary
                  --------------------------------------------
 
                    Figure 2-1: Encapsulated packet structure
+
 
 3. HIRCP Packets
 
@@ -87,16 +92,72 @@ Summary
 
 3.2 Data Packets
 
-           4 bytes      1 byte  1 byte  1 byte  1 byte   1 byte  1 byte
-      ------------------------------------------------------------------
-     | HIRCP constant | Opcode | Thumb | Index | Middle | Ring  | Pinky |
-      ------------------------------------------------------------------
+       4 bytes      1 byte  1 byte  1 byte  1 byte   1 byte  1 byte  1 byte
+  --------------------------------------------------------------------------
+ | HIRCP constant | Opcode | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+  --------------------------------------------------------------------------
 
                             Figure 3-2: DATA packet
 
-    DATA packets (opcode 3) have the format shown in Figure 3-2. Finger
-    rotation in degrees for each of the five fingers of the right hand are
+    DATA packets (opcode 3) have the format shown in Figure 3-2. Rotations in
+    degrees for the wrist and each of the five fingers on the right hand are
     encoded into their corresponding fields.
 
+3.3 Data Ackowledgement Packets
 
+         4 bytes      1 byte  2 bytes  2 bytes  2 bytes  2 bytes  2 bytes
+    ----------------------------------------------------------------------
+   | HIRCP constant | Opcode | Thumb  | Index  | Middle |  Ring  | Pinky  |
+    ----------------------------------------------------------------------
+
+                            Figure 3-3: DACK packet
+
+    DACK packets (opcode 4) have the format shown in Figure 3-3. Fingertip
+    pressure sensor values for each of the five fingers on the right hand are
+    encoded into their corresponding fields. Two bytes are needed since values
+    read from the analog-to-digital converter are in the range of 0 to 4096.
+
+3.4 Error Packets
+
+                          4 bytes      1 byte    1 byte
+                     -------------------------------------
+                    | HIRCP constant | Opcode | ErrorCode |
+                     -------------------------------------
+
+                            Figure 3-4: ERR packet
+
+    ERR packets (option 7) have the format shown in Figure 3-4. The type of
+    error is encoded as an 8-bit integer in the ErrorCode field. An ERR packet
+    can be the acknowledgment of any other type of packet. A table of error
+    codes and types of errors is given in the appendix.
+
+
+4. Initial Connection
+
+    TODO (Brandon)
+
+
+5. Normal Termination
+
+    TODO (Brandon)
+
+
+I. Appendix
+
+Error Codes
+
+    Value   Type
+      0     Undefined
+      1     Invalid packet
+      2     Unexpected packet
+
+References
+
+    [1] Sollins, J., "The TFTP Protocol (Revision 2)", RFC 1350, Massachusetts
+        Institute of Technology, July 1992.
+
+Author's Contact
+
+    Human Interface for Robotic Control Group
+    Email: brandonto@cmail.carleton.ca
 
