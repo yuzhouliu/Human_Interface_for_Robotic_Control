@@ -2,7 +2,7 @@ Human Interface for Robotic Control Group
 Carleton University
 January 11, 2016
 
-                        The HIRC Protocol (Revision 1)
+                        The HIRCP Protocol (Revision 1)
 
 
 Copyright Notice
@@ -35,7 +35,7 @@ Summary
     separate reliability layer exists. It is designed for a very specific
     application. Therefore, it lacks many features present in other haptics
     communication protocols. It can support connection, disconnection,
-    rotation streaming (live and recorded), and pressure feedback.
+    servo position streaming (live and recorded), and pressure feedback.
 
 
 2. Overview of the Protocol
@@ -148,12 +148,23 @@ Summary
     request has been denied. If a request has been denied for any reason, the
     controller application can terminate the connection and wait for the
     microcontroller to time out due to inactivity before attempting another
-    connection. See Section-6 on premature termination for ore details.
+    connection. See Section-6 on premature termination for more details.
 
 
 6. Premature Termination
 
-    TODO (Brandon)
+    A connection can also be terminated prematurely. It is up to the programmer
+    to ensure that proper steps are taken in such cases. All sockets should be
+    set to non-blocking mode and have a timeout associated with its operations.
+    Applications implementing HIRCP should assume that connection is lost on a
+    socket timeout and take the neccessary actions to free any memory allocated
+    for that session. The server should then return to listening for new
+    connections on the listen socket. The client should idle for a time greater
+    than the timeout before attempting a reconnection. A watchdog timer can be
+    used for this purpose if plausible.
+
+    All errors cause termination of connection. Upon receiving or sending an
+    error the host should take the actions described previously.
 
 
 I. Appendix
