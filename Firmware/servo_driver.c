@@ -159,6 +159,11 @@ void DeInitPWMModules()
     MAP_TimerDisable(TIMERA2_BASE, TIMER_B);
     MAP_TimerDisable(TIMERA3_BASE, TIMER_A);
     MAP_TimerDisable(TIMERA3_BASE, TIMER_B);
+    MAP_TimerDisable(TIMERA1_BASE, TIMER_A);
+    MAP_TimerDisable(TIMERA1_BASE, TIMER_B);
+    MAP_TimerDisable(TIMERA0_BASE, TIMER_A);
+    MAP_PRCMPeripheralClkDisable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkDisable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkDisable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkDisable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
 }

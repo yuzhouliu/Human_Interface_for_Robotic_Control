@@ -80,6 +80,11 @@ void Convert_Degrees_To_DutyCycle(unsigned char ucDegrees, enum Servo_Joint_Type
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eFinger);
+void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint);
+
+//****************************************************************************
+// Stops the servo motor from moving further
+//****************************************************************************
+void StopServo(enum Servo_Joint_Type eFinger);
 
 #endif //  __SERVO_DRIVER_IF_H__
