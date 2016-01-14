@@ -38,7 +38,7 @@
 #define HK15298B_PWM_MATCH_PER_DEGREE (0x251C0UL-0x157C0UL)/100 // Equates to 0x280 or 640    
 
 // Define max position for wrist and fingers
-#define FINGER_THUMB_POS_LIMIT 95       // HK15298B servo
+#define FINGER_THUMB_POS_LIMIT 100      // HK15298B servo
 #define FINGER_INDEX_POS_LIMIT 100      // HK15298B servo
 #define FINGER_MIDDLE_POS_LIMIT 100     // HK15298B servo
 #define FINGER_RING_POS_LIMIT 100       // HK15298B servo

@@ -51,7 +51,7 @@
 #include "uart_if.h"
 #endif
 
-#include "pinmux.h"
+#include "pin_mux_config.h"
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
