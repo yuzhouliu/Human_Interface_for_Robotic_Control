@@ -11,12 +11,13 @@
 // January 3, 2016
 //
 // Modified:
-// January 9, 2016
+// January 29, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 
 #include "FrameRateManager.h"
@@ -87,7 +88,7 @@ void Panel::run()
     //
     // Main panel logic
     //
-    //fpsManager.setFPS(5);
+    fpsManager.setFPS(20);
     while (!Window::gExit)
     {
         if (!_connected)
@@ -438,10 +439,46 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
         float multiplier = (float)(1) - (float)(encodedPressure)/4096;
-        fingerPressures.pressure[i] = static_cast<unsigned char>(multiplier*255);
-        std::cout << "pressure = " << static_cast<unsigned int>(fingerPressures.pressure[i]) << std::endl;
+        fingerPressures.pressure[i] =
+            static_cast<unsigned char>(multiplier*255);
+        std::cout << "pressure = "
+            << static_cast<unsigned int>(fingerPressures.pressure[i])
+            << std::endl;
     }
 
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Save IP address to file
+//!
+//! \param ipAddress IP address to save.
+//!
+//! \return Returns \b true if the address was saved successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Panel::_saveIPAddress(std::string ipAddress)
+{
+    //
+    // Opens a file stream to save IP address to file
+    //
+    std::ofstream addressFile;
+    addressFile.open(_addressFilePath);
+    if (!addressFile.is_open())
+    {
+        std::cerr << "[ERROR] Panel::_saveIPAddress(): Unable to open file."
+            << std::endl;
+        return false;
+    }
+
+    //
+    // Save IP address to file
+    //
+    addressFile << ipAddress << std::endl;
+
+    addressFile.close();
     return true;
 }
 
@@ -464,13 +501,41 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
     switch (msg)
     {
     case WM_INITDIALOG:
+    {
+        //
+        // Opens file stream to read saved IP addresses
+        //
+        std::string ipAddress;
+        std::ifstream addressFile;
+        addressFile.open(_addressFilePath);
+        if (!addressFile.is_open())
+        {
+            std::cerr << "[ERROR] Panel::_saveIPAddress(): Unable to open "\
+                "file." << std::endl;
+            return FALSE;
+        }
+
+        //
+        // Populates combo box with list of recently used IP addresses
+        //
+        while (getline(addressFile, ipAddress))
+        {
+            SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
+                (LPARAM)ipAddress.c_str());
+        }
+        addressFile.close();
+
         CenterWindow(hwnd);
         break;
+    }
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
         case IDC_CONNECT:
         {
+            //
+            // Get IP address that user inputted
+            //
             HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
             char addressInput[IPv4Address::MAX_IP_ADDR_BUF_LEN];
             int len = GetWindowTextLength(hComboBox);
@@ -481,7 +546,18 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                     IPv4Address::MAX_IP_ADDR_LEN);
                 if (IPv4Address::validateIPAddress(addressInput))
                 {
+                    //
+                    // Connect to remote host and save address
+                    //
                     connect(addressInput);
+                    _saveIPAddress(std::string(addressInput));
+
+                    //
+                    // TODO (Brandon): Check if IP address exists in combo box
+                    // before inserting
+                    //
+                    SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
+                        (LPARAM)addressInput);
                     EndDialog(hwnd, 0);
                 }
                 else

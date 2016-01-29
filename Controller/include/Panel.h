@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 9, 2016
+// January 29, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -41,6 +41,7 @@ private:
     std::unique_ptr<TCPSocket> _socket;
     std::mutex _socket_mutex;
     bool _connected;
+    const std::string _addressFilePath = "data/cache/IPAddresses.txt";
 
     /* Methods */
     bool _initialize();
@@ -48,6 +49,7 @@ private:
     void _render();
     bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
         unsigned char *buf, unsigned int buflen);
+    bool _saveIPAddress(std::string ipAddress);
 
 public:
     /* Constructor */

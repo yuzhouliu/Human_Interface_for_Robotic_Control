@@ -82,6 +82,15 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
     if (!hand.isValid() || !hand.isRight())
     {
         std::cout << "No hand detected." << std::endl;
+        unsigned int bufIndex = 0;
+        for (int i = 0; i < NUM_FINGERS; i++)
+        {
+            //
+            // Stores angle sequentially in buf
+            //
+            buf[bufIndex++] = 0;
+        }
+        buf[bufIndex++] = 0;
         return false;
     }
 
