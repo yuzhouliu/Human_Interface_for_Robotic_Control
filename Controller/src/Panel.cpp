@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 30, 2016
+// January 31, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -26,6 +26,14 @@
 #include "Window.h"
 
 #include "resource.h"
+
+//
+// Enabling Visual Styles (for combo box)
+//
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+#include <Commctrl.h>
 
 //*****************************************************************************
 //
@@ -516,7 +524,7 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
         }
 
         //
-        // Populates combo box with list of recently used IP addresses
+        // Populates combo box with list of saved IP addresses
         //
         while (getline(addressFile, ipAddress))
         {
@@ -525,6 +533,10 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
         }
         addressFile.close();
 
+        //
+        // Sets minimum drop down size to 5 elements and centers window
+        //
+        SendDlgItemMessage(hwnd, IDC_COMBO, CB_SETMINVISIBLE, 5, 0);
         CenterWindow(hwnd);
         break;
     }
