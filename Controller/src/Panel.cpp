@@ -555,9 +555,8 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                     // Insert IP address into combo box and save IP address if
                     // it does not exist in combo box already
                     //
-                    std::cout << "IP Address = " << addressInput << std::endl;
                     if (SendDlgItemMessage(hwnd, IDC_COMBO, CB_FINDSTRINGEXACT,
-                        0, (LPARAM)addressInput) != CB_ERR)
+                        -1, (LPARAM)addressInput) == CB_ERR)
                     {
                         _saveIPAddress(std::string(addressInput));
                         SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
