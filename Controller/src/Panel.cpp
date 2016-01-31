@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// January 29, 2016
+// January 30, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -465,7 +465,7 @@ bool Panel::_saveIPAddress(std::string ipAddress)
     // Opens a file stream to save IP address to file
     //
     std::ofstream addressFile;
-    addressFile.open(_addressFilePath);
+    addressFile.open(_addressFilePath, std::ios::app);
     if (!addressFile.is_open())
     {
         std::cerr << "[ERROR] Panel::_saveIPAddress(): Unable to open file."
@@ -510,7 +510,7 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
         addressFile.open(_addressFilePath);
         if (!addressFile.is_open())
         {
-            std::cerr << "[ERROR] Panel::_saveIPAddress(): Unable to open "\
+            std::cerr << "[ERROR] Panel::ConnectDlgProc(): Unable to open "\
                 "file." << std::endl;
             return FALSE;
         }
@@ -547,17 +547,22 @@ BOOL CALLBACK Panel::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                 if (IPv4Address::validateIPAddress(addressInput))
                 {
                     //
-                    // Connect to remote host and save address
+                    // Connect to remote host
                     //
-                    connect(addressInput);
-                    _saveIPAddress(std::string(addressInput));
+                    //connect(addressInput);
 
                     //
-                    // TODO (Brandon): Check if IP address exists in combo box
-                    // before inserting
+                    // Insert IP address into combo box and save IP address if
+                    // it does not exist in combo box already
                     //
-                    SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
-                        (LPARAM)addressInput);
+                    std::cout << "IP Address = " << addressInput << std::endl;
+                    if (SendDlgItemMessage(hwnd, IDC_COMBO, CB_FINDSTRINGEXACT,
+                        0, (LPARAM)addressInput) != CB_ERR)
+                    {
+                        _saveIPAddress(std::string(addressInput));
+                        SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
+                            (LPARAM)addressInput);
+                    }
                     EndDialog(hwnd, 0);
                 }
                 else
