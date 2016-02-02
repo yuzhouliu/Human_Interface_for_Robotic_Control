@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// January 8, 2016
+// Feburary 1, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -46,11 +46,13 @@ private:
     std::shared_ptr<Panel> _panel;
     unsigned short _width;
     unsigned short _height;
+    const std::string _addressFilePath = "data/cache/IPAddresses.txt";
 
     /* Methods */
     bool _initialize();
     void _terminate();
     void _processInput();
+    bool _saveIPAddress(std::string ipAddress);
 
 public:
     /* Fields */
@@ -64,6 +66,12 @@ public:
 
     /* Methods */
     bool run();
+    BOOL CALLBACK ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+        LPARAM lParam);
+
+    /* Static methods */
+    static BOOL CALLBACK ConnectDlgProcRouter(HWND hwnd, UINT msg,
+        WPARAM wParam, LPARAM lParam);
 };
 
 #endif /* _WINDOW_H_ */

@@ -11,18 +11,29 @@
 // December 27, 2015
 //
 // Modified:
-// January 8, 2016
+// Feburary 1, 2016
 //
 //*****************************************************************************
 #include "Window.h"
 
+#include <fstream>
 #include <iostream>
 #include <thread>
 
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#include "IPv4Address.h"
+
 #include "resource.h"
+
+//
+// Enabling Visual Styles (for combo box)
+//
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+#include <Commctrl.h>
 
 //
 // Initialize static variable
@@ -233,14 +244,15 @@ void Window::_processInput()
                     //
                     DialogBoxParam(GetModuleHandle(NULL),
                         MAKEINTRESOURCE(IDD_CONNECT), NULL,
-                        Panel::DlgProcRouter, (LPARAM)(_panel.get()));
+                        Window::ConnectDlgProcRouter, (LPARAM)(this));
                     break;
                 case ID_FILE_DISCONNECT:
                     //
                     // File -> Disconnect
                     //
-                    MessageBox(_windowHandle, "Not implemented",
-                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    _panel->disconnect();
+                    EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_FILE_CONNECT, MF_ENABLED);
                     break;
                 case ID_FILE_QUIT:
                     //
@@ -273,6 +285,39 @@ void Window::_processInput()
             break;
         }
     }
+}
+
+//*****************************************************************************
+//
+//! Save IP address to file
+//!
+//! \param ipAddress IP address to save.
+//!
+//! \return Returns \b true if the address was saved successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Window::_saveIPAddress(std::string ipAddress)
+{
+    //
+    // Opens a file stream to save IP address to file
+    //
+    std::ofstream addressFile;
+    addressFile.open(_addressFilePath, std::ios::app);
+    if (!addressFile.is_open())
+    {
+        std::cerr << "[ERROR] Panel::_saveIPAddress(): Unable to open file."
+            << std::endl;
+        return false;
+    }
+
+    //
+    // Save IP address to file
+    //
+    addressFile << ipAddress << std::endl;
+
+    addressFile.close();
+    return true;
 }
 
 //*****************************************************************************
@@ -329,4 +374,170 @@ void CenterWindow(HWND hwnd)
      if (nY + nHeight > nScreenHeight) nY = nScreenHeight - nHeight;
 
      MoveWindow(hwnd, nX, nY, nWidth, nHeight, FALSE);
+}
+
+//*****************************************************************************
+//
+//! Dialog function for File->Connect dialog box.
+//!
+//! \param hwnd handle to the dialog box.
+//! \param msg the message command received.
+//! \param wParam notification message in high byte and control identifier of
+//!     the control that sent the message in low byte.
+//! \param lParam window handle to the control that sent the message.
+//!
+//! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
+//
+//*****************************************************************************
+BOOL CALLBACK Window::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam)
+{
+    switch (msg)
+    {
+    case WM_INITDIALOG:
+    {
+        //
+        // Opens file stream to read saved IP addresses
+        //
+        std::string ipAddress;
+        std::ifstream addressFile;
+        addressFile.open(_addressFilePath);
+        if (!addressFile.is_open())
+        {
+            std::cerr << "[ERROR] Panel::ConnectDlgProc(): Unable to open "\
+                "file." << std::endl;
+            return FALSE;
+        }
+
+        //
+        // Populates combo box with list of saved IP addresses
+        //
+        while (getline(addressFile, ipAddress))
+        {
+            SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
+                (LPARAM)ipAddress.c_str());
+        }
+        addressFile.close();
+
+        //
+        // Sets minimum drop down size to 5 elements and centers window
+        //
+        SendDlgItemMessage(hwnd, IDC_COMBO, CB_SETMINVISIBLE, 5, 0);
+        CenterWindow(hwnd);
+        break;
+    }
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_CONNECT:
+        {
+            //
+            // Get IP address that user inputted
+            //
+            HWND hComboBox = GetDlgItem(hwnd, IDC_COMBO);
+            char addressInput[IPv4Address::MAX_IP_ADDR_BUF_LEN];
+            int len = GetWindowTextLength(hComboBox);
+            if ((len >= IPv4Address::MIN_IP_ADDR_LEN) &&
+                (len <= IPv4Address::MAX_IP_ADDR_LEN))
+            {
+                GetDlgItemText(hwnd, IDC_COMBO, addressInput,
+                    IPv4Address::MAX_IP_ADDR_LEN);
+                if (IPv4Address::validateIPAddress(addressInput))
+                {
+                    //
+                    // Connect to remote host
+                    //
+                    //_panel->connect(addressInput);
+
+                    //
+                    // Insert IP address into combo box and save IP address if
+                    // it does not exist in combo box already
+                    //
+                    if (SendDlgItemMessage(hwnd, IDC_COMBO, CB_FINDSTRINGEXACT,
+                        -1, (LPARAM)addressInput) == CB_ERR)
+                    {
+                        _saveIPAddress(std::string(addressInput));
+                        SendDlgItemMessage(hwnd, IDC_COMBO, CB_ADDSTRING, 0,
+                            (LPARAM)addressInput);
+                    }
+                    EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_FILE_CONNECT, MF_GRAYED);
+                    EndDialog(hwnd, 0);
+                }
+                else
+                {
+                    MessageBox(hwnd, "Invalid IP address",
+                        "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+                }
+            }
+            else
+            {
+                MessageBox(hwnd, "Invalid IP address",
+                    "Invalid IP address", MB_ICONINFORMATION | MB_OK);
+            }
+            break;
+        }
+        case IDCANCEL:
+            EndDialog(hwnd, 0);
+            break;
+        }
+        break;
+    case WM_CLOSE:
+        EndDialog(hwnd, 0);
+        break;
+    default:
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+//*****************************************************************************
+//
+//! Static DlgProc router function for File->Connect, that routes the event to
+//! the correct DlgProc for further processing.
+//!
+//! \param hwnd handle to the dialog box.
+//! \param msg the message command received.
+//! \param wParam notification message in high byte and control identifier of
+//!     the control that sent the message in low byte.
+//! \param lParam window handle to the control that sent the message.
+//!
+//! \return Returns 1 if the dialog box exited successfully and 0 otherwise.
+//
+//*****************************************************************************
+BOOL CALLBACK Window::ConnectDlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
+    LPARAM lParam)
+{
+    Window *window;
+
+    //
+    // The pointer to the window class is passed in lParam on dialog
+    // initialization
+    //
+    if (msg == WM_INITDIALOG)
+    {
+        window = reinterpret_cast<Window*>(lParam);
+
+        //
+        // Store the pointer to the window class as user data in the dialog box
+        //
+        SetWindowLong(hwnd, GWL_USERDATA,
+            reinterpret_cast<LONG_PTR>(window));
+    }
+
+    //
+    // Fetch the pointer to the window class from the dialog box
+    //
+    window = reinterpret_cast<Window*>(GetWindowLong(hwnd, GWL_USERDATA));
+
+    //
+    // Delegate the call of the DlgProc function to the correct class
+    //
+    if (window)
+    {
+        return window->ConnectDlgProc(hwnd, msg, wParam, lParam);
+    }
+
+    return FALSE;
 }
