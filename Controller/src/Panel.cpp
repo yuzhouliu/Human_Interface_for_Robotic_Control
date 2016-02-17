@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 1, 2016
+// Feburary 17, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -230,8 +230,8 @@ bool Panel::disconnect()
 //! \param message buffer containing message to send.
 //! \param len length of the buffer
 //!
-//! \return Returns \b true if the connection was closed successfully and \b
-//! false otherwise.
+//! \return Returns \b true if the packet was sent successfully and \b false
+//! otherwise.
 //
 //*****************************************************************************
 bool Panel::send(unsigned char *message, unsigned short len)
@@ -258,12 +258,12 @@ bool Panel::send(unsigned char *message, unsigned short len)
 
 //*****************************************************************************
 //
-//! Sends data to remote host. Synchronized by mutex.
+//! Receives data from remote host. Synchronized by mutex.
 //!
 //! \param message buffer to store message to be received.
 //! \param len length of the buffer.
 //!
-//! \return Returns \b true if the connection was closed successfully and \b
+//! \return Returns \b true if the packet was received successfully and \b
 //! false otherwise.
 //
 //*****************************************************************************
