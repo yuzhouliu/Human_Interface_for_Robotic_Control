@@ -88,44 +88,47 @@ void Panel::run()
     fpsManager.setFPS(20);
     while (!Window::gExit)
     {
-        if (!_connected)
-        {
-            continue;
-        }
-
         //
         // Begins tracking fps
         //
         fpsManager.beginFrame();
 
         //
+        // Clears finger pressures
+        //
+        for (int i=0; i<NUM_FINGERS; i++)
+        {
+            fingerPressures.pressure[i] = 255;
+        }
+
+        //
         // Fetches relevent data from Leap Motion Controller
         //
         leap.processFrame(data, _MAX_PAYLOAD);
 
-        //
-        // Send data to remote host
-        //
-        if (!send(data, _MAX_PAYLOAD))
+        if (_connected)
         {
-            continue;
-        }
+            //
+            // Send data to remote host
+            //
+            if (!send(data, _MAX_PAYLOAD))
+            {
+                continue;
+            }
 
-        //
-        // Receive data from remote host
-        //
-        if (!recv(data, _MAX_PAYLOAD))
-        {
-            continue;
-        }
+            //
+            // Receive data from remote host
+            //
+            if (!recv(data, _MAX_PAYLOAD))
+            {
+                continue;
+            }
 
-        //
-        // Populates FingerPressureStruct with finger pressure information
-        // TODO (Brandon): As of now, this populates structure with angle
-        // information. Must change to pressure information once we establish
-        // communication to microcontroller and receive feedback from sensors.
-        //
-        _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
+            //
+            // Populates FingerPressureStruct with finger pressure information
+            //
+            _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
+        }
 
         //
         // Updates model

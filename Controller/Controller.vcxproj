@@ -16,7 +16,6 @@
     <ClInclude Include="include\Finger.h" />
     <ClInclude Include="include\FrameRateManager.h" />
     <ClInclude Include="include\Hand.h" />
-    <ClInclude Include="include\HIRCP.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\IObservable.h" />
     <ClInclude Include="include\IObserver.h" />
@@ -36,7 +35,6 @@
     <ClCompile Include="src\Finger.cpp" />
     <ClCompile Include="src\FrameRateManager.cpp" />
     <ClCompile Include="src\Hand.cpp" />
-    <ClCompile Include="src\HIRCP.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\IPv4Address.cpp" />
     <ClCompile Include="src\LeapMotionManager.cpp" />
