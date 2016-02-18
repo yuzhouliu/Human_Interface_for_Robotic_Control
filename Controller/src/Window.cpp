@@ -512,7 +512,7 @@ BOOL CALLBACK Window::ConnectDlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
     Window *window;
 
     //
-    // The pointer to the window class is passed in lParam on dialog
+    // The pointer to the Window instance is passed in lParam on dialog
     // initialization
     //
     if (msg == WM_INITDIALOG)
@@ -520,19 +520,20 @@ BOOL CALLBACK Window::ConnectDlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
         window = reinterpret_cast<Window*>(lParam);
 
         //
-        // Store the pointer to the window class as user data in the dialog box
+        // Store the pointer to the Window instance as user data in the dialog
+        // box
         //
         SetWindowLong(hwnd, GWL_USERDATA,
             reinterpret_cast<LONG_PTR>(window));
     }
 
     //
-    // Fetch the pointer to the window class from the dialog box
+    // Fetch the pointer to the Window instance from the dialog box
     //
     window = reinterpret_cast<Window*>(GetWindowLong(hwnd, GWL_USERDATA));
 
     //
-    // Delegate the call of the DlgProc function to the correct class
+    // Delegate the call of the DlgProc function to the correct instance
     //
     if (window)
     {
