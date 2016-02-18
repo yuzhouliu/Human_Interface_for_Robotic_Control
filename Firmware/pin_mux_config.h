@@ -20,6 +20,8 @@
 //
 //*****************************************************************************
 
+//#define DEBUG	    // For switching ON/OFF UART0
+
 extern void PinMuxConfig(void);
 
 #endif //  __PIN_MUX_CONFIG_H__

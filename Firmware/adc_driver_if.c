@@ -49,7 +49,6 @@
 #include "uart_if.h"
 
 #define FOREVER 1
-#define NO_OF_SAMPLES 2
 
 //****************************************************************************
 // Initializes the Sensor ADCs for operation
@@ -90,7 +89,7 @@ void DisableSensorADC(void)
 //
 // \param eFinger -> finger type (ex: FINGER_THUMB, FINGER_INDEX, etc)
 //
-// \return A float value ranging from 0 - 1.4V
+// \return Raw ADC value between 0 to 4096 (0 to 1.4V)
 //*****************************************************************************
 unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
 {

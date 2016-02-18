@@ -210,19 +210,3 @@ void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint)
         	return;
     }
 }
-
-//****************************************************************************
-// Stops the servo motor from moving further
-//****************************************************************************
-void StopServo(enum Servo_Joint_Type eServoJoint)
-{
-	// Stops the proper timer (PWM) module
-	switch(eServoJoint) {
-	    case SERVO_FINGER_THUMB:
-	    	DeInitPWMModules();
-	        break;
-	    default:
-	    	//UART_PRINT("[MoveServo] Invalid Finger input\n");
-	        return;
-	}
-}

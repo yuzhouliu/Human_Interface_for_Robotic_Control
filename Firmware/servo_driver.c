@@ -123,6 +123,7 @@ void InitPWMModules()
     SetupTimerPWMMode(TIMERA1_BASE, TIMER_A,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
 
+#ifndef DEBUG
     // NOTE: Enabling the following two will diable JTAG (debug).
     //  	 Must use Uniflash instead
     // TIMERA1 (TIMER B), Pin 19 as Pinky
@@ -134,14 +135,17 @@ void InitPWMModules()
     // TDO --> PWM_0
     SetupTimerPWMMode(TIMERA0_BASE, TIMER_A,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+#endif
 
     // Enable the timers
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA1_BASE,TIMER_A);
+#ifndef DEBUG
     MAP_TimerEnable(TIMERA1_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA0_BASE,TIMER_A);
+#endif
 }
 
 //****************************************************************************
