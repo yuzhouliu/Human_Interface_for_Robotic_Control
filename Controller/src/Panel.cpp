@@ -78,14 +78,13 @@ void Panel::run()
 {
     FrameRateManager fpsManager;
     LeapMotionManager leap;
-    const unsigned short _MAX_PAYLOAD = 256;
-    unsigned char data[_MAX_PAYLOAD];
+    LeapDataStruct leapData;
     FingerPressureStruct fingerPressures;
 
     //
     // Main panel logic
     //
-    fpsManager.setFPS(20);
+    fpsManager.setFPS(10);
     while (!Window::gExit)
     {
         //
@@ -104,14 +103,17 @@ void Panel::run()
         //
         // Fetches relevent data from Leap Motion Controller
         //
-        leap.processFrame(data, _MAX_PAYLOAD);
+        if (!leap.processFrame(leapData))
+        {
+            continue;
+        }
 
         if (_connected)
         {
             //
             // Send data to remote host
             //
-            if (!send(data, _MAX_PAYLOAD))
+            if (!send(leapData.data, leapData._MAX_PAYLOAD))
             {
                 continue;
             }
@@ -119,7 +121,7 @@ void Panel::run()
             //
             // Receive data from remote host
             //
-            if (!recv(data, _MAX_PAYLOAD))
+            if (!recv(leapData.data, leapData._MAX_PAYLOAD))
             {
                 continue;
             }
@@ -127,7 +129,8 @@ void Panel::run()
             //
             // Populates FingerPressureStruct with finger pressure information
             //
-            _populateFingerPressureStruct(fingerPressures, data, _MAX_PAYLOAD);
+            _populateFingerPressureStruct(fingerPressures, leapData.data,
+                leapData._MAX_PAYLOAD);
         }
 
         //

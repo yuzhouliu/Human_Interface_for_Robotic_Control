@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// January 5, 2016
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #include "LeapMotionManager.h"
@@ -57,10 +57,53 @@ LeapMotionManager::~LeapMotionManager()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
+bool LeapMotionManager::processFrame(LeapDataStruct leapData)
 {
-    LeapDataStruct leapData;
+    _LeapAngleStruct leapAngles;
+
+    //
+    // Get current frame from Leap Motion Controller
+    //
     Leap::Frame frame = _controller.frame();
+
+    //
+    // Get camera image from frame
+    //
+    Leap::ImageList imageList = frame.images();
+    Leap::Image image = imageList[0];
+    const unsigned char *imageData = image.data();
+    int imageSize = image.bytesPerPixel() * image.height() * image.width();
+    if (imageSize > 0)
+    {
+        if (imageSize != LeapDataStruct::_IMAGE_SIZE)
+        {
+            std::cout << "[ERROR] LeapMotionManager::processFrame(): "\
+                "Unexpected image size." << std::endl;
+            return false;
+        }
+
+        leapData.imageAvailable = true;
+
+        //
+        // Set image RGB to same value to display grayscale and set alpha to
+        // opaque
+        //
+        for (int i=0; i<imageSize; i++)
+        {
+            leapData.imageDataRGBA[4*i] = imageData[i];
+            leapData.imageDataRGBA[4*i+1] = imageData[i];
+            leapData.imageDataRGBA[4*i+2] = imageData[i];
+            leapData.imageDataRGBA[4*i+3] = 0xFF;
+        }
+    }
+    else
+    {
+        leapData.imageAvailable = false;
+    }
+
+    //
+    // Get hand data from frame
+    //
     Leap::HandList hands = frame.hands();
     Leap::Hand hand;
 
@@ -88,14 +131,14 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
             //
             // Stores angle sequentially in buf
             //
-            buf[bufIndex++] = 0;
+            leapData.data[bufIndex++] = 0;
         }
-        buf[bufIndex++] = 0;
+        leapData.data[bufIndex++] = 0;
         return false;
     }
 
     //
-    // Populates LeapDataStruct structure with finger info
+    // Populates LeapDataStruct and LeapAngleStruct structure with finger info
     //
     Leap::FingerList fingers = hand.fingers();
     for (auto it = fingers.begin(); it != fingers.end(); it++)
@@ -107,13 +150,33 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
             Leap::Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
             Leap::Bone bone = finger.bone(boneType);
             direction[b] = bone.direction();
+
+            if (boneType == Leap::Bone::TYPE_DISTAL)
+            {
+                Leap::Vector center = bone.center();
+                SDL_Rect &fingerRect = leapData.fingerRects[finger.type];
+
+                //
+                // Dont ask... this makes it pretty accurate...
+                //
+                fingerRect.w = 25 - 25 * (center.y / 500);
+                if (fingerRect.w < 5)
+                {
+                    fingerRect.w = 5;
+                }
+                fingerRect.h = fingerRect.w;
+                fingerRect.x = -center.x*(170/center.y)*0.85 + 800/2
+                    + 0.7*fingerRect.w;
+                fingerRect.y = center.z*(170/center.y)*0.85 + 600/2
+                    - 1.2*fingerRect.h;
+            }
         }
-        leapData.totalAngle[finger.type()] = (unsigned char)
+        leapAngles.totalAngle[finger.type()] = (unsigned char)
             (_radiansToDegrees(_calculateTotalAngle(direction, 4)));
     }
 
     //
-    // Populates LeapDataStruct structure with wrist info
+    // Populates LeapAngleStruct structure with wrist info
     //
     Leap::Vector palmNormal = hand.palmNormal();
     float rollInRadians = palmNormal.roll();
@@ -127,12 +190,12 @@ bool LeapMotionManager::processFrame(unsigned char *buf, unsigned int buflen)
     {
         wristAngle = 0;
     }
-    leapData.wristAngle = (unsigned char)(wristAngle);
+    leapAngles.wristAngle = (unsigned char)(wristAngle);
 
     //
     // Serialize data
     //
-    _serialize(leapData, buf, buflen);
+    _serialize(leapAngles, leapData.data, leapData._MAX_PAYLOAD);
 
     return true;
 }
@@ -178,24 +241,24 @@ float LeapMotionManager::_radiansToDegrees(float angle)
 
 //*****************************************************************************
 //
-//! Serializes structure of data and stores into buffer.
+//! Serializes structure of angle data and stores into buffer.
 //!
-//! \param leapData the structure with data to serialize.
+//! \param leapAngles the structure with data to serialize.
 //! \param buf the buffer to store serialized data.
 //! \param buflen the size of the buffer
 //!
 //! \return None.
 //
 //*****************************************************************************
-void LeapMotionManager::_serialize(LeapDataStruct &leapData,
+void LeapMotionManager::_serialize(_LeapAngleStruct &leapAngles,
     unsigned char *buf, unsigned int buflen)
 {
     //
     // Buffer needs to be at least this size
     //
     const int BITS_PER_BYTE = 8;
-    int angleSize = sizeof(leapData.totalAngle[0]);
-    int wristSize = sizeof(leapData.wristAngle);
+    int angleSize = sizeof(leapAngles.totalAngle[0]);
+    int wristSize = sizeof(leapAngles.wristAngle);
     assert(buflen >= (angleSize*NUM_FINGERS + wristSize));
 
     //
@@ -204,7 +267,7 @@ void LeapMotionManager::_serialize(LeapDataStruct &leapData,
     unsigned int bufIndex = 0;
     for (int i=0; i<NUM_FINGERS; i++)
     {
-        auto angle = leapData.totalAngle[i];
+        auto angle = leapAngles.totalAngle[i];
 
         //
         // Stores angle sequentially in buf
@@ -212,7 +275,7 @@ void LeapMotionManager::_serialize(LeapDataStruct &leapData,
         buf[bufIndex++] = angle;
         std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
     }
-    buf[bufIndex++] = leapData.wristAngle;
+    buf[bufIndex++] = leapAngles.wristAngle;
     std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
     std::cout << std::endl;
 }

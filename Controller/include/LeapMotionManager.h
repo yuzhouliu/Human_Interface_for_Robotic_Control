@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// January 4, 2016
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -19,9 +19,22 @@
 
 #include "Leap.h"
 
+#include <SDL.h>
+
 #include "Finger.h" /* NUM_FINGERS */
 
 struct LeapDataStruct
+{
+    static const unsigned short _MAX_PAYLOAD = 256;
+    static const unsigned short _IMAGE_SIZE = 153600;
+    static const unsigned short _IMAGE_DATA_SIZE = 614400;
+    unsigned char data[LeapDataStruct::_MAX_PAYLOAD];
+    bool imageAvailable;
+    unsigned char imageDataRGBA[LeapDataStruct::_IMAGE_DATA_SIZE];
+    SDL_Rect fingerRects[NUM_FINGERS];
+};
+
+struct _LeapAngleStruct
 {
     unsigned char totalAngle[NUM_FINGERS];
     unsigned char wristAngle;
@@ -36,7 +49,7 @@ private:
     /* Methods */
     float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
     float _radiansToDegrees(float angle);
-    void _serialize(LeapDataStruct &leapData, unsigned char *buf,
+    void _serialize(_LeapAngleStruct &leapData, unsigned char *buf,
         unsigned int buflen);
 
 public:
@@ -47,7 +60,7 @@ public:
     ~LeapMotionManager();
 
     /* Methods */
-    bool processFrame(unsigned char *buf, unsigned int buflen);
+    bool processFrame(LeapDataStruct leapData);
 };
 
 #endif /* _LEAPMOTIONMANAGER_H_ */
