@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 1, 2016
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -44,7 +44,8 @@ private:
 
     /* Methods */
     bool _initialize();
-    void _update(FingerPressureStruct *fingerPressures);
+    void _update(LeapDataStruct &leapData,
+        FingerPressureStruct &fingerPressures);
     void _render();
     bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
         unsigned char *buf, unsigned int buflen);

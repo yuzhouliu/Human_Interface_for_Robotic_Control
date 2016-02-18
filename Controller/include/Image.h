@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 29, 2015
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _IMAGE_H_
@@ -50,10 +50,11 @@ public:
     /* Methods */
     void setRenderer(SDL_Renderer *renderer);
     bool setTexture(std::string path);
+    bool setTexture(SDL_Surface *surface);
     SDL_Texture *getTexture();
     unsigned short getWidth();
     unsigned short getHeight();
-    void setRenderRect(SDL_Rect *renderRect);
+    void setRenderRect(SDL_Rect &renderRect);
     SDL_Rect getRenderRect();
     void setAngle(unsigned short angle);
     unsigned short getAngle();

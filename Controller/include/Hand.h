@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// December 30, 2015
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _HAND_H_
@@ -22,6 +22,7 @@
 #include <SDL.h>
 
 #include "Finger.h"
+#include "LeapMotionManager.h" /* LeapDataStruct */
 
 struct FingerPressureStruct
 {
@@ -32,7 +33,9 @@ class Hand
 {
 private:
     /* Fields */
-    std::unique_ptr<Image> _baseImage;
+    SDL_Renderer *_renderer;
+    std::unique_ptr<Image> _image;
+    std::unique_ptr<Image> _staticImage;
     std::vector<std::unique_ptr<Finger>> _fingerList;
 
 public:
@@ -44,7 +47,8 @@ public:
     ~Hand();
 
     /* Methods */
-    void update(FingerPressureStruct *fingerPressures);
+    void update(LeapDataStruct &leapData,
+        FingerPressureStruct &fingerPressures);
     void render();
 };
 

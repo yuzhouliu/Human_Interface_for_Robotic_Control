@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// December 28, 2015
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #include "Image.h"
@@ -108,7 +108,6 @@ bool Image::setTexture(std::string path)
     }
 
     SDL_Surface *surface = nullptr;
-    SDL_Texture *texture = nullptr;
 
     //
     // Loads surface from path
@@ -122,6 +121,25 @@ bool Image::setTexture(std::string path)
         return false;
     }
 
+    bool ret = setTexture(surface);
+    SDL_FreeSurface(surface);
+    return ret;
+}
+
+//*****************************************************************************
+//
+//! Sets the texture that the class will manage.
+//!
+//! \param surface SDL_Surface of image.
+//!
+//! \return Returns \b true if the texture was loaded and set successfully and
+//! \b false otherwise.
+//
+//*****************************************************************************
+bool Image::setTexture(SDL_Surface *surface)
+{
+    SDL_Texture *texture = nullptr;
+
     //
     // Color key surface (Cyan: 0, 255, 255)
     //
@@ -129,8 +147,7 @@ bool Image::setTexture(std::string path)
         0xFF)) < 0)
     {
         std::cerr << "[ERROR] Image::setTexture(): Unable to color key image "\
-            "from " << path.c_str() << "! SDL Error: " << SDL_GetError() <<
-            std::endl;
+            "! SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -141,11 +158,9 @@ bool Image::setTexture(std::string path)
     if (texture == nullptr)
     {
         std::cerr << "[ERROR] Image::setTexture(): Unable to create texture "\
-            "from " << path.c_str() << "SDL Error: " << SDL_GetError() <<
-            std::endl;
+            "! SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
-    SDL_FreeSurface(surface);
 
     return _setTexture(texture);
 }
@@ -201,9 +216,9 @@ unsigned short Image::getHeight()
 //! \return None.
 //
 //*****************************************************************************
-void Image::setRenderRect(SDL_Rect *renderRect)
+void Image::setRenderRect(SDL_Rect &renderRect)
 {
-    _renderRect = *renderRect;
+    _renderRect = renderRect;
 }
 
 //*****************************************************************************

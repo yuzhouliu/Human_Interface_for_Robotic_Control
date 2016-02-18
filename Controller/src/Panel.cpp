@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 17, 2016
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -136,7 +136,7 @@ void Panel::run()
         //
         // Updates model
         //
-        _update(&fingerPressures);
+        _update(leapData, fingerPressures);
 
         //
         // Updates GUI
@@ -368,14 +368,16 @@ bool Panel::_initialize()
 //
 //! Updates program logic. Called once per frame by run().
 //!
-//! \param None.
+//! \param leapData a structure containing leap data information.
+//! \param fingerPressures a structure containing finger pressure information.
 //!
 //! \return None.
 //
 //*****************************************************************************
-void Panel::_update(FingerPressureStruct *fingerPressures)
+void Panel::_update(LeapDataStruct &leapData,
+    FingerPressureStruct &fingerPressures)
 {
-    _hand->update(fingerPressures);
+    _hand->update(leapData, fingerPressures);
 }
 
 //*****************************************************************************

@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 30, 2015
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _FINGER_H_
@@ -39,6 +39,7 @@ private:
     /* Fields */
     FingerType _type;
     std::unique_ptr<Image> _image;
+    std::unique_ptr<Image> _staticImage;
     unsigned char _pressure;
 
 public:
@@ -50,7 +51,9 @@ public:
 
     /* Methods */
     const std::unique_ptr<Image> &getImage();
+    const std::unique_ptr<Image> &getStaticImage();
     void setPressure(unsigned char pressure);
+    void setRenderRect(SDL_Rect &renderRect);
     void render();
 };
 

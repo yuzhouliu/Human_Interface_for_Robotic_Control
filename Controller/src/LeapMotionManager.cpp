@@ -157,7 +157,8 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
                 SDL_Rect &fingerRect = leapData.fingerRects[finger.type];
 
                 //
-                // Dont ask... this makes it pretty accurate...
+                // Calculates position on screen to render to
+                // This makes it pretty accurate... don't ask...
                 //
                 fingerRect.w = 25 - 25 * (center.y / 500);
                 if (fingerRect.w < 5)

@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// December 30, 2015
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #include "Finger.h"
@@ -38,7 +38,13 @@ Finger::Finger(FingerType type, SDL_Renderer *renderer)
         "data/gfx/hand_right_pinky.png"
     };
 
-    _image = std::unique_ptr<Image>(new Image(renderer, fingerPaths[+type]));
+    _staticImage = std::unique_ptr<Image>(new Image(renderer,
+        fingerPaths[+type]));
+    _staticImage->enableAlphaBlend();
+    _staticImage->setAlphaBlend(0);
+
+    _image = std::unique_ptr<Image>(new Image(renderer,
+        "data/gfx/pressure.png"));
     _image->enableAlphaBlend();
     _image->setAlphaBlend(0);
 }
@@ -73,6 +79,20 @@ const std::unique_ptr<Image> &Finger::getImage()
 
 //*****************************************************************************
 //
+//! Gets the static image.
+//!
+//! \param None.
+//!
+//! \return Returns a reference to the image.
+//
+//*****************************************************************************
+const std::unique_ptr<Image> &Finger::getStaticImage()
+{
+    return _staticImage;
+}
+
+//*****************************************************************************
+//
 //! Sets the finger pressure.
 //!
 //! \param pressure the new pressure to set.
@@ -83,6 +103,20 @@ const std::unique_ptr<Image> &Finger::getImage()
 void Finger::setPressure(unsigned char pressure)
 {
     _pressure = pressure;
+}
+
+//*****************************************************************************
+//
+//! Sets the rectangle that dictates where the texture will be rendered.
+//!
+//! \param renderRect to set.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Finger::setRenderRect(SDL_Rect &renderRect)
+{
+    _image->setRenderRect(renderRect);
 }
 
 //*****************************************************************************
