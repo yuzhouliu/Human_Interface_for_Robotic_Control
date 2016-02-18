@@ -72,10 +72,10 @@ void PinMuxConfig(void)
     MAP_PinTypeADC(PIN_60, PIN_MODE_255);
 
     // Configure PIN_03 for UART0 UART0_TX
-    MAP_PinTypeUART(PIN_03, PIN_MODE_7);
+    //MAP_PinTypeUART(PIN_03, PIN_MODE_7);
 
     // Configure PIN_04 for UART0 UART0_RX
-    MAP_PinTypeUART(PIN_04, PIN_MODE_7);
+    //MAP_PinTypeUART(PIN_04, PIN_MODE_7);
 }
 
 //*****************************************************************************

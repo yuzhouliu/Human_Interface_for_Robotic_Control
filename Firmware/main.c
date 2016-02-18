@@ -46,7 +46,6 @@
 #include "uart_if.h"
 #endif
 
-//#include "pinmux.h"
 #include "pin_mux_config.h"
 #include "servo_driver_if.h"
 #include "adc_driver_if.h"
@@ -172,12 +171,12 @@ void main()
     while (lRetVal >= 0)
     {
     	lRetVal = BsdTcpServerReceive(data);
-    	/*
+
     	for (i = 0; i<NUM_SERVOS; i++)
     	{
     		MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
     	}
-    	*/
+
     	for (i = 0; i< NUM_SENSORS; i++)
     	{
         	UnsignedShort_to_UnsignedChar(GetSensorReading((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);

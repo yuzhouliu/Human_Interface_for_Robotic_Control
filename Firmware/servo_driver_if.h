@@ -32,8 +32,8 @@
 
 // Define the PWM Duty Cycle Match values for HK15298B servo
 #define HK15298B_MAX_DEG_LIMIT 100
-#define HK15298B_PWM_0_DEGREES 0x11940UL						// 0.9ms (out of 20ms) duty cycle
-//#define HK15298B_PWM_0_DEGREES 0x157C0UL                        // 1.1ms (out of 20ms) duty cycle
+//#define HK15298B_PWM_0_DEGREES 0x11940UL						// 0.9ms (out of 20ms) duty cycle
+#define HK15298B_PWM_0_DEGREES 0x157C0UL                        // 1.1ms (out of 20ms) duty cycle
 #define HK15298B_PWM_100_DEGREES 0x251C0UL                      // 1.9ms (out of 20ms) duty cycle
 #define HK15298B_PWM_MATCH_PER_DEGREE (0x251C0UL-0x157C0UL)/100 // Equates to 0x280 or 640    
 
@@ -45,6 +45,7 @@
 #define FINGER_PINKY_POS_LIMIT 100      // HK15298B servo
 #define WRIST_POS_LIMIT 180             // HS311 servo
 
+#define FINGER_POS_0_THRESHOLD 20		// Anything below x degrees is interpreted as 0.
 
 // Defines for fingers
 enum Servo_Joint_Type {
