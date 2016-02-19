@@ -47,8 +47,7 @@ public:
     ~Hand();
 
     /* Methods */
-    void update(LeapDataStruct &leapData,
-        FingerPressureStruct &fingerPressures);
+    void update(LeapData &leapData, FingerPressureStruct &fingerPressures);
     void render();
 };
 

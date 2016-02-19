@@ -23,15 +23,38 @@
 
 #include "Finger.h" /* NUM_FINGERS */
 
-struct LeapDataStruct
+struct LeapData
 {
     static const unsigned short _MAX_PAYLOAD = 256;
-    static const unsigned short _IMAGE_SIZE = 153600;
-    static const unsigned short _IMAGE_DATA_SIZE = 614400;
-    unsigned char data[LeapDataStruct::_MAX_PAYLOAD];
-    bool imageAvailable;
-    unsigned char imageDataRGBA[LeapDataStruct::_IMAGE_DATA_SIZE];
+    static const unsigned int _IMAGE_SIZE = 153600;
+    static const unsigned int _IMAGE_DATA_SIZE = 614400;
+
+    //
+    // Finger data
+    //
+    unsigned char data[LeapData::_MAX_PAYLOAD];
     SDL_Rect fingerRects[NUM_FINGERS];
+
+    //
+    // Image data
+    //
+    bool imageAvailable = false;
+    int imageWidth;
+    int imageHeight;
+    int imageDepth;
+    int imagePitch;
+    unsigned char *imageDataRGBA;
+    SDL_Rect imageRenderRect;
+
+    LeapData()
+    {
+        imageDataRGBA = new unsigned char[LeapData::_IMAGE_DATA_SIZE];
+    }
+
+    ~LeapData()
+    {
+        delete[] imageDataRGBA;
+    }
 };
 
 struct _LeapAngleStruct
@@ -45,6 +68,8 @@ class LeapMotionManager
 private:
     /* Fields */
     Leap::Controller _controller;
+    int _windowWidth;
+    int _windowHeight;
 
     /* Methods */
     float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
@@ -54,13 +79,13 @@ private:
 
 public:
     /* Constructor */
-    LeapMotionManager();
+    LeapMotionManager(SDL_Window *window);
 
     /* Destructor */
     ~LeapMotionManager();
 
     /* Methods */
-    bool processFrame(LeapDataStruct leapData);
+    bool processFrame(LeapData &leapData);
 };
 
 #endif /* _LEAPMOTIONMANAGER_H_ */

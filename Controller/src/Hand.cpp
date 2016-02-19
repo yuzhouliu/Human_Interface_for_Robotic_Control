@@ -83,15 +83,37 @@ Hand::~Hand()
 //! \return None.
 //
 //*****************************************************************************
-void Hand::update(LeapDataStruct &leapData,
+void Hand::update(LeapData &leapData,
     FingerPressureStruct &fingerPressures)
 {
     //
     // Updates hand image
     //
-    _image;
-    _image = std::unique_ptr<Image>(new Image(_renderer,
-        "data/gfx/hand_base.png"));
+    if (leapData.imageAvailable)
+    {
+        SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+            (void*)(leapData.imageDataRGBA), leapData.imageWidth,
+            leapData.imageHeight, leapData.imageDepth, leapData.imagePitch,
+            0x00, 0x00, 0x00, 0x00);
+        if (surface == nullptr)
+        {
+            std::cout << "[ERROR] Hand::update(): " << SDL_GetError()
+                << std::endl;
+            exit(-1);
+        }
+
+        _image = std::unique_ptr<Image>(new Image());
+        _image->setRenderer(_renderer);
+        _image->setTexture(surface);
+        _image->setRenderRect(leapData.imageRenderRect);
+
+        SDL_FreeSurface(surface);
+
+        for (int i=0; i<NUM_FINGERS; i++)
+        {
+            _fingerList[i]->setRenderRect(leapData.fingerRects[i]);
+        }
+    }
 
     //
     // Updates finger pressures

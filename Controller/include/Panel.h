@@ -44,7 +44,7 @@ private:
 
     /* Methods */
     bool _initialize();
-    void _update(LeapDataStruct &leapData,
+    void _update(LeapData &leapData,
         FingerPressureStruct &fingerPressures);
     void _render();
     bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,

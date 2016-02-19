@@ -20,16 +20,20 @@
 
 //*****************************************************************************
 //
-//! Empty constructor for LeapMotionManager.
+//! Constructor for LeapMotionManager.
 //!
-//! \param None.
+//! \param window SDL_Window that the application is running on.
 //!
 //! \return None.
 //
 //*****************************************************************************
-LeapMotionManager::LeapMotionManager()
+LeapMotionManager::LeapMotionManager(SDL_Window *window)
 {
-
+    //
+    // Get the width and height of the window
+    //
+    SDL_GetWindowSize(window, &_windowWidth, &_windowHeight);
+    _controller.setPolicy(Leap::Controller::POLICY_IMAGES);
 }
 
 //*****************************************************************************
@@ -57,7 +61,7 @@ LeapMotionManager::~LeapMotionManager()
 //! \b false otherwise.
 //
 //*****************************************************************************
-bool LeapMotionManager::processFrame(LeapDataStruct leapData)
+bool LeapMotionManager::processFrame(LeapData &leapData)
 {
     _LeapAngleStruct leapAngles;
 
@@ -73,9 +77,10 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
     Leap::Image image = imageList[0];
     const unsigned char *imageData = image.data();
     int imageSize = image.bytesPerPixel() * image.height() * image.width();
+    std::cout << "imageSize = " << imageSize << std::endl;
     if (imageSize > 0)
     {
-        if (imageSize != LeapDataStruct::_IMAGE_SIZE)
+        if (imageSize != LeapData::_IMAGE_SIZE)
         {
             std::cout << "[ERROR] LeapMotionManager::processFrame(): "\
                 "Unexpected image size." << std::endl;
@@ -83,6 +88,17 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
         }
 
         leapData.imageAvailable = true;
+        leapData.imageWidth = image.width();
+        leapData.imageHeight = image.height();
+        leapData.imageDepth = 32;
+        leapData.imagePitch = leapData.imageWidth*4;
+
+        leapData.imageRenderRect.w = leapData.imageWidth;
+        leapData.imageRenderRect.h = 2*leapData.imageHeight;
+        leapData.imageRenderRect.x =
+            (_windowWidth - leapData.imageRenderRect.w)/2;
+        leapData.imageRenderRect.y =
+            (_windowHeight - leapData.imageRenderRect.h)/2;
 
         //
         // Set image RGB to same value to display grayscale and set alpha to
@@ -111,7 +127,7 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
     // Iterates through list of hands provided by Leap Motion Controller and
     // identifies first right hand it detects.
     //
-    for (auto it = hands.begin(); it != hands.end(); it++)
+    for (auto it=hands.begin(); it!=hands.end(); it++)
     {
         if ((*it).isRight())
         {
@@ -126,7 +142,7 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
     {
         std::cout << "No hand detected." << std::endl;
         unsigned int bufIndex = 0;
-        for (int i = 0; i < NUM_FINGERS; i++)
+        for (int i=0; i<NUM_FINGERS; i++)
         {
             //
             // Stores angle sequentially in buf
@@ -138,10 +154,10 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
     }
 
     //
-    // Populates LeapDataStruct and LeapAngleStruct structure with finger info
+    // Populates LeapData and LeapAngleStruct structure with finger info
     //
     Leap::FingerList fingers = hand.fingers();
-    for (auto it = fingers.begin(); it != fingers.end(); it++)
+    for (auto it=fingers.begin(); it!=fingers.end(); it++)
     {
         Leap::Finger finger = (*it);
         Leap::Vector direction[4];
@@ -154,7 +170,9 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
             if (boneType == Leap::Bone::TYPE_DISTAL)
             {
                 Leap::Vector center = bone.center();
-                SDL_Rect &fingerRect = leapData.fingerRects[finger.type];
+
+                SDL_Rect &fingerRect = leapData.fingerRects[
+                    static_cast<int>(finger.type())];
 
                 //
                 // Calculates position on screen to render to
@@ -166,10 +184,15 @@ bool LeapMotionManager::processFrame(LeapDataStruct leapData)
                     fingerRect.w = 5;
                 }
                 fingerRect.h = fingerRect.w;
-                fingerRect.x = -center.x*(170/center.y)*0.85 + 800/2
+                fingerRect.x = -center.x*(170/center.y)*0.85 + _windowWidth/2
                     + 0.7*fingerRect.w;
-                fingerRect.y = center.z*(170/center.y)*0.85 + 600/2
+                fingerRect.y = center.z*(170/center.y)*0.85 + _windowHeight/2
                     - 1.2*fingerRect.h;
+
+                /*leapData.fingerRects[finger.type].x = fingerRect.x;
+                leapData.fingerRects[finger.type].y = fingerRect.y;
+                leapData.fingerRects[finger.type].w = fingerRect.w;
+                leapData.fingerRects[finger.type].h = fingerRect.h;*/
             }
         }
         leapAngles.totalAngle[finger.type()] = (unsigned char)

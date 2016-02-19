@@ -29,7 +29,6 @@
 //
 //*****************************************************************************
 Image::Image()
-    : Image(nullptr, nullptr)
 {
 
 }
@@ -138,6 +137,13 @@ bool Image::setTexture(std::string path)
 //*****************************************************************************
 bool Image::setTexture(SDL_Surface *surface)
 {
+    if (_renderer == nullptr)
+    {
+        std::cerr << "[ERROR] Image::setTexture(): Renderer has not been set."\
+            " Call setRenderer() first." << std::endl;
+        return false;
+    }
+
     SDL_Texture *texture = nullptr;
 
     //
@@ -406,7 +412,7 @@ void Image::centreImage(const std::unique_ptr<Image> &image,
     centredRect.h = image->getHeight();
     centredRect.x = (screenWidth - centredRect.w) / 2;
     centredRect.y = (screenHeight - centredRect.h) / 2;
-    image->setRenderRect(&centredRect);
+    image->setRenderRect(centredRect);
 }
 
 //*****************************************************************************

@@ -28,7 +28,7 @@
 //
 //! Constructor for Panel. Acquires resources for renderer and hand model.
 //!
-//! \param None.
+//! \param window SDL_Window that the application is running on.
 //!
 //! \return None.
 //
@@ -77,8 +77,8 @@ Panel::~Panel()
 void Panel::run()
 {
     FrameRateManager fpsManager;
-    LeapMotionManager leap;
-    LeapDataStruct leapData;
+    LeapMotionManager leap(_window);
+    LeapData leapData;
     FingerPressureStruct fingerPressures;
 
     //
@@ -103,10 +103,7 @@ void Panel::run()
         //
         // Fetches relevent data from Leap Motion Controller
         //
-        if (!leap.processFrame(leapData))
-        {
-            continue;
-        }
+        leap.processFrame(leapData);
 
         if (_connected)
         {
@@ -374,7 +371,7 @@ bool Panel::_initialize()
 //! \return None.
 //
 //*****************************************************************************
-void Panel::_update(LeapDataStruct &leapData,
+void Panel::_update(LeapData &leapData,
     FingerPressureStruct &fingerPressures)
 {
     _hand->update(leapData, fingerPressures);

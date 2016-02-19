@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 1, 2016
+// Feburary 18, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -38,8 +38,8 @@ class Window
 {
 private:
     /* Fields */
-    const int _DEFAULT_WIDTH = 640;
-    const int _DEFAULT_HEIGHT = 480;
+    const int _DEFAULT_WIDTH = 800;
+    const int _DEFAULT_HEIGHT = 600;
     SDL_Window *_window;
     HWND _windowHandle;
     HMENU _menu;
