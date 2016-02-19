@@ -77,27 +77,47 @@ void CheckDegreeAgainstLimit(unsigned char *ucDegrees, enum Servo_Joint_Type eSe
     {
         case SERVO_FINGER_THUMB:
             if (*ucDegrees > FINGER_THUMB_POS_LIMIT) 
-                { *ucDegrees = FINGER_THUMB_POS_LIMIT; }
+            { *ucDegrees = FINGER_THUMB_POS_LIMIT; }
+            else if (*ucDegrees < FINGER_POS_0_THRESHOLD)
+            { *ucDegrees = 0; }
+            else
+            { *ucDegrees = *ucDegrees - FINGER_POS_0_THRESHOLD; }
             break;
         case SERVO_FINGER_INDEX:
             if (*ucDegrees > FINGER_INDEX_POS_LIMIT) 
-                { *ucDegrees = FINGER_INDEX_POS_LIMIT; }
+            { *ucDegrees = FINGER_INDEX_POS_LIMIT; }
+            else if (*ucDegrees < FINGER_POS_0_THRESHOLD)
+            { *ucDegrees = 0; }
+            else
+            { *ucDegrees = *ucDegrees - FINGER_POS_0_THRESHOLD; }
             break;
         case SERVO_FINGER_MIDDLE:
             if (*ucDegrees > FINGER_MIDDLE_POS_LIMIT) 
-                { *ucDegrees = FINGER_MIDDLE_POS_LIMIT; }
+            { *ucDegrees = FINGER_MIDDLE_POS_LIMIT; }
+            else if (*ucDegrees < FINGER_POS_0_THRESHOLD)
+            { *ucDegrees = 0; }
+            else
+            { *ucDegrees = *ucDegrees - FINGER_POS_0_THRESHOLD; }
             break;
         case SERVO_FINGER_RING:
             if (*ucDegrees > FINGER_RING_POS_LIMIT) 
-                { *ucDegrees = FINGER_RING_POS_LIMIT; }
+            { *ucDegrees = FINGER_RING_POS_LIMIT; }
+            else if (*ucDegrees < FINGER_POS_0_THRESHOLD)
+            { *ucDegrees = 0; }
+            else
+            { *ucDegrees = *ucDegrees - FINGER_POS_0_THRESHOLD; }
             break;
         case SERVO_FINGER_PINKY:
             if (*ucDegrees > FINGER_PINKY_POS_LIMIT) 
-                { *ucDegrees = FINGER_PINKY_POS_LIMIT; }
+            { *ucDegrees = FINGER_PINKY_POS_LIMIT; }
+            else if (*ucDegrees < FINGER_POS_0_THRESHOLD)
+            { *ucDegrees = 0; }
+            else
+            { *ucDegrees = *ucDegrees - FINGER_POS_0_THRESHOLD; }
             break;
         case SERVO_WRIST:
             if (*ucDegrees > WRIST_POS_LIMIT) 
-                { *ucDegrees = WRIST_POS_LIMIT; }
+            { *ucDegrees = WRIST_POS_LIMIT; }
             break;
         default:
             //UART_PRINT("[CheckDegreeAgainstLimit] Invalid Finger input\n");
@@ -189,20 +209,4 @@ void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint)
             //UART_PRINT("[MoveServo] Invalid Finger input\n");
         	return;
     }
-}
-
-//****************************************************************************
-// Stops the servo motor from moving further
-//****************************************************************************
-void StopServo(enum Servo_Joint_Type eServoJoint)
-{
-	// Stops the proper timer (PWM) module
-	switch(eServoJoint) {
-	    case SERVO_FINGER_THUMB:
-	    	DeInitPWMModules();
-	        break;
-	    default:
-	    	//UART_PRINT("[MoveServo] Invalid Finger input\n");
-	        return;
-	}
 }

@@ -1,31 +1,3 @@
-
-#ifndef __PIN_MUX_CONFIG_H__
-#define __PIN_MUX_CONFIG_H__
-
-//*****************************************************************************
-//
-// pin_mux_config.h
-//
-// Pin mux configuration
-//
-// This header file was generated using TI's pin mux online tool:
-// https://dev.ti.com/pinmux/app.html#/config/CC3200/ID_500/ID_0/null/null
-// Copyright notice is moved to the end of this file.
-//
-// Created:
-// December 20, 2015
-//
-// Modified:
-// December 20, 2015
-//
-//*****************************************************************************
-
-//#define DEBUG	    // For switching ON/OFF UART0
-
-extern void PinMuxConfig(void);
-
-#endif //  __PIN_MUX_CONFIG_H__
-
 //*****************************************************************************
 // pin_mux_config.h
 //
@@ -64,7 +36,14 @@ extern void PinMuxConfig(void);
 //
 //*****************************************************************************
 
-// This file was automatically generated on 12/20/2015 at 2:02:41 PM
+// This file was automatically generated on 2/17/2016 at 8:35:47 PM
 // by TI PinMux version 
 //
 //*****************************************************************************
+
+#ifndef __PIN_MUX_CONFIG_H__
+#define __PIN_MUX_CONFIG_H__
+
+extern void PinMuxConfig(void);
+
+#endif //  __PIN_MUX_CONFIG_H__

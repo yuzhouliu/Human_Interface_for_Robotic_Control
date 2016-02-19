@@ -22,6 +22,9 @@
 // Defines number of sensors
 #define NUM_SENSORS 5
 
+// Defines number of samples for averaging ADC reading
+#define NO_OF_SAMPLES 2
+
 // Defines for finger-tip sensors
 enum Fingertip_Sensor_Type {
     SENSOR_FINGER_THUMB=0,

@@ -46,9 +46,9 @@
 #include "uart_if.h"
 #endif
 
-//#include "pinmux.h"
 #include "pin_mux_config.h"
 #include "servo_driver_if.h"
+#include "servo_driver_search_pressure_if.h"
 #include "adc_driver_if.h"
 #include "msg_util_if.h"
 
@@ -142,6 +142,8 @@ void main()
     unsigned char highByte, lowByte;
     int i;
 
+    unsigned char freeMovementMode;
+
     memset(sent_data, 0, 10);
     // Board Initialization
     BoardInit();
@@ -172,18 +174,27 @@ void main()
     while (lRetVal >= 0)
     {
     	lRetVal = BsdTcpServerReceive(data);
-    	/*
-    	for (i = 0; i<NUM_SERVOS; i++)
-    	{
-    		MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
-    	}
-    	*/
-    	for (i = 0; i< NUM_SENSORS; i++)
-    	{
-        	UnsignedShort_to_UnsignedChar(GetSensorReading((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
-        	sent_data[i*2] = (char)highByte;
-        	sent_data[i*2+1] = (char)lowByte;
-    	}
+
+        if (freeMovementMode)
+        {
+            for (i = 0; i<NUM_SERVOS; i++)
+            {
+                MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
+            }
+
+            for (i = 0; i< NUM_SENSORS; i++)
+            {
+                UnsignedShort_to_UnsignedChar(GetSensorReading((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
+                sent_data[i*2] = (char)highByte;
+                sent_data[i*2+1] = (char)lowByte;
+            }
+        }
+        else
+        {
+            MoveServo_SearchPressure(CMD_CLOSE);
+            memset(sent_data, 1, 10);
+        }
+    	
     	lRetVal = BsdTcpServerSend(sent_data, 10);
     	UART_PRINT("Sent 10 bytes to client.\n\r");
 

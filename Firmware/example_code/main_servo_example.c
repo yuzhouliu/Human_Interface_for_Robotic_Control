@@ -112,18 +112,11 @@ void main()
     {
         MoveServo(0, SERVO_FINGER_INDEX);
         MoveServo(0, SERVO_FINGER_THUMB);
-        // Testing PWM stop
-        MAP_UtilsDelay(30000000);
-        MoveServo(180, SERVO_FINGER_THUMB);
-        MAP_UtilsDelay(300000);
-        StopServo(SERVO_FINGER_THUMB);
-
-        /*
         MoveServo(0, SERVO_FINGER_MIDDLE);
         MoveServo(0, SERVO_FINGER_RING);
         MoveServo(0, SERVO_FINGER_PINKY);
         MoveServo(180, SERVO_WRIST);
-        MAP_UtilsDelay(30000000);
+        MAP_UtilsDelay(20000000);
 
         MoveServo(100, SERVO_FINGER_INDEX);
         MoveServo(100, SERVO_FINGER_THUMB);
@@ -131,9 +124,8 @@ void main()
         MoveServo(100, SERVO_FINGER_RING);
         MoveServo(100, SERVO_FINGER_PINKY);
         MoveServo(0, SERVO_WRIST);
-		*/
 
-        MAP_UtilsDelay(30000000);
+        MAP_UtilsDelay(20000000);
     }
 
     //
