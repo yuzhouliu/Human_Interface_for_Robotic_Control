@@ -77,7 +77,6 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     Leap::Image image = imageList[0];
     const unsigned char *imageData = image.data();
     int imageSize = image.bytesPerPixel() * image.height() * image.width();
-    std::cout << "imageSize = " << imageSize << std::endl;
     if (imageSize > 0)
     {
         if (imageSize != LeapData::_IMAGE_SIZE)
@@ -115,6 +114,16 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     else
     {
         leapData.imageAvailable = false;
+    }
+
+    //
+    // Hide finger pressure by default
+    //
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        SDL_Rect &fingerRect = leapData.fingerRects[i];
+        fingerRect.w = 0;
+        fingerRect.h = 0;
     }
 
     //

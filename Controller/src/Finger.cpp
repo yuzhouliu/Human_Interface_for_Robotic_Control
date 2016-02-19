@@ -38,15 +38,27 @@ Finger::Finger(FingerType type, SDL_Renderer *renderer)
         "data/gfx/hand_right_pinky.png"
     };
 
+    //
+    // Static image for viewport
+    //
     _staticImage = std::unique_ptr<Image>(new Image(renderer,
         fingerPaths[+type]));
     _staticImage->enableAlphaBlend();
     _staticImage->setAlphaBlend(0);
 
+    //
+    // Dynamic image for following finger positions
+    //
     _image = std::unique_ptr<Image>(new Image(renderer,
         "data/gfx/pressure.png"));
     _image->enableAlphaBlend();
     _image->setAlphaBlend(0);
+
+    //
+    // Hide image at first
+    //
+    SDL_Rect rect = { 0, 0, 0, 0 };
+    setRenderRect(rect);
 }
 
 //*****************************************************************************

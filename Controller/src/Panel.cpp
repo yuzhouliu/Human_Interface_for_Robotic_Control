@@ -325,9 +325,9 @@ bool Panel::_initialize()
     }
 
     //
-    // Sets renderer to default to an Opqaue White color on screen clear
+    // Sets renderer to default to an Opqaue black color on screen clear
     //
-    iRetVal = SDL_SetRenderDrawColor(_renderer, 0xFF, 0xFF, 0xFF,
+    iRetVal = SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00,
         SDL_ALPHA_OPAQUE);
     if (iRetVal < 0)
     {
