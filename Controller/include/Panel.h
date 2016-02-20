@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -63,6 +63,8 @@ public:
     bool disconnect();
     bool send(unsigned char *message, unsigned short len);
     bool recv(unsigned char *message, unsigned short len);
+    bool startRecording(char *filePath);
+    bool stopRecording();
 };
 
 #endif /* _PANEL_H_ */

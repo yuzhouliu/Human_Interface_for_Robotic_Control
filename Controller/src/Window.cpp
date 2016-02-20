@@ -11,11 +11,12 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 1, 2016
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #include "Window.h"
 
+#include <Commdlg.h> /* OPENFILENAME */
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -261,12 +262,31 @@ void Window::_processInput()
                     gExit = true;
                     break;
                 case ID_OPTIONS_STARTRECORDING:
+                {
                     //
                     // Options -> Start Recording
                     //
-                    MessageBox(_windowHandle, "Not implemented",
-                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    OPENFILENAME openFileName;
+                    char filePathBuf[MAX_PATH] = "";
+
+                    ZeroMemory(&openFileName, sizeof(openFileName));
+
+                    openFileName.lStructSize = sizeof(openFileName);
+                    openFileName.hwndOwner = _windowHandle;
+                    openFileName.lpstrFilter = "HIRC Files (*.hirc)\0*.hirc\0"\
+                        "All Files (*.*)\0*.*\0";
+                    openFileName.lpstrFile = filePathBuf;
+                    openFileName.nMaxFile = MAX_PATH;
+                    openFileName.lpstrDefExt = "hirc";
+                    openFileName.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST |
+                        OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+
+                    if (GetSaveFileName(&openFileName))
+                    {
+                        // TODO (Brandon): Start recording
+                    }
                     break;
+                }
                 case ID_OPTIONS_STOPRECORDING:
                     //
                     // Options -> Stop Recording

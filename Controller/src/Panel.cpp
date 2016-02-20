@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -290,6 +290,36 @@ bool Panel::recv(unsigned char *message, unsigned short len)
 
     std::cout << "Not connected." << std::endl;
     return false;
+}
+
+//*****************************************************************************
+//
+//! Starts recording data stream to file.
+//!
+//! \param filePath path to file to save data stream to.
+//!
+//! \return Returns \b true if recording started successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Panel::startRecording(char *filePath)
+{
+    // TODO (Brandon): Implement
+}
+
+//*****************************************************************************
+//
+//! Stops recording data stream and save file.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if recording stopped successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Panel::stopRecording()
+{
+    // TODO (Brandon): Implement
 }
 
 //*****************************************************************************
