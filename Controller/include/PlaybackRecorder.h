@@ -19,6 +19,8 @@
 
 #include <fstream>
 
+#include "LeapMotionManager.h" /* LeapData */
+
 class PlaybackRecorder
 {
 private:
@@ -37,7 +39,7 @@ public:
     bool isRecording();
     bool startRecording(char *filePath, int fps);
     bool stopRecording();
-    void update(char *data);
+    void update(LeapData &leapData);
 };
 
 #endif /* _PLAYBACKRECORDER_H_ */

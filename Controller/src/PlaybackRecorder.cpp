@@ -137,12 +137,17 @@ bool PlaybackRecorder::stopRecording()
 //! \return None.
 //
 //*****************************************************************************
-void PlaybackRecorder::update(char *data)
+void PlaybackRecorder::update(LeapData &leapData)
 {
     if (!_recording)
     {
         return;
     }
 
-    // TODO (Brandon): Append data to file
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        _file << leapData.totalAngle[i];
+    }
+
+    _file << leapData.wristAngle;
 }

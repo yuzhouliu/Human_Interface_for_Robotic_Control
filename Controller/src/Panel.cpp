@@ -19,7 +19,6 @@
 #include <cassert>
 #include <iostream>
 
-#include "FrameRateManager.h"
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
 #include "Window.h"
@@ -103,6 +102,16 @@ void Panel::run()
         // Fetches relevent data from Leap Motion Controller
         //
         leap.processFrame(leapData);
+
+        //
+        // Record data (if applicable)
+        //
+        _playbackRecorder.update(leapData);
+
+        //
+        // Serialize data
+        //
+        leap.serialize(leapData, leapData.data, leapData._MAX_PAYLOAD);
 
         if (_connected)
         {
@@ -332,12 +341,66 @@ bool Panel::stopRecording()
 {
     if (_playbackStreamer.isStreaming())
     {
-        std::cout << "[ERROR] Panel::startRecording(): Not recording while "\
-            "streaming." << std::endl;
+        std::cout << "[ERROR] Panel::stopRecording(): Recording not started."\
+            << std::endl;
         return false;
     }
 
     if (!_playbackRecorder.stopRecording())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Starts streaming data from file.
+//!
+//! \param filePath path to file to stream data from.
+//!
+//! \return Returns \b true if streaming started successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Panel::startStreaming(char *filePath)
+{
+    if (_playbackRecorder.isRecording())
+    {
+        std::cout << "[ERROR] Panel::startStreaming(): Cannot stream while "\
+            "recording." << std::endl;
+        return false;
+    }
+
+    if (!_playbackStreamer.startStreaming(filePath))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Stops streaming data.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if streaming stopped successfully and \b false
+//! otherwise.
+//
+//*****************************************************************************
+bool Panel::stopStreaming()
+{
+    if (_playbackRecorder.isRecording())
+    {
+        std::cout << "[ERROR] Panel::stopStreaming(): Streaming not started."\
+            << std::endl;
+        return false;
+    }
+
+    if (!_playbackStreamer.stopStreaming())
     {
         return false;
     }

@@ -75,6 +75,7 @@ bool PlaybackStreamer::isStreaming()
 bool PlaybackStreamer::startStreaming(char *filePath)
 {
     // TODO (Brandon): Implement
+    return false;
 }
 
 //*****************************************************************************
@@ -87,7 +88,8 @@ bool PlaybackStreamer::startStreaming(char *filePath)
 //! otherwise.
 //
 //*****************************************************************************
-bool stopStreaming()
+bool PlaybackStreamer::stopStreaming()
 {
     // TODO (Brandon): Implement
+    return false;
 }

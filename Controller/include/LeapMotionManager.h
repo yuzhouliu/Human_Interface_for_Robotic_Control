@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -33,6 +33,8 @@ struct LeapData
     // Finger data
     //
     unsigned char data[LeapData::_MAX_PAYLOAD];
+    unsigned char totalAngle[NUM_FINGERS];
+    unsigned char wristAngle;
     SDL_Rect fingerRects[NUM_FINGERS];
 
     //
@@ -57,12 +59,6 @@ struct LeapData
     }
 };
 
-struct _LeapAngleStruct
-{
-    unsigned char totalAngle[NUM_FINGERS];
-    unsigned char wristAngle;
-};
-
 class LeapMotionManager
 {
 private:
@@ -74,8 +70,6 @@ private:
     /* Methods */
     float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
     float _radiansToDegrees(float angle);
-    void _serialize(_LeapAngleStruct &leapData, unsigned char *buf,
-        unsigned int buflen);
 
 public:
     /* Constructor */
@@ -86,6 +80,8 @@ public:
 
     /* Methods */
     bool processFrame(LeapData &leapData);
+    void serialize(LeapData &leapData, unsigned char *buf,
+        unsigned int buflen);
 };
 
 #endif /* _LEAPMOTIONMANAGER_H_ */

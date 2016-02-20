@@ -26,6 +26,7 @@
 
 #include <SDL.h>
 
+#include "FrameRateManager.h"
 #include "Hand.h"
 #include "IObservable.h"
 #include "Network.h"

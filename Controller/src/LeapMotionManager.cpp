@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #include "LeapMotionManager.h"
@@ -63,8 +63,6 @@ LeapMotionManager::~LeapMotionManager()
 //*****************************************************************************
 bool LeapMotionManager::processFrame(LeapData &leapData)
 {
-    _LeapAngleStruct leapAngles;
-
     //
     // Get current frame from Leap Motion Controller
     //
@@ -163,7 +161,7 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     }
 
     //
-    // Populates LeapData and LeapAngleStruct structure with finger info
+    // Populates LeapData structure with finger info
     //
     Leap::FingerList fingers = hand.fingers();
     for (auto it=fingers.begin(); it!=fingers.end(); it++)
@@ -204,7 +202,7 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
                 leapData.fingerRects[finger.type].h = fingerRect.h;*/
             }
         }
-        leapAngles.totalAngle[finger.type()] = (unsigned char)
+        leapData.totalAngle[finger.type()] = (unsigned char)
             (_radiansToDegrees(_calculateTotalAngle(direction, 4)));
     }
 
@@ -223,14 +221,55 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     {
         wristAngle = 0;
     }
-    leapAngles.wristAngle = (unsigned char)(wristAngle);
+    leapData.wristAngle = (unsigned char)(wristAngle);
 
     //
     // Serialize data
     //
-    _serialize(leapAngles, leapData.data, leapData._MAX_PAYLOAD);
+    //serialize(leapData, leapData.data, leapData._MAX_PAYLOAD);
 
     return true;
+}
+
+//*****************************************************************************
+//
+//! Serializes structure of angle data and stores into buffer.
+//!
+//! \param leapData the structure with data to serialize.
+//! \param buf the buffer to store serialized data.
+//! \param buflen the size of the buffer
+//!
+//! \return None.
+//
+//*****************************************************************************
+void LeapMotionManager::serialize(LeapData &leapAngles, unsigned char *buf,
+    unsigned int buflen)
+{
+    //
+    // Buffer needs to be at least this size
+    //
+    const int BITS_PER_BYTE = 8;
+    int angleSize = sizeof(leapAngles.totalAngle[0]);
+    int wristSize = sizeof(leapAngles.wristAngle);
+    assert(buflen >= (angleSize*NUM_FINGERS + wristSize));
+
+    //
+    // Serialize data
+    //
+    unsigned int bufIndex = 0;
+    for (int i=0; i<NUM_FINGERS; i++)
+    {
+        auto angle = leapAngles.totalAngle[i];
+
+        //
+        // Stores angle sequentially in buf
+        //
+        buf[bufIndex++] = angle;
+        std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
+    }
+    buf[bufIndex++] = leapAngles.wristAngle;
+    std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
+    std::cout << std::endl;
 }
 
 //*****************************************************************************
@@ -270,45 +309,4 @@ float LeapMotionManager::_radiansToDegrees(float angle)
 {
     const float _RADIANS_TO_DEGREES = (float)57.2958;
     return _RADIANS_TO_DEGREES * angle;
-}
-
-//*****************************************************************************
-//
-//! Serializes structure of angle data and stores into buffer.
-//!
-//! \param leapAngles the structure with data to serialize.
-//! \param buf the buffer to store serialized data.
-//! \param buflen the size of the buffer
-//!
-//! \return None.
-//
-//*****************************************************************************
-void LeapMotionManager::_serialize(_LeapAngleStruct &leapAngles,
-    unsigned char *buf, unsigned int buflen)
-{
-    //
-    // Buffer needs to be at least this size
-    //
-    const int BITS_PER_BYTE = 8;
-    int angleSize = sizeof(leapAngles.totalAngle[0]);
-    int wristSize = sizeof(leapAngles.wristAngle);
-    assert(buflen >= (angleSize*NUM_FINGERS + wristSize));
-
-    //
-    // Serialize data
-    //
-    unsigned int bufIndex = 0;
-    for (int i=0; i<NUM_FINGERS; i++)
-    {
-        auto angle = leapAngles.totalAngle[i];
-
-        //
-        // Stores angle sequentially in buf
-        //
-        buf[bufIndex++] = angle;
-        std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
-    }
-    buf[bufIndex++] = leapAngles.wristAngle;
-    std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
-    std::cout << std::endl;
 }
