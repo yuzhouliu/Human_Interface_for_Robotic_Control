@@ -26,7 +26,7 @@
 //
 //*****************************************************************************
 PlaybackStreamer::PlaybackStreamer()
-    : _file(), _recording(false)
+    : _file(), _streaming(false)
 {
 
 }

@@ -29,6 +29,8 @@
 #include "Hand.h"
 #include "IObservable.h"
 #include "Network.h"
+#include "PlaybackRecorder.h"
+#include "PlaybackStreamer.h"
 #include "TCPSocket.h"
 
 class Panel
@@ -40,6 +42,9 @@ private:
     std::unique_ptr<Hand> _hand;
     std::unique_ptr<TCPSocket> _socket;
     std::mutex _socket_mutex;
+    FrameRateManager _fpsManager;
+    PlaybackRecorder _playbackRecorder;
+    PlaybackStreamer _playbackStreamer;
     bool _connected;
 
     /* Methods */
@@ -65,6 +70,8 @@ public:
     bool recv(unsigned char *message, unsigned short len);
     bool startRecording(char *filePath);
     bool stopRecording();
+    bool startStreaming(char *filePath);
+    bool stopStreaming();
 };
 
 #endif /* _PANEL_H_ */

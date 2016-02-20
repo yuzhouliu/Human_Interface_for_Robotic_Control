@@ -11,7 +11,7 @@
 // December 21, 2015
 //
 // Modified:
-// December 28, 2015
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #include "FrameRateManager.h"
@@ -82,9 +82,23 @@ void FrameRateManager::endFrame()
 
 //*****************************************************************************
 //
-//! Sets the minimum FPS that the class will maintain.
+//! Gets the maximum FPS that the class will maintain.
 //!
-//! \param Sets the frames per second to \i fps.
+//! \param None.
+//!
+//! \return The maximum FPS that the class will maintain.
+//
+//*****************************************************************************
+int FrameRateManager::getFPS()
+{
+    return _fps;
+}
+
+//*****************************************************************************
+//
+//! Sets the maximum FPS that the class will maintain.
+//!
+//! \param fps the FPS to set.
 //!
 //! \return None.
 //

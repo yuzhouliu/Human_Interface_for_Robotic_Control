@@ -11,7 +11,7 @@
 // December 21, 2015
 //
 // Modified:
-// December 27, 2015
+// Feburary 19, 2016
 //
 //*****************************************************************************
 #ifndef _FRAMERATEMANAGER_H_
@@ -37,6 +37,7 @@ public:
     /* Methods */
     void beginFrame();
     void endFrame();
+    int getFPS();
     void setFPS(int fps);
 };
 

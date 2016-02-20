@@ -34,6 +34,7 @@ public:
     ~PlaybackRecorder();
 
     /* Methods */
+    bool isRecording();
     bool startRecording(char *filePath, int fps);
     bool stopRecording();
     void update(char *data);

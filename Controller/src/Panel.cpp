@@ -76,7 +76,6 @@ Panel::~Panel()
 //*****************************************************************************
 void Panel::run()
 {
-    FrameRateManager fpsManager;
     LeapMotionManager leap(_window);
     LeapData leapData;
     FingerPressureStruct fingerPressures;
@@ -84,13 +83,13 @@ void Panel::run()
     //
     // Main panel logic
     //
-    fpsManager.setFPS(10);
+    _fpsManager.setFPS(10);
     while (!Window::gExit)
     {
         //
         // Begins tracking fps
         //
-        fpsManager.beginFrame();
+        _fpsManager.beginFrame();
 
         //
         // Clears finger pressures
@@ -143,7 +142,7 @@ void Panel::run()
         //
         // Ends frame and blocks until FPS elapses
         //
-        fpsManager.endFrame();
+        _fpsManager.endFrame();
     }
 }
 
@@ -304,7 +303,19 @@ bool Panel::recv(unsigned char *message, unsigned short len)
 //*****************************************************************************
 bool Panel::startRecording(char *filePath)
 {
-    // TODO (Brandon): Implement
+    if (_playbackStreamer.isStreaming())
+    {
+        std::cout << "[ERROR] Panel::startRecording(): Cannot record while "\
+            "streaming." << std::endl;
+        return false;
+    }
+
+    if (!_playbackRecorder.startRecording(filePath, _fpsManager.getFPS()))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 //*****************************************************************************
@@ -319,7 +330,19 @@ bool Panel::startRecording(char *filePath)
 //*****************************************************************************
 bool Panel::stopRecording()
 {
-    // TODO (Brandon): Implement
+    if (_playbackStreamer.isStreaming())
+    {
+        std::cout << "[ERROR] Panel::startRecording(): Not recording while "\
+            "streaming." << std::endl;
+        return false;
+    }
+
+    if (!_playbackRecorder.stopRecording())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 //*****************************************************************************

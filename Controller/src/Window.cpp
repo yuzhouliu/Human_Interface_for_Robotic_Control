@@ -283,16 +283,22 @@ void Window::_processInput()
 
                     if (GetSaveFileName(&openFileName))
                     {
-                        // TODO (Brandon): Start recording
+                        _panel->startRecording(filePathBuf);
                     }
+
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_ENABLED);
                     break;
                 }
                 case ID_OPTIONS_STOPRECORDING:
                     //
                     // Options -> Stop Recording
                     //
-                    MessageBox(_windowHandle, "Not implemented",
-                        "Not implemented", MB_ICONINFORMATION | MB_OK);
+                    _panel->stopRecording();
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
+                    /*MessageBox(_windowHandle, "Not implemented",
+                        "Not implemented", MB_ICONINFORMATION | MB_OK);*/
                     break;
                 default:
                     break;

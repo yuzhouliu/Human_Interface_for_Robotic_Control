@@ -52,6 +52,20 @@ PlaybackRecorder::~PlaybackRecorder()
 
 //*****************************************************************************
 //
+//! Returns true if recording in progress.
+//!
+//! \param None.
+//!
+//! \return Returns \b true if recording in progress and \b false otherwise.
+//
+//*****************************************************************************
+bool PlaybackRecorder::isRecording()
+{
+    return _recording;
+}
+
+//*****************************************************************************
+//
 //! Starts recording data stream to file.
 //!
 //! \param filePath path to file to save data stream to.
