@@ -288,6 +288,8 @@ void Window::_processInput()
 
                     EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_GRAYED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     break;
                 }
                 case ID_OPTIONS_STOPRECORDING:
@@ -297,8 +299,51 @@ void Window::_processInput()
                     _panel->stopRecording();
                     EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     /*MessageBox(_windowHandle, "Not implemented",
                         "Not implemented", MB_ICONINFORMATION | MB_OK);*/
+                    break;
+                case ID_OPTIONS_STARTPLAYBACK:
+                {
+                    //
+                    // Options -> Start Playback
+                    //
+                    OPENFILENAME openFileName;
+                    char filePathBuf[MAX_PATH] = "";
+
+                    ZeroMemory(&openFileName, sizeof(openFileName));
+
+                    openFileName.lStructSize = sizeof(openFileName);
+                    openFileName.hwndOwner = _windowHandle;
+                    openFileName.lpstrFilter = "HIRC Files (*.hirc)\0*.hirc\0"\
+                        "All Files (*.*)\0*.*\0";
+                    openFileName.lpstrFile = filePathBuf;
+                    openFileName.nMaxFile = MAX_PATH;
+                    openFileName.lpstrDefExt = "hirc";
+                    openFileName.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST |
+                        OFN_HIDEREADONLY;
+
+                    if (GetOpenFileName(&openFileName))
+                    {
+                        _panel->startStreaming(filePathBuf);
+                    }
+
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_ENABLED);
+                    break;
+                }
+                case ID_OPTIONS_STOPPLAYBACK:
+                    //
+                    // Options -> Stop Playback
+                    //
+                    _panel->stopStreaming();
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     break;
                 default:
                     break;

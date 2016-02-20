@@ -16,6 +16,8 @@
 //*****************************************************************************
 #include "PlaybackStreamer.h"
 
+#include <iostream>
+
 //*****************************************************************************
 //
 //! Empty constructor for PlaybackStreamer.
@@ -74,8 +76,24 @@ bool PlaybackStreamer::isStreaming()
 //*****************************************************************************
 bool PlaybackStreamer::startStreaming(char *filePath)
 {
-    // TODO (Brandon): Implement
-    return false;
+    if (_streaming)
+    {
+        std::cout << "[WARNING] PlaybackStreamer::startStreaming(): Already "\
+            "streaming!"<< std::endl;
+        return false;
+    }
+
+    _file.open(filePath);
+    if (!_file.is_open())
+    {
+        std::cout << "[ERROR] PlaybackStreamer::startStreaming(): Cannot "\
+            "open file!"<< std::endl;
+        return false;
+    }
+
+    // TODO (Brandon): Check for HIRC constant
+
+    return true;
 }
 
 //*****************************************************************************
