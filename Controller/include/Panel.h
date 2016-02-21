@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 21, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -47,6 +47,7 @@ private:
     PlaybackRecorder _playbackRecorder;
     PlaybackStreamer _playbackStreamer;
     bool _connected;
+    int _cachedFPS;
 
     /* Methods */
     bool _initialize();

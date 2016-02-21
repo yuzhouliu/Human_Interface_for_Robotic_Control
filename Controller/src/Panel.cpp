@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 21, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -33,7 +33,8 @@
 //
 //*****************************************************************************
 Panel::Panel(SDL_Window *window)
-    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false)
+    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false),
+    _cachedFPS(0)
 {
     //
     // Initialize panel
@@ -373,10 +374,12 @@ bool Panel::startStreaming(char *filePath)
         return false;
     }
 
+    _cachedFPS = _fpsManager.getFPS();
     if (!_playbackStreamer.startStreaming(filePath))
     {
         return false;
     }
+    _fpsManager.setFPS(_playbackStreamer.getStreamingFPS());
 
     return true;
 }
@@ -404,6 +407,12 @@ bool Panel::stopStreaming()
     {
         return false;
     }
+
+    //
+    // Reset FPS to cached value
+    //
+    _fpsManager.setFPS(_cachedFPS);
+    _cachedFPS = 0;
 
     return true;
 }

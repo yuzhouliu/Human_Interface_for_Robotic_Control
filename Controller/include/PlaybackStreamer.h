@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 21, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -25,6 +25,7 @@ private:
     /* Fields */
     std::ifstream _file;
     bool _streaming;
+    int _fps;
 
 public:
     /* Constructor */
@@ -37,6 +38,7 @@ public:
     bool isStreaming();
     bool startStreaming(char *filePath);
     bool stopStreaming();
+    int getStreamingFPS();
 };
 
 #endif /* _PLAYBACKSTREAMER_H_ */

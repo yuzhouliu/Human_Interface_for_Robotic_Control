@@ -11,12 +11,13 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 20, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
 
 #include <iostream>
+#include <string>
 
 //*****************************************************************************
 //
@@ -28,7 +29,7 @@
 //
 //*****************************************************************************
 PlaybackStreamer::PlaybackStreamer()
-    : _file(), _streaming(false)
+    : _file(), _streaming(false), _fps(0)
 {
 
 }
@@ -83,7 +84,7 @@ bool PlaybackStreamer::startStreaming(char *filePath)
         return false;
     }
 
-    _file.open(filePath);
+    _file.open(filePath, std::fstream::binary);
     if (!_file.is_open())
     {
         std::cout << "[ERROR] PlaybackStreamer::startStreaming(): Cannot "\
@@ -91,7 +92,24 @@ bool PlaybackStreamer::startStreaming(char *filePath)
         return false;
     }
 
-    // TODO (Brandon): Check for HIRC constant
+    //
+    // Check for HIRC constant
+    //
+    char hircBuf[5+1];
+    _file.read(hircBuf, 5);
+    hircBuf[5] = '\0';
+    std::string hircString(hircBuf);
+    if (hircString != "HIRC\r")
+    {
+        return false;
+    }
+
+    //
+    // Check the fps
+    //
+    char fpsBuf;
+    _file.read(&fpsBuf, 1);
+    _fps = static_cast<int>(fpsBuf);
 
     return true;
 }
@@ -108,6 +126,37 @@ bool PlaybackStreamer::startStreaming(char *filePath)
 //*****************************************************************************
 bool PlaybackStreamer::stopStreaming()
 {
-    // TODO (Brandon): Implement
-    return false;
+    if (!_streaming)
+    {
+        std::cout << "[WARNING] PlaybackStreamer::stopStreaming(): Not "\
+            "currently streaming!"<< std::endl;
+        return false;
+    }
+
+    if (!_file.is_open())
+    {
+        std::cout << "[ERROR] PlaybackStreamer::stopStreaming(): File not "\
+            "open!"<< std::endl;
+        return false;
+    }
+
+    _file.close();
+    _streaming = false;
+    _fps = 0;
+
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Gets the maximum FPS that the stream will maintain.
+//!
+//! \param None.
+//!
+//! \return The maximum FPS that the stream will maintain.
+//
+//*****************************************************************************
+int PlaybackStreamer::getStreamingFPS()
+{
+    return _fps;
 }

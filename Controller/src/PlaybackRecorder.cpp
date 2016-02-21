@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 21, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -91,7 +91,11 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
         return false;
     }
 
-    _file << "HIRC" << fps;
+    //
+    // Append HIRC constant and fps as header
+    //
+    char fpsByte = static_cast<char>(fps);
+    _file << 'HIRC' << fpsByte;
 
     _recording = true;
     return true;
@@ -112,7 +116,7 @@ bool PlaybackRecorder::stopRecording()
     if (!_recording)
     {
         std::cout << "[WARNING] PlaybackRecorder::stopRecording(): Not "\
-            "recording!"<< std::endl;
+            "currently recording!"<< std::endl;
         return false;
     }
 

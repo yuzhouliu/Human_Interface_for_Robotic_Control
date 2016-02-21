@@ -34,18 +34,18 @@ struct LeapData
     //
     unsigned char data[LeapData::_MAX_PAYLOAD];
     unsigned char totalAngle[NUM_FINGERS];
-    unsigned char wristAngle;
+    unsigned char wristAngle = 0;
     SDL_Rect fingerRects[NUM_FINGERS];
 
     //
     // Image data
     //
     bool imageAvailable = false;
-    int imageWidth;
-    int imageHeight;
-    int imageDepth;
-    int imagePitch;
-    unsigned char *imageDataRGBA;
+    int imageWidth = 0;
+    int imageHeight = 0;
+    int imageDepth = 0;
+    int imagePitch = 0;
+    unsigned char *imageDataRGBA = nullptr;
     SDL_Rect imageRenderRect;
 
     LeapData()
