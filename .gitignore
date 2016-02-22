@@ -1,7 +1,16 @@
 # Created by https://www.gitignore.io/api/visualstudio,windows
 #
 
+# Temporary swap files
 *.swp
+
+# Java binary files
+*.class
+
+# Eclipse project files
+.classpath
+.project
+.settings
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
