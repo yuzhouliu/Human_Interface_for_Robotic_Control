@@ -31,7 +31,7 @@
 //
 //*****************************************************************************
 PlaybackStreamer::PlaybackStreamer()
-    : _file(), _streaming(false), _fps(0)
+    : _file(), _streaming(false), _fps(0), _timer()
 {
 
 }
@@ -116,6 +116,7 @@ bool PlaybackStreamer::startStreaming(char *filePath)
     _fps = static_cast<int>(fpsBuf);
 
     _streaming = true;
+    _timer.start();
 
     return true;
 }
@@ -149,6 +150,7 @@ bool PlaybackStreamer::stopStreaming()
     _file.close();
     _streaming = false;
     _fps = 0;
+    _timer.stop();
 
     return true;
 }
@@ -169,6 +171,18 @@ void PlaybackStreamer::update(LeapData &leapData)
         return;
     }
 
+    //
+    // Wait two seconds before starting playback stream to allow InMoov hand
+    // to synchronize with recorded movement
+    //
+    unsigned int timeOnTimer = _timer.getTimeOnTimer();
+    if (timeOnTimer < 2000)
+    {
+        std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds have not"\
+            "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
+        return;
+    }
+
     char angleData[NUM_FINGERS+1]; // NUM_FINGERS + WRIST
     _file.read(angleData, NUM_FINGERS+1);
 
@@ -181,6 +195,9 @@ void PlaybackStreamer::update(LeapData &leapData)
         return;
     }
 
+    //
+    // Updates struct with recorded data for playback streaming
+    //
     int i;
     for (i=0; i<NUM_FINGERS; i++)
     {

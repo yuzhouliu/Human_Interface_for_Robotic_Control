@@ -21,6 +21,7 @@
 
 #include "IObservable.h"
 #include "LeapMotionManager.h" /* LeapData */
+#include "Timer.h"
 
 class PlaybackStreamer : public IObservable
 {
@@ -29,6 +30,7 @@ private:
     std::ifstream _file;
     bool _streaming;
     int _fps;
+    Timer _timer;
 
 public:
     /* Constructor */

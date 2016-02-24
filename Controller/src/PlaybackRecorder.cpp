@@ -148,10 +148,16 @@ void PlaybackRecorder::update(LeapData &leapData)
         return;
     }
 
+    //
+    // Appends finger rotation data to file
+    //
     for (int i=0; i<NUM_FINGERS; i++)
     {
         _file << leapData.totalAngle[i];
     }
 
+    //
+    // Appends wrist rotation data to file
+    //
     _file << leapData.wristAngle;
 }
