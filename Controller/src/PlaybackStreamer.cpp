@@ -1,4 +1,4 @@
-
+//*****************************************************************************
 //
 // PlaybackStreamer.cpp
 //
@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <string>
+
+#include "Window.h"
 
 //*****************************************************************************
 //
@@ -167,6 +169,15 @@ void PlaybackStreamer::update(LeapData &leapData)
 
     char angleData[NUM_FINGERS+1]; // NUM_FINGERS + WRIST
     _file.read(angleData, NUM_FINGERS+1);
+
+    //
+    // File streaming complete
+    //
+    if (_file.rdstate() & std::fstream::eofbit)
+    {
+        notify(EVENT_STOP_STREAMING);
+        return;
+    }
 
     int i;
     for (i=0; i<NUM_FINGERS; i++)

@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -19,9 +19,10 @@
 
 #include <fstream>
 
+#include "IObservable.h"
 #include "LeapMotionManager.h" /* LeapData */
 
-class PlaybackStreamer
+class PlaybackStreamer : public IObservable
 {
 private:
     /* Fields */

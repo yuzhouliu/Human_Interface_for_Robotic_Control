@@ -32,8 +32,8 @@
 //! \return None.
 //
 //*****************************************************************************
-Panel::Panel(SDL_Window *window)
-    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false),
+Panel::Panel(Window *window, SDL_Window *sdlWindow)
+    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr), _connected(false),
     _cachedFPS(0)
 {
     //
@@ -45,6 +45,11 @@ Panel::Panel(SDL_Window *window)
             std::endl;
         return;
     }
+
+    //
+    // Adds Window as observer to PlaybackStreamer
+    //
+    _playbackStreamer.addObserver(window);
 }
 
 //*****************************************************************************

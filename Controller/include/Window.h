@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -26,15 +26,22 @@
 
 #include "Hand.h"
 #include "Image.h"
+#include "IObserver.h"
 #include "Panel.h"
 
 extern struct SDL_Window;
 extern struct SDL_Renderer;
 
 void panelTask(std::shared_ptr<Panel> panel);
+void messageBoxTask(HWND windowHandle, std::string title, std::string message);
 void CenterWindow(HWND hwnd);
 
-class Window
+enum WindowEvents
+{
+    EVENT_STOP_STREAMING = 1,
+};
+
+class Window : public IObserver
 {
 private:
     /* Fields */
@@ -72,6 +79,9 @@ public:
     /* Static methods */
     static BOOL CALLBACK ConnectDlgProcRouter(HWND hwnd, UINT msg,
         WPARAM wParam, LPARAM lParam);
+
+    /* IObserver methods */
+    void onNotify(int event);
 };
 
 #endif /* _WINDOW_H_ */
