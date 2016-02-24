@@ -19,6 +19,8 @@
 
 #include <fstream>
 
+#include "LeapMotionManager.h" /* LeapData */
+
 class PlaybackStreamer
 {
 private:
@@ -38,6 +40,7 @@ public:
     bool isStreaming();
     bool startStreaming(char *filePath);
     bool stopStreaming();
+    void update(LeapData &leapData);
     int getStreamingFPS();
 };
 

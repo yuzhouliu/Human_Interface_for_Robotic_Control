@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 20, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -111,6 +111,8 @@ bool PlaybackStreamer::startStreaming(char *filePath)
     _file.read(&fpsBuf, 1);
     _fps = static_cast<int>(fpsBuf);
 
+    _streaming = true;
+
     return true;
 }
 
@@ -145,6 +147,33 @@ bool PlaybackStreamer::stopStreaming()
     _fps = 0;
 
     return true;
+}
+
+//*****************************************************************************
+//
+//! Populates leapData if streaming. Called once per frame.
+//!
+//! \param leapData LeapData structure storing data fields to stream to.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void PlaybackStreamer::update(LeapData &leapData)
+{
+    if (!_streaming)
+    {
+        return;
+    }
+
+    char angleData[NUM_FINGERS+1]; // NUM_FINGERS + WRIST
+    _file.read(angleData, NUM_FINGERS+1);
+
+    int i;
+    for (i=0; i<NUM_FINGERS; i++)
+    {
+        leapData.totalAngle[i] = angleData[i];
+    }
+    leapData.wristAngle = angleData[i];
 }
 
 //*****************************************************************************

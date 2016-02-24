@@ -136,7 +136,7 @@ bool PlaybackRecorder::stopRecording()
 //
 //! Appends data to file if recording. Called once per frame.
 //!
-//! \param None.
+//! \param leapData LeapData structure storing data fields to record.
 //!
 //! \return None.
 //

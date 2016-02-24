@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -108,6 +108,11 @@ void Panel::run()
         // Record data (if applicable)
         //
         _playbackRecorder.update(leapData);
+
+        //
+        // Stream data (if applicable)
+        //
+        _playbackStreamer.update(leapData);
 
         //
         // Serialize data
