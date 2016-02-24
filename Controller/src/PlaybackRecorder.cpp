@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -95,7 +95,7 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
     // Append HIRC constant and fps as header
     //
     char fpsByte = static_cast<char>(fps);
-    _file << 'HIRC' << fpsByte;
+    _file << "HIRC" << fpsByte;
 
     _recording = true;
     return true;

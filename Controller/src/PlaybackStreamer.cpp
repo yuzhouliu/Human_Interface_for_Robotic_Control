@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 23, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -103,6 +103,8 @@ bool PlaybackStreamer::startStreaming(char *filePath)
     std::string hircString(hircBuf);
     if (hircString != "HIRC\r")
     {
+        std::cout << "[ERROR] PlaybackStreamer::startStreaming(): Not an "\
+            "HIRC file!"<< std::endl;
         return false;
     }
 
