@@ -11,7 +11,7 @@
 // December 21, 2015
 //
 // Modified:
-// December 28, 2015
+// February 24, 2016
 //
 //*****************************************************************************
 #include "Timer.h"
@@ -64,7 +64,7 @@ void Timer::start()
         _startTime = SDL_GetTicks();
         _tempTime = _startTime;
         _pausedTime = 0;
-        _started = false;
+        _started = true;
         _paused = false;
     }
 }
