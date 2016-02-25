@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 23, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -384,6 +384,9 @@ bool Panel::startStreaming(char *filePath)
         return false;
     }
 
+    //
+    // Save the current FPS and start streaming with recorded FPS
+    //
     _cachedFPS = _fpsManager.getFPS();
     if (!_playbackStreamer.startStreaming(filePath))
     {

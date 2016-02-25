@@ -171,18 +171,6 @@ void PlaybackStreamer::update(LeapData &leapData)
         return;
     }
 
-    //
-    // Wait two seconds before starting playback stream to allow InMoov hand
-    // to synchronize with recorded movement
-    //
-    unsigned int timeOnTimer = _timer.getTimeOnTimer();
-    if (timeOnTimer < 2000)
-    {
-        std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds have not"\
-            "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
-        return;
-    }
-
     char angleData[NUM_FINGERS+1]; // NUM_FINGERS + WRIST
     _file.read(angleData, NUM_FINGERS+1);
 
@@ -193,6 +181,23 @@ void PlaybackStreamer::update(LeapData &leapData)
     {
         notify(EVENT_STOP_STREAMING);
         return;
+    }
+
+    //
+    // Wait two seconds before starting playback stream to allow InMoov hand
+    // to synchronize with recorded movement
+    //
+    unsigned int timeOnTimer = _timer.getTimeOnTimer();
+    if (timeOnTimer < 2000)
+    {
+        //
+        // Return to start position (continually stream starting position for
+        // two seconds
+        //
+        _file.seekg(6);
+
+        std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds have not"\
+            "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
     }
 
     //
