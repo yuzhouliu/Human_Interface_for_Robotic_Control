@@ -41,10 +41,12 @@
 //
 //*****************************************************************************
 
-#include "pin_mux_config.h" 
+#include "pin_mux_config.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 #include "hw_gpio.h"
+#include "rom.h"
+#include "rom_map.h"
 #include "pin.h"
 #include "gpio.h"
 #include "prcm.h"
@@ -52,94 +54,56 @@
 //*****************************************************************************
 void PinMuxConfig(void)
 {
-    //
-    // Enable Peripheral Clocks 
-    //
-    PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_ADC, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
-    PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
+    // Enable Peripheral Clocks
+    MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_ADC, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
 
-    //
     // Configure PIN_01 for TimerPWM6 GT_PWM06
-    //
-    PinTypeTimer(PIN_01, PIN_MODE_3);
+    MAP_PinTypeTimer(PIN_01, PIN_MODE_3);
 
-    //
     // Configure PIN_64 for TimerPWM5 GT_PWM05
-    //
-    PinTypeTimer(PIN_64, PIN_MODE_3);
+    MAP_PinTypeTimer(PIN_64, PIN_MODE_3);
 
-    //
     // Configure PIN_02 for TimerPWM7 GT_PWM07
-    //
-    PinTypeTimer(PIN_02, PIN_MODE_3);
+    MAP_PinTypeTimer(PIN_02, PIN_MODE_3);
 
-    //
     // Configure PIN_21 for TimerPWM2 GT_PWM02
-    //
-    PinTypeTimer(PIN_21, PIN_MODE_9);
+    MAP_PinTypeTimer(PIN_21, PIN_MODE_9);
 
-    //
+
+#ifndef DEBUG
+    // Pin 17/19 are muxed with JTAG, must flash with Uniflash
     // Configure PIN_19 for TimerPWM3 GT_PWM03
-    //
-    PinTypeTimer(PIN_19, PIN_MODE_8);
+    MAP_PinTypeTimer(PIN_19, PIN_MODE_8);
 
-    //
     // Configure PIN_17 for TimerPWM0 GT_PWM00
-    //
-    PinTypeTimer(PIN_17, PIN_MODE_5);
+    MAP_PinTypeTimer(PIN_17, PIN_MODE_5);
+#endif
 
-    //
+#ifndef DEBUG
+    // Pin 57 is muxed with UART0 RX, so cannot use UART to debug
     // Configure PIN_57 for ADC0 ADC_CH0
-    //
-    PinTypeADC(PIN_57, PIN_MODE_255);
+    MAP_PinTypeADC(PIN_57, PIN_MODE_255);
+#endif
 
-    //
     // Configure PIN_58 for ADC0 ADC_CH1
-    //
-    PinTypeADC(PIN_58, PIN_MODE_255);
+    MAP_PinTypeADC(PIN_58, PIN_MODE_255);
 
-    //
     // Configure PIN_59 for ADC0 ADC_CH2
-    //
-    PinTypeADC(PIN_59, PIN_MODE_255);
+    MAP_PinTypeADC(PIN_59, PIN_MODE_255);
 
-    //
     // Configure PIN_60 for ADC0 ADC_CH3
-    //
-    PinTypeADC(PIN_60, PIN_MODE_255);
+    MAP_PinTypeADC(PIN_60, PIN_MODE_255);
 
-    //
-    // Configure PIN_52 for UART0 UART0_RTS
-    //
-    PinTypeUART(PIN_52, PIN_MODE_6);
-
-    //
-    // Configure PIN_50 for UART0 UART0_CTS
-    //
-    PinTypeUART(PIN_50, PIN_MODE_12);
-
-    //
+#ifdef DEBUG
     // Configure PIN_03 for UART0 UART0_TX
-    //
-    PinTypeUART(PIN_03, PIN_MODE_7);
+    MAP_PinTypeUART(PIN_03, PIN_MODE_7);
 
-    //
     // Configure PIN_04 for UART0 UART0_RX
-    //
-    PinTypeUART(PIN_04, PIN_MODE_7);
-
-    //
-    // Configure PIN_05 for I2C0 I2C_SCL
-    //
-    PinTypeI2C(PIN_05, PIN_MODE_5);
-
-    //
-    // Configure PIN_06 for I2C0 I2C_SDA
-    //
-    PinTypeI2C(PIN_06, PIN_MODE_5);
+    MAP_PinTypeUART(PIN_04, PIN_MODE_7);
+#endif
 }

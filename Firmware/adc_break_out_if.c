@@ -188,10 +188,20 @@ static int16_t readRegister(uint8_t i2cAddress, uint8_t reg)
     }
     else
     {
+        #ifdef ADC_DEBUG
         UART_PRINT("I2C Read failed\n\r");
+        #endif
         return FAILURE;
     }
 }
+//****************************************************************************
+//
+//! The delay function uses timer to implement the delay time in milliseconds
+//!
+//! \param time in millisecond
+//
+//!  \return void
+//****************************************************************************
 static void delay(int time_ms)
 {
     // Initialize Timer 0B as one-shot down counter.

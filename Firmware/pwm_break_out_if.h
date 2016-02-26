@@ -30,12 +30,24 @@
 //******************************************************************************
 //                      Interface Functions
 //******************************************************************************
-//reset the PWM module
-void reset(void);
+//reset the PWM module (optional)
+void PWM_reset(void);
 //set the Frequency for the PWM
 void setPWMFreq(float freq);
 //set duty cycle for a specific PWM channel, channel from 0 to 15
-void setPWM_DutyCycle(uint8_t channel, uint16_t duty_cycle);
+int setPWM_DutyCycle(uint8_t channel, float duty_cycle);
+//set the start (on) and end (off) of the high segment of the PWM pulse
+void setPWMOnOff(uint8_t channel, uint16_t on, uint16_t off);
+
+//******************************************************************************
+//                      EXAMPLE
+//******************************************************************************
+// The working flow for the PWM could be:
+// First, You need to set up the operating frequency for the PWM module
+// The set up frequency only need to be done one at the beginning of the code
+// setPWMFreq(50);//set the frequency for the PWM to 50 Hz
+// After set up the frequency, you can set the duty cycle for the channels
+// setPWM_DutyCycle(0,50); //set the duty cycle for channel 0 to 50%
 //******************************************************************************
 //                          Constants
 //******************************************************************************
@@ -54,3 +66,6 @@ void setPWM_DutyCycle(uint8_t channel, uint16_t duty_cycle);
 #define ALLLED_ON_H 0xFB
 #define ALLLED_OFF_L 0xFC
 #define ALLLED_OFF_H 0xFD
+
+#define SLEEPMODE   0x31
+#define WORKMODE    0x21
