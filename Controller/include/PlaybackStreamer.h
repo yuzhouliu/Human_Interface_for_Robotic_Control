@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -19,13 +19,18 @@
 
 #include <fstream>
 
-class PlaybackStreamer
+#include "IObservable.h"
+#include "LeapMotionManager.h" /* LeapData */
+#include "Timer.h"
+
+class PlaybackStreamer : public IObservable
 {
 private:
     /* Fields */
     std::ifstream _file;
     bool _streaming;
     int _fps;
+    Timer _timer;
 
 public:
     /* Constructor */
@@ -38,6 +43,7 @@ public:
     bool isStreaming();
     bool startStreaming(char *filePath);
     bool stopStreaming();
+    void update(LeapData &leapData);
     int getStreamingFPS();
 };
 

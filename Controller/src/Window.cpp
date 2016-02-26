@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -94,7 +94,7 @@ bool Window::run()
     //
     // Creates panel
     //
-    _panel = std::shared_ptr<Panel>(new Panel(_window));
+    _panel = std::shared_ptr<Panel>(new Panel(this, _window));
 
     //
     // Creates thread
@@ -284,12 +284,16 @@ void Window::_processInput()
                     if (GetSaveFileName(&openFileName))
                     {
                         _panel->startRecording(filePathBuf);
+                        EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING,
+                            MF_GRAYED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING,
+                            MF_ENABLED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK,
+                            MF_GRAYED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK,
+                            MF_GRAYED);
                     }
 
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_ENABLED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     break;
                 }
                 case ID_OPTIONS_STOPRECORDING:
@@ -297,9 +301,11 @@ void Window::_processInput()
                     // Options -> Stop Recording
                     //
                     _panel->stopRecording();
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING,
+                        MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK,
+                        MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     /*MessageBox(_windowHandle, "Not implemented",
                         "Not implemented", MB_ICONINFORMATION | MB_OK);*/
@@ -327,12 +333,16 @@ void Window::_processInput()
                     if (GetOpenFileName(&openFileName))
                     {
                         _panel->startStreaming(filePathBuf);
+                        EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING,
+                            MF_GRAYED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING,
+                            MF_GRAYED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK,
+                            MF_GRAYED);
+                        EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK,
+                            MF_ENABLED);
                     }
 
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_ENABLED);
                     break;
                 }
                 case ID_OPTIONS_STOPPLAYBACK:
@@ -340,9 +350,11 @@ void Window::_processInput()
                     // Options -> Stop Playback
                     //
                     _panel->stopStreaming();
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING,
+                        MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
-                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK,
+                        MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
                     break;
                 default:
@@ -404,6 +416,24 @@ bool Window::_saveIPAddress(std::string ipAddress)
 void panelTask(std::shared_ptr<Panel> panel)
 {
     panel->run();
+}
+
+//*****************************************************************************
+//
+//! Thread function responsible for opening a message box with specified
+//! message.
+//!
+//! \param windowHandle handle to the parent window.
+//! \param title the title to display.
+//! \param message the message to display.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void messageBoxTask(HWND windowHandle, std::string title, std::string message)
+{
+    MessageBox(windowHandle, title.c_str(),
+        message.c_str(), MB_ICONINFORMATION | MB_OK);
 }
 
 //*****************************************************************************
@@ -612,4 +642,43 @@ BOOL CALLBACK Window::ConnectDlgProcRouter(HWND hwnd, UINT msg, WPARAM wParam,
     }
 
     return FALSE;
+}
+
+//*****************************************************************************
+//
+//! Event handler for events that Window is listening for. (Virtual method of
+//! IObserver interface)
+//!
+//! \param event the identifier of the event.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void Window::onNotify(int event)
+{
+    switch (event)
+    {
+    case EVENT_STOP_STREAMING:
+    {
+        //
+        // Event occurs when PlaybackStreamer reaches end of file
+        //
+        _panel->stopStreaming();
+        EnableMenuItem(_menu, ID_OPTIONS_STARTRECORDING, MF_ENABLED);
+        EnableMenuItem(_menu, ID_OPTIONS_STOPRECORDING, MF_GRAYED);
+        EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK, MF_ENABLED);
+        EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
+
+        //
+        // Creates daemon thread
+        //
+        std::thread messageBoxThread(messageBoxTask, _windowHandle,
+            "Playback Complete", "Playback Complete");
+        messageBoxThread.detach();
+
+        break;
+    }
+    default:
+        break;
+    }
 }

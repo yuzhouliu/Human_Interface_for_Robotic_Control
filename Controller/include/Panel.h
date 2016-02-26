@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 23, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -33,6 +33,8 @@
 #include "PlaybackRecorder.h"
 #include "PlaybackStreamer.h"
 #include "TCPSocket.h"
+
+class Window;
 
 class Panel
 {
@@ -59,7 +61,7 @@ private:
 
 public:
     /* Constructor */
-    Panel(SDL_Window *window);
+    Panel(Window *window, SDL_Window *sdlWindow);
 
     /* Destructor */
     ~Panel();

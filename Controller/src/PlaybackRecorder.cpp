@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -95,7 +95,7 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
     // Append HIRC constant and fps as header
     //
     char fpsByte = static_cast<char>(fps);
-    _file << 'HIRC' << fpsByte;
+    _file << "HIRC" << fpsByte;
 
     _recording = true;
     return true;
@@ -136,7 +136,7 @@ bool PlaybackRecorder::stopRecording()
 //
 //! Appends data to file if recording. Called once per frame.
 //!
-//! \param None.
+//! \param leapData LeapData structure storing data fields to record.
 //!
 //! \return None.
 //
@@ -148,10 +148,16 @@ void PlaybackRecorder::update(LeapData &leapData)
         return;
     }
 
+    //
+    // Appends finger rotation data to file
+    //
     for (int i=0; i<NUM_FINGERS; i++)
     {
         _file << leapData.totalAngle[i];
     }
 
+    //
+    // Appends wrist rotation data to file
+    //
     _file << leapData.wristAngle;
 }

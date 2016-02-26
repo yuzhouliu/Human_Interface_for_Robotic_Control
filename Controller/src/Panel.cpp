@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 21, 2016
+// Feburary 24, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -32,8 +32,8 @@
 //! \return None.
 //
 //*****************************************************************************
-Panel::Panel(SDL_Window *window)
-    : _window(window), _renderer(nullptr), _hand(nullptr), _connected(false),
+Panel::Panel(Window *window, SDL_Window *sdlWindow)
+    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr), _connected(false),
     _cachedFPS(0)
 {
     //
@@ -45,6 +45,11 @@ Panel::Panel(SDL_Window *window)
             std::endl;
         return;
     }
+
+    //
+    // Adds Window as observer to PlaybackStreamer
+    //
+    _playbackStreamer.addObserver(window);
 }
 
 //*****************************************************************************
@@ -108,6 +113,11 @@ void Panel::run()
         // Record data (if applicable)
         //
         _playbackRecorder.update(leapData);
+
+        //
+        // Stream data (if applicable)
+        //
+        _playbackStreamer.update(leapData);
 
         //
         // Serialize data
@@ -374,6 +384,9 @@ bool Panel::startStreaming(char *filePath)
         return false;
     }
 
+    //
+    // Save the current FPS and start streaming with recorded FPS
+    //
     _cachedFPS = _fpsManager.getFPS();
     if (!_playbackStreamer.startStreaming(filePath))
     {
