@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 27, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKRECORDER_H_
@@ -20,6 +20,7 @@
 #include <fstream>
 
 #include "LeapMotionManager.h" /* LeapData */
+#include "Timer.h"
 
 class PlaybackRecorder
 {
@@ -27,6 +28,7 @@ private:
     /* Fields */
     std::ofstream _file;
     bool _recording;
+    Timer _timer;
 
 public:
     /* Constructor */

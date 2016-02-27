@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 24, 2016
+// Feburary 27, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -166,6 +166,9 @@ bool PlaybackStreamer::stopStreaming()
 //*****************************************************************************
 void PlaybackStreamer::update(LeapData &leapData)
 {
+    //
+    // Not currently streaming, so do not update
+    //
     if (!_streaming)
     {
         return;

@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 24, 2016
+// Feburary 27, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -28,7 +28,7 @@
 //
 //*****************************************************************************
 PlaybackRecorder::PlaybackRecorder()
-    : _file(), _recording(false)
+    : _file(), _recording(false), _timer()
 {
 
 }
@@ -98,6 +98,8 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
     _file << "HIRC" << fpsByte;
 
     _recording = true;
+    _timer.start();
+
     return true;
 }
 
@@ -129,6 +131,8 @@ bool PlaybackRecorder::stopRecording()
 
     _file.close();
     _recording = false;
+    _timer.stop();
+
     return true;
 }
 
@@ -143,9 +147,23 @@ bool PlaybackRecorder::stopRecording()
 //*****************************************************************************
 void PlaybackRecorder::update(LeapData &leapData)
 {
+    //
+    // Not currently recording, so do not update
+    //
     if (!_recording)
     {
         return;
+    }
+
+    //
+    // Wait two seconds before recording to allow user to set starting position
+    // of hand
+    //
+    unsigned int timeOnTimer = _timer.getTimeOnTimer();
+    if (timeOnTimer < 2000)
+    {
+        std::cout << "[NOTICE] PlaybackRecorder::update(): 2 seconds have not"\
+            "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
     }
 
     //
