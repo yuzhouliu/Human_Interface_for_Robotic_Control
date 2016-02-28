@@ -11,7 +11,7 @@
 // December 20, 2015
 //
 // Modified:
-// January 4, 2016
+// February 27, 2016
 //
 //*****************************************************************************
 #include "Application.h"
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
 #include "Network.h"
 #include "Window.h"
@@ -114,6 +115,16 @@ bool Application::_initialize()
     }
 
     //
+    // Initialize SDL_ttf
+    //
+    if (TTF_Init() < 0)
+    {
+        std::cerr << "[ERROR] Application::_initialize(): TTF_Init() failed. "\
+            "SDL_ttf Error: " << TTF_GetError() << std::endl;
+        return false;
+    }
+
+    //
     // Initializes socket API
     //
     if (!network::initialize())
@@ -139,6 +150,7 @@ void Application::_terminate()
 {
     network::terminate();
 
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
