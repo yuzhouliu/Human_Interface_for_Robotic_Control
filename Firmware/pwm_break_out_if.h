@@ -10,6 +10,10 @@
 // Modified: February 16 2016
 //
 //*****************************************************************************
+
+#ifndef __PWM_BREAK_OUT_IF_H__
+#define __PWM_BREAK_OUT_IF_H__
+
 // Standard includes
 #include <stdio.h>
 #include <string.h>
@@ -69,3 +73,5 @@ void setPWMOnOff(uint8_t channel, uint16_t on, uint16_t off);
 
 #define SLEEPMODE   0x31
 #define WORKMODE    0x21
+
+#endif // __PWM_BREAK_OUT_IF_H__

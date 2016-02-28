@@ -63,7 +63,9 @@ void InitSensorADC(void)
     MAP_ADCEnable(ADC_BASE);
 
     // Enable ADC channel
-    //MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);    // NOTE: Cannot enabled concurrently with UART0 RX
+#ifndef DEBUG
+    MAP_ADCChannelEnable(ADC_BASE, ADC_CH_0);    // NOTE: Cannot enabled concurrently with UART0 RX
+#endif
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_1);
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_2);
     MAP_ADCChannelEnable(ADC_BASE, ADC_CH_3);

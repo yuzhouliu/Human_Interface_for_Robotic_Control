@@ -118,6 +118,7 @@ void main()
         MoveServo(180, SERVO_WRIST);
         MAP_UtilsDelay(20000000);
 
+        /*
         MoveServo(100, SERVO_FINGER_INDEX);
         MoveServo(100, SERVO_FINGER_THUMB);
         MoveServo(100, SERVO_FINGER_MIDDLE);
@@ -126,6 +127,7 @@ void main()
         MoveServo(0, SERVO_WRIST);
 
         MAP_UtilsDelay(20000000);
+        */
     }
 
     //

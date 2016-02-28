@@ -51,6 +51,10 @@
 #include "servo_driver_search_pressure_if.h"
 #include "adc_driver_if.h"
 #include "msg_util_if.h"
+//#include "adc_break_out_if.h"
+#include "i2c_if.h"
+
+#include "pwm_break_out_if.h"
 
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
@@ -142,7 +146,7 @@ void main()
     unsigned char highByte, lowByte;
     int i;
 
-    unsigned char freeMovementMode;
+    //unsigned char freeMovementMode = 1;
 
     memset(sent_data, 0, 10);
     // Board Initialization
@@ -151,21 +155,26 @@ void main()
     // Configure the pinmux settings for the peripherals exercised
     PinMuxConfig();
 
-    // Initialize the PWM outputs on the board
-    InitServos();
-
-    // Initialize the sensor ADC
-    InitSensorADC();
-
     // Configuring UART
     InitTerm();
 
     // Display banner
     DisplayBanner(APPLICATION_NAME);
 
+    // Configure I2C
+    I2C_IF_Open(I2C_MASTER_MODE_STD);
+
+    // Initialize the PWM outputs on the board
+    //InitServos();
+    InitServos_PWM_Breakout();
+
+    // Initialize the sensor ADC
+    InitSensorADC();
+
     // Connect to WIFI using default info
     //WlanConnect(NULL, NULL, NULL);
     WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
+    //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
     // Setup the TCP Server Socket
     BsdTcpServerSetup(PORT_NUM);
@@ -175,11 +184,12 @@ void main()
     {
     	lRetVal = BsdTcpServerReceive(data);
 
-        if (freeMovementMode)
-        {
+        //if (freeMovementMode)
+        //{
             for (i = 0; i<NUM_SERVOS; i++)
             {
-                MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
+                //MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
+            	MoveServo_PWM_Breakout((unsigned char)data[i], (enum Servo_Joint_Type)i);
             }
 
             for (i = 0; i< NUM_SENSORS; i++)
@@ -188,12 +198,12 @@ void main()
                 sent_data[i*2] = (char)highByte;
                 sent_data[i*2+1] = (char)lowByte;
             }
-        }
-        else
-        {
-            MoveServo_SearchPressure(CMD_CLOSE);
-            memset(sent_data, 1, 10);
-        }
+        //}
+        //else
+        //{
+        //    MoveServo_SearchPressure(CMD_CLOSE);
+        //    memset(sent_data, 1, 10);
+        //}
     	
     	lRetVal = BsdTcpServerSend(sent_data, 10);
     	UART_PRINT("Sent 10 bytes to client.\n\r");

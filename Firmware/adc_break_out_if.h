@@ -10,6 +10,11 @@
 // Modified: February 16 2016
 //
 //*****************************************************************************
+
+
+#ifndef __ADC_BREAK_OUT_IF_H__
+#define __ADC_BREAK_OUT_IF_H__
+
 // Standard includes
 #include <stdio.h>
 #include <string.h>
@@ -27,6 +32,7 @@
 #include "prcm.h"
 #include "utils.h"
 #include "uart.h"
+
 //******************************************************************************
 //                      Interface Functions
 //******************************************************************************
@@ -120,3 +126,5 @@ unsigned int readADC(unsigned int channel); //take an ADC reading, channel is 0 
     #define ADS1015_REG_CONFIG_CQUE_4CONV   (0x0002)  // Assert ALERT/RDY after four conversions
     #define ADS1015_REG_CONFIG_CQUE_NONE    (0x0003)  // Disable the comparator and put ALERT/RDY in high state (default)
 /*=========================================================================*/
+
+#endif //__ADC_BREAK_OUT_IF_H__

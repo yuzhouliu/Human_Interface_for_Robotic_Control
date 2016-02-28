@@ -27,7 +27,9 @@
 #include "timer.h"
 #include "utils.h"
 #include "prcm.h"
+#include "common.h"
 #include "uart.h"
+#include "uart_if.h"
 
 #include "servo_driver_if.h"
 #include "servo_driver_search_pressure_if.h"
@@ -40,8 +42,8 @@
 void MoveServo_SearchPressure(unsigned char ucCommand)
 {
     static struct ServoPosition ServoPositionRecord;    // Track current position
-    static unsigned char ucPreviousCommand = 1;         // Store previous command (open/close)
-    static unsigned char ucDegreesTarget = 0;           // Target degrees
+    //static unsigned char ucPreviousCommand = 1;         // Store previous command (open/close)
+    //static unsigned char ucDegreesTarget = 0;           // Target degrees
     unsigned char ucDegreesCurrent;                     // Current Position of finger
     
     unsigned char ucFingerIndex;                        // Temp i
@@ -49,17 +51,17 @@ void MoveServo_SearchPressure(unsigned char ucCommand)
     unsigned short usPressureSensorReading;             // Stores pressure sensor reading
 
     // If command has changed, update target position
-    if (ucCommand != ucPreviousCommand)
-    {
-        if (ucCommand == CMD_CLOSE)
-        {
-            ucDegreesTarget = FINGER_THUMB_POS_LIMIT;
-        }
-        else if (ucCommand == CMD_OPEN)
-        {
-            ucDegreesTarget = FINGER_MIN_POS_LIMIT;
-        }
-    }
+    //if (ucCommand != ucPreviousCommand)
+    //{
+    //    if (ucCommand == CMD_CLOSE)
+    //    {
+    //        ucDegreesTarget = FINGER_THUMB_POS_LIMIT;
+    //    }
+    //    else if (ucCommand == CMD_OPEN)
+    //    {
+    //        ucDegreesTarget = FINGER_MIN_POS_LIMIT;
+    //    }
+    //}
 
     // Close/Open the hand incrementally _x_ number of times
     for (ucIterationIndex = 0; ucIterationIndex < SCALE_SPEED; ucIterationIndex++)
@@ -71,18 +73,21 @@ void MoveServo_SearchPressure(unsigned char ucCommand)
             ucDegreesCurrent = GetFingerPosition(&ServoPositionRecord, (enum Fingertip_Sensor_Type)ucFingerIndex);
 
             // If the target has already been reached for this finger, skip to next finger
+            /*
             if ( ucDegreesCurrent == ucDegreesTarget )
             {
                 continue;
             }
+            */
 
             // Get the Pressure sensor reading
             usPressureSensorReading = GetSensorReading((enum Fingertip_Sensor_Type)ucFingerIndex);
+            UART_PRINT("Sensor Reading: %d\n\r", usPressureSensorReading);
 
             // Move servo accordingly with respect to Pressure sensor reading
-            if (usPressureSensorReading < PRESSURE_THRESHOLD) 
+            if (usPressureSensorReading > PRESSURE_THRESHOLD)
             {
-                //ADC reading BELOW threshold, Move servo towards Target
+                //ADC reading BELOW (smaller value means more pressure) threshold, Move servo towards Target
                 if (ucCommand == CMD_CLOSE)
                 {
                     if ((ucDegreesCurrent += POSITION_INCREMENT) > FINGER_THUMB_POS_LIMIT)
@@ -92,9 +97,9 @@ void MoveServo_SearchPressure(unsigned char ucCommand)
                 }
                 else if (ucCommand == CMD_OPEN)
                 {
-                    if (ucDegreesCurrent < (FINGER_MIN_POS_LIMIT + POSITION_INCREMENT))
+                    if (ucDegreesCurrent < (FINGER_MINIMUM_POS_LIMIT + POSITION_INCREMENT))
                     {
-                        ucDegreesCurrent = FINGER_MIN_POS_LIMIT;
+                        ucDegreesCurrent = FINGER_MINIMUM_POS_LIMIT;
                     }
                     else 
                     {
@@ -102,14 +107,14 @@ void MoveServo_SearchPressure(unsigned char ucCommand)
                     }
                 }       
             }        
-            else if (usPressureSensorReading > (PRESSURE_THRESHOLD + TOLERANCE) )
+            else if (usPressureSensorReading < (PRESSURE_THRESHOLD + TOLERANCE) )
             {
-                // ABOVE threshold+tolerance, retreat by _x_ degrees each time
+                // ABOVE threshold+tolerance (smaller value means more pressure), retreat by _x_ degrees each time
                 if (ucCommand == CMD_CLOSE)
                 {
-                    if (ucDegreesCurrent < (FINGER_MIN_POS_LIMIT + RETREAT_DECREMENT))
+                    if (ucDegreesCurrent < (FINGER_MINIMUM_POS_LIMIT + RETREAT_DECREMENT))
                     {
-                        ucDegreesCurrent = FINGER_MIN_POS_LIMIT;
+                        ucDegreesCurrent = FINGER_MINIMUM_POS_LIMIT;
                     }
                     else 
                     {
