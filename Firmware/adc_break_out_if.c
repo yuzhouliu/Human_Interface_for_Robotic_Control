@@ -228,6 +228,15 @@ static void delay(int time_ms)
     MAP_TimerIntUnregister(TIMERA0_BASE, TIMER_B);
 }
 
+int I2C_IF_Write(unsigned char ucDevAddr,
+ unsigned char *pucData,
+ unsigned char ucLen,
+ unsigned char ucStop)
+{
+	return 0;
+}
+//I2C_IF_Write
+
 //*****************************************************************************
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 

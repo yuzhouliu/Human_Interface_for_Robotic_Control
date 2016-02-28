@@ -199,7 +199,7 @@ static uint8_t read(uint8_t regAddress)
     if(iRetVal == SUCCESS)
     {
         #ifdef PWM_DEBUG
-        UART_PRINT("I2C Read complete\n\r");
+        //UART_PRINT("I2C Read complete\n\r");
         #endif 
         return ((uint8_t)DataBuf[0]);
     }
@@ -231,10 +231,11 @@ static int write(uint8_t regAddress, uint8_t data)
 
     // Write the data to the register on the PWM Board
     iRetVal = I2C_IF_Write((unsigned char)PWM_ADDRESS, DataBuf, 2, 1);
+
     if(iRetVal == SUCCESS)
     {
         #ifdef PWM_DEBUG
-        UART_PRINT("I2C Write complete\n\r");
+        //UART_PRINT("I2C Write complete\n\r");
         #endif
         return SUCCESS;
     }

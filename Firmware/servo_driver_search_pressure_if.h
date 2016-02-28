@@ -28,8 +28,8 @@
 
 #define POSITION_INCREMENT 5    // Movement increment in degrees
 #define RETREAT_DECREMENT 2     // Movement to retreat if above threshold
-#define PRESSURE_THRESHOLD 500  // Threshold pressure before servo stops
-#define TOLERANCE 100           // Tolerance value for holding position
+#define PRESSURE_THRESHOLD 2400  // Threshold pressure before servo stops
+#define TOLERANCE 50           // Tolerance value for holding position
 
 struct ServoPosition {
     // Current servo position
