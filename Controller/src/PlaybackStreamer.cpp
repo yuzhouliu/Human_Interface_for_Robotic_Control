@@ -19,21 +19,85 @@
 #include <iostream>
 #include <string>
 
+#include "SDL.h"
+#include "SDL_ttf.h"
+
 #include "Window.h"
 
 //*****************************************************************************
 //
 //! Empty constructor for PlaybackStreamer.
 //!
-//! \param None.
+//! \param renderer the renderer to render images to.
 //!
 //! \return None.
 //
 //*****************************************************************************
-PlaybackStreamer::PlaybackStreamer()
+PlaybackStreamer::PlaybackStreamer(SDL_Renderer *renderer)
     : _file(), _streaming(false), _fps(0), _timer()
 {
+    //
+    // Opens font to use for text
+    //
+    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 16);
+    if (font == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackStreamer::PlaybackStreamer(): Font "\
+            "could not be loaded." << std::endl;
+        return;
+    }
 
+    SDL_Color color = {0, 0xFF, 0}; // Green color
+    SDL_Rect renderRect;
+
+    //
+    // Create image for delay text
+    //
+    SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
+        "Playback will start in 2 seconds", color);
+    if (delayTextSurface == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackStreamer::PlaybackStreamer(): Surface "\
+            "could not be loaded." << std::endl;
+        return;
+    }
+    _delayText = std::unique_ptr<Image>(new Image());
+    _delayText->setRenderer(renderer);
+    _delayText->setTexture(delayTextSurface);
+    renderRect.x = 200;
+    renderRect.y = 500;
+    renderRect.w = _delayText->getWidth();
+    renderRect.h = _delayText->getHeight();
+    _delayText->setRenderRect(renderRect);
+
+    SDL_Surface *playingTextSurface = TTF_RenderText_Solid(font,
+        "Playing", color);
+    if (playingTextSurface == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackStreamer::PlaybackStreamer(): Surface "\
+            "could not be loaded." << std::endl;
+        return;
+    }
+    _playingText = std::unique_ptr<Image>(new Image());
+    _playingText->setRenderer(renderer);
+    _playingText->setTexture(playingTextSurface);
+    renderRect.x = 300;
+    renderRect.y = 500;
+    renderRect.w = _playingText->getWidth();
+    renderRect.h = _playingText->getHeight();
+    _playingText->setRenderRect(renderRect);
+
+    _playingImage = std::unique_ptr<Image>(new Image(renderer,
+        "data/gfx/play.png"));
+    renderRect.x = 200;
+    renderRect.y = 400;
+    renderRect.w = _playingImage->getWidth();
+    renderRect.h = _playingImage->getHeight();
+    _playingImage->setRenderRect(renderRect);
+
+    SDL_FreeSurface(delayTextSurface);
+    SDL_FreeSurface(playingTextSurface);
+    TTF_CloseFont(font);
 }
 
 //*****************************************************************************
@@ -226,4 +290,24 @@ void PlaybackStreamer::update(LeapData &leapData)
 int PlaybackStreamer::getStreamingFPS()
 {
     return _fps;
+}
+
+//*****************************************************************************
+//
+//! Renders any text or icon related to streaming.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void PlaybackStreamer::render()
+{
+    if (_streaming)
+    {
+        //
+        // TODO (Brandon): Complete implementation
+        //
+        _playingImage->onRender();
+    }
 }

@@ -46,8 +46,8 @@ private:
     std::unique_ptr<TCPSocket> _socket;
     std::mutex _socket_mutex;
     FrameRateManager _fpsManager;
-    PlaybackRecorder _playbackRecorder;
-    PlaybackStreamer _playbackStreamer;
+    std::unique_ptr<PlaybackRecorder> _playbackRecorder;
+    std::unique_ptr<PlaybackStreamer> _playbackStreamer;
     bool _connected;
     int _cachedFPS;
 

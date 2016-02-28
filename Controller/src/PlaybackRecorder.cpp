@@ -18,19 +18,83 @@
 
 #include <iostream>
 
+#include "SDL.h"
+#include "SDL_ttf.h"
+
 //*****************************************************************************
 //
 //! Empty constructor for PlaybackRecorder.
 //!
-//! \param None.
+//! \param renderer the renderer to render images to.
 //!
 //! \return None.
 //
 //*****************************************************************************
-PlaybackRecorder::PlaybackRecorder()
+PlaybackRecorder::PlaybackRecorder(SDL_Renderer *renderer)
     : _file(), _recording(false), _timer()
 {
+    //
+    // Opens font to use for text
+    //
+    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 16);
+    if (font == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackRecorder::PlaybackRecorder(): Font "\
+            "could not be loaded." << std::endl;
+        return;
+    }
 
+    SDL_Color color = {0xFF, 0, 0}; // Red color
+    SDL_Rect renderRect;
+
+    //
+    // Create image for delay text
+    //
+    SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
+        "Recording will start in 2 seconds", color);
+    if (delayTextSurface == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackRecorder::PlaybackRecorder(): Surface "\
+            "could not be loaded." << std::endl;
+        return;
+    }
+    _delayText = std::unique_ptr<Image>(new Image());
+    _delayText->setRenderer(renderer);
+    _delayText->setTexture(delayTextSurface);
+    renderRect.x = 200;
+    renderRect.y = 500;
+    renderRect.w = _delayText->getWidth();
+    renderRect.h = _delayText->getHeight();
+    _delayText->setRenderRect(renderRect);
+
+    SDL_Surface *recordingTextSurface = TTF_RenderText_Solid(font,
+        "Recording", color);
+    if (recordingTextSurface == nullptr)
+    {
+        std::cout << "[ERROR] PlaybackRecorder::PlaybackRecorder(): Surface "\
+            "could not be loaded." << std::endl;
+        return;
+    }
+    _recordingText = std::unique_ptr<Image>(new Image());
+    _recordingText->setRenderer(renderer);
+    _recordingText->setTexture(recordingTextSurface);
+    renderRect.x = 300;
+    renderRect.y = 500;
+    renderRect.w = _recordingText->getWidth();
+    renderRect.h = _recordingText->getHeight();
+    _recordingText->setRenderRect(renderRect);
+
+    _recordingImage = std::unique_ptr<Image>(new Image(renderer,
+        "data/gfx/pressure.png"));
+    renderRect.x = 200;
+    renderRect.y = 500;
+    renderRect.w = _recordingImage->getWidth();
+    renderRect.h = _recordingImage->getHeight();
+    _recordingImage->setRenderRect(renderRect);
+
+    SDL_FreeSurface(delayTextSurface);
+    SDL_FreeSurface(recordingTextSurface);
+    TTF_CloseFont(font);
 }
 
 //*****************************************************************************
@@ -178,4 +242,24 @@ void PlaybackRecorder::update(LeapData &leapData)
     // Appends wrist rotation data to file
     //
     _file << leapData.wristAngle;
+}
+
+//*****************************************************************************
+//
+//! Renders any text or icon related to recording.
+//!
+//! \param None.
+//!
+//! \return None.
+//
+//*****************************************************************************
+void PlaybackRecorder::render()
+{
+    if (_recording)
+    {
+        //
+        // TODO (Brandon): Complete implementation
+        //
+        _recordingImage->onRender();
+    }
 }

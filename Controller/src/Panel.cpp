@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 24, 2016
+// Feburary 27, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -49,7 +49,7 @@ Panel::Panel(Window *window, SDL_Window *sdlWindow)
     //
     // Adds Window as observer to PlaybackStreamer
     //
-    _playbackStreamer.addObserver(window);
+    _playbackStreamer->addObserver(window);
 }
 
 //*****************************************************************************
@@ -112,12 +112,12 @@ void Panel::run()
         //
         // Record data (if applicable)
         //
-        _playbackRecorder.update(leapData);
+        _playbackRecorder->update(leapData);
 
         //
         // Stream data (if applicable)
         //
-        _playbackStreamer.update(leapData);
+        _playbackStreamer->update(leapData);
 
         //
         // Serialize data
@@ -323,14 +323,14 @@ bool Panel::recv(unsigned char *message, unsigned short len)
 //*****************************************************************************
 bool Panel::startRecording(char *filePath)
 {
-    if (_playbackStreamer.isStreaming())
+    if (_playbackStreamer->isStreaming())
     {
         std::cout << "[ERROR] Panel::startRecording(): Cannot record while "\
             "streaming." << std::endl;
         return false;
     }
 
-    if (!_playbackRecorder.startRecording(filePath, _fpsManager.getFPS()))
+    if (!_playbackRecorder->startRecording(filePath, _fpsManager.getFPS()))
     {
         return false;
     }
@@ -350,14 +350,14 @@ bool Panel::startRecording(char *filePath)
 //*****************************************************************************
 bool Panel::stopRecording()
 {
-    if (_playbackStreamer.isStreaming())
+    if (_playbackStreamer->isStreaming())
     {
         std::cout << "[ERROR] Panel::stopRecording(): Recording not started."\
             << std::endl;
         return false;
     }
 
-    if (!_playbackRecorder.stopRecording())
+    if (!_playbackRecorder->stopRecording())
     {
         return false;
     }
@@ -377,7 +377,7 @@ bool Panel::stopRecording()
 //*****************************************************************************
 bool Panel::startStreaming(char *filePath)
 {
-    if (_playbackRecorder.isRecording())
+    if (_playbackRecorder->isRecording())
     {
         std::cout << "[ERROR] Panel::startStreaming(): Cannot stream while "\
             "recording." << std::endl;
@@ -388,11 +388,11 @@ bool Panel::startStreaming(char *filePath)
     // Save the current FPS and start streaming with recorded FPS
     //
     _cachedFPS = _fpsManager.getFPS();
-    if (!_playbackStreamer.startStreaming(filePath))
+    if (!_playbackStreamer->startStreaming(filePath))
     {
         return false;
     }
-    _fpsManager.setFPS(_playbackStreamer.getStreamingFPS());
+    _fpsManager.setFPS(_playbackStreamer->getStreamingFPS());
 
     return true;
 }
@@ -409,14 +409,14 @@ bool Panel::startStreaming(char *filePath)
 //*****************************************************************************
 bool Panel::stopStreaming()
 {
-    if (_playbackRecorder.isRecording())
+    if (_playbackRecorder->isRecording())
     {
         std::cout << "[ERROR] Panel::stopStreaming(): Streaming not started."\
             << std::endl;
         return false;
     }
 
-    if (!_playbackStreamer.stopStreaming())
+    if (!_playbackStreamer->stopStreaming())
     {
         return false;
     }
@@ -463,7 +463,7 @@ bool Panel::_initialize()
     }
 
     //
-    // Sets renderer to default to an Opqaue black color on screen clear
+    // Sets renderer to default to an Opaque black color on screen clear
     //
     iRetVal = SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00,
         SDL_ALPHA_OPAQUE);
@@ -495,6 +495,14 @@ bool Panel::_initialize()
     // Creates socket
     //
     _socket = std::unique_ptr<TCPSocket>(new TCPSocket());
+
+    //
+    // Creates playback recorder and streamr
+    //
+    _playbackRecorder = std::unique_ptr<PlaybackRecorder>(
+        new PlaybackRecorder(_renderer));
+    _playbackStreamer = std::unique_ptr<PlaybackStreamer>(
+        new PlaybackStreamer(_renderer));
 
     return true;
 }
@@ -535,6 +543,8 @@ void Panel::_render()
     // Renders all images to screen
     //
     _hand->render();
+    _playbackRecorder->render();
+    _playbackStreamer->render();
 
     //
     // Updates screen (swaps screen buffers)

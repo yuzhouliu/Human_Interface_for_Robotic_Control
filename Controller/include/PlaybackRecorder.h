@@ -19,6 +19,9 @@
 
 #include <fstream>
 
+#include "SDL.h"
+
+#include "Image.h"
 #include "LeapMotionManager.h" /* LeapData */
 #include "Timer.h"
 
@@ -29,10 +32,13 @@ private:
     std::ofstream _file;
     bool _recording;
     Timer _timer;
+    std::unique_ptr<Image> _recordingImage;
+    std::unique_ptr<Image> _recordingText;
+    std::unique_ptr<Image> _delayText;
 
 public:
     /* Constructor */
-    PlaybackRecorder();
+    PlaybackRecorder(SDL_Renderer *renderer);
 
     /* Destructor */
     ~PlaybackRecorder();
@@ -42,6 +48,7 @@ public:
     bool startRecording(char *filePath, int fps);
     bool stopRecording();
     void update(LeapData &leapData);
+    void render();
 };
 
 #endif /* _PLAYBACKRECORDER_H_ */

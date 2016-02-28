@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 24, 2016
+// Feburary 27, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -19,6 +19,9 @@
 
 #include <fstream>
 
+#include "SDL.h"
+
+#include "Image.h"
 #include "IObservable.h"
 #include "LeapMotionManager.h" /* LeapData */
 #include "Timer.h"
@@ -31,10 +34,13 @@ private:
     bool _streaming;
     int _fps;
     Timer _timer;
+    std::unique_ptr<Image> _playingImage;
+    std::unique_ptr<Image> _playingText;
+    std::unique_ptr<Image> _delayText;
 
 public:
     /* Constructor */
-    PlaybackStreamer();
+    PlaybackStreamer(SDL_Renderer *renderer);
 
     /* Destructor */
     ~PlaybackStreamer();
@@ -45,6 +51,7 @@ public:
     bool stopStreaming();
     void update(LeapData &leapData);
     int getStreamingFPS();
+    void render();
 };
 
 #endif /* _PLAYBACKSTREAMER_H_ */
