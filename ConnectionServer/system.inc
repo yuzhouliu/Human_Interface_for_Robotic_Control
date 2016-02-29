@@ -1,7 +1,7 @@
 <?php
 	/* This file contains all the constants for the system
 	 *
-	 * homepage: robotarm.byethost24.com
+	 * host: http://robotarm.net23.net
 	 */
 
 	$isTesting = 0;
