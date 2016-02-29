@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 27, 2016
+// Feburary 28, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -499,10 +499,10 @@ bool Panel::_initialize()
     //
     // Creates playback recorder and streamr
     //
-    _playbackRecorder = std::unique_ptr<PlaybackRecorder>(
-        new PlaybackRecorder(_renderer));
     _playbackStreamer = std::unique_ptr<PlaybackStreamer>(
-        new PlaybackStreamer(_renderer));
+        new PlaybackStreamer(_window));
+    _playbackRecorder = std::unique_ptr<PlaybackRecorder>(
+        new PlaybackRecorder(_window));
 
     return true;
 }

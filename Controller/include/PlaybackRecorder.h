@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 27, 2016
+// Feburary 28, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKRECORDER_H_
@@ -31,6 +31,7 @@ private:
     /* Fields */
     std::ofstream _file;
     bool _recording;
+    bool _delayElapsed;
     Timer _timer;
     std::unique_ptr<Image> _recordingImage;
     std::unique_ptr<Image> _recordingText;
@@ -38,7 +39,7 @@ private:
 
 public:
     /* Constructor */
-    PlaybackRecorder(SDL_Renderer *renderer);
+    PlaybackRecorder(SDL_Window *window);
 
     /* Destructor */
     ~PlaybackRecorder();

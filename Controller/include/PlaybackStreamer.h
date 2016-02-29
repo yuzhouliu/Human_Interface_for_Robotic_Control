@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 27, 2016
+// Feburary 28, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -32,6 +32,7 @@ private:
     /* Fields */
     std::ifstream _file;
     bool _streaming;
+    bool _delayElapsed;
     int _fps;
     Timer _timer;
     std::unique_ptr<Image> _playingImage;
@@ -40,7 +41,7 @@ private:
 
 public:
     /* Constructor */
-    PlaybackStreamer(SDL_Renderer *renderer);
+    PlaybackStreamer(SDL_Window *window);
 
     /* Destructor */
     ~PlaybackStreamer();

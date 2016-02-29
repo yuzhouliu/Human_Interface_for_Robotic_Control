@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 27, 2016
+// Feburary 28, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -28,14 +28,21 @@
 //
 //! Empty constructor for PlaybackStreamer.
 //!
-//! \param renderer the renderer to render images to.
+//! \param window the sdl window of the application.
 //!
 //! \return None.
 //
 //*****************************************************************************
-PlaybackStreamer::PlaybackStreamer(SDL_Renderer *renderer)
-    : _file(), _streaming(false), _fps(0), _timer()
+PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
+    : _file(), _streaming(false), _delayElapsed(false), _fps(0), _timer()
 {
+    //
+    // Gets the renderer and window dimensions
+    //
+    SDL_Renderer *renderer = SDL_GetRenderer(window);
+    int windowWidth, windowHeight;
+    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+
     //
     // Opens font to use for text
     //
@@ -47,11 +54,11 @@ PlaybackStreamer::PlaybackStreamer(SDL_Renderer *renderer)
         return;
     }
 
-    SDL_Color color = {0, 0xFF, 0}; // Green color
+    SDL_Color color = {0x27, 0xBE, 0x64, 0xFF}; // Green color
     SDL_Rect renderRect;
 
     //
-    // Create image for delay text
+    // Creates image for delay text
     //
     SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
         "Playback will start in 2 seconds", color);
@@ -70,6 +77,9 @@ PlaybackStreamer::PlaybackStreamer(SDL_Renderer *renderer)
     renderRect.h = _delayText->getHeight();
     _delayText->setRenderRect(renderRect);
 
+    //
+    // Creates image for playing text
+    //
     SDL_Surface *playingTextSurface = TTF_RenderText_Solid(font,
         "Playing", color);
     if (playingTextSurface == nullptr)
@@ -87,10 +97,13 @@ PlaybackStreamer::PlaybackStreamer(SDL_Renderer *renderer)
     renderRect.h = _playingText->getHeight();
     _playingText->setRenderRect(renderRect);
 
+    //
+    // Creates image for playing sprite
+    //
     _playingImage = std::unique_ptr<Image>(new Image(renderer,
         "data/gfx/play.png"));
     renderRect.x = 200;
-    renderRect.y = 400;
+    renderRect.y = 500;
     renderRect.w = _playingImage->getWidth();
     renderRect.h = _playingImage->getHeight();
     _playingImage->setRenderRect(renderRect);
@@ -180,6 +193,7 @@ bool PlaybackStreamer::startStreaming(char *filePath)
     _fps = static_cast<int>(fpsBuf);
 
     _streaming = true;
+    _delayElapsed = false;
     _timer.start();
 
     return true;
@@ -197,6 +211,10 @@ bool PlaybackStreamer::startStreaming(char *filePath)
 //*****************************************************************************
 bool PlaybackStreamer::stopStreaming()
 {
+    //
+    // TODO (Brandon): This could cause a state issue when startStream fails
+    // because file.close() is called after this. Fix this later.
+    //
     if (!_streaming)
     {
         std::cout << "[WARNING] PlaybackStreamer::stopStreaming(): Not "\
@@ -263,9 +281,12 @@ void PlaybackStreamer::update(LeapData &leapData)
         //
         _file.seekg(6);
 
-        std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds have not"\
+        std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds has not "\
             "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
+
+        return;
     }
+    _delayElapsed = true;
 
     //
     // Updates struct with recorded data for playback streaming
@@ -305,9 +326,14 @@ void PlaybackStreamer::render()
 {
     if (_streaming)
     {
-        //
-        // TODO (Brandon): Complete implementation
-        //
-        _playingImage->onRender();
+        if (_delayElapsed)
+        {
+            _playingImage->onRender();
+            _playingText->onRender();
+        }
+        else
+        {
+            _delayText->onRender();
+        }
     }
 }
