@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 27, 2016
+// Feburary 28, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -25,14 +25,21 @@
 //
 //! Empty constructor for PlaybackRecorder.
 //!
-//! \param renderer the renderer to render images to.
+//! \param window the sdl window of the application.
 //!
 //! \return None.
 //
 //*****************************************************************************
-PlaybackRecorder::PlaybackRecorder(SDL_Renderer *renderer)
-    : _file(), _recording(false), _timer()
+PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
+    : _file(), _recording(false), _delayElapsed(false), _timer()
 {
+    //
+    // Gets the renderer and window dimensions
+    //
+    SDL_Renderer *renderer = SDL_GetRenderer(window);
+    int windowWidth, windowHeight;
+    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+
     //
     // Opens font to use for text
     //
@@ -44,11 +51,11 @@ PlaybackRecorder::PlaybackRecorder(SDL_Renderer *renderer)
         return;
     }
 
-    SDL_Color color = {0xFF, 0, 0}; // Red color
+    SDL_Color color = {0xFF, 0, 0, 0xFF}; // Red color
     SDL_Rect renderRect;
 
     //
-    // Create image for delay text
+    // Creates image for delay text
     //
     SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
         "Recording will start in 2 seconds", color);
@@ -67,6 +74,9 @@ PlaybackRecorder::PlaybackRecorder(SDL_Renderer *renderer)
     renderRect.h = _delayText->getHeight();
     _delayText->setRenderRect(renderRect);
 
+    //
+    // Creates image for recording text
+    //
     SDL_Surface *recordingTextSurface = TTF_RenderText_Solid(font,
         "Recording", color);
     if (recordingTextSurface == nullptr)
@@ -84,6 +94,9 @@ PlaybackRecorder::PlaybackRecorder(SDL_Renderer *renderer)
     renderRect.h = _recordingText->getHeight();
     _recordingText->setRenderRect(renderRect);
 
+    //
+    // Creates image for recording sprite
+    //
     _recordingImage = std::unique_ptr<Image>(new Image(renderer,
         "data/gfx/pressure.png"));
     renderRect.x = 200;
@@ -162,6 +175,7 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
     _file << "HIRC" << fpsByte;
 
     _recording = true;
+    _delayElapsed = false;
     _timer.start();
 
     return true;
@@ -226,9 +240,12 @@ void PlaybackRecorder::update(LeapData &leapData)
     unsigned int timeOnTimer = _timer.getTimeOnTimer();
     if (timeOnTimer < 2000)
     {
-        std::cout << "[NOTICE] PlaybackRecorder::update(): 2 seconds have not"\
+        std::cout << "[NOTICE] PlaybackRecorder::update(): 2 seconds has not "\
             "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
+
+        return;
     }
+    _delayElapsed = true;
 
     //
     // Appends finger rotation data to file
@@ -257,9 +274,14 @@ void PlaybackRecorder::render()
 {
     if (_recording)
     {
-        //
-        // TODO (Brandon): Complete implementation
-        //
-        _recordingImage->onRender();
+        if (_delayElapsed)
+        {
+            _recordingImage->onRender();
+            _recordingText->onRender();
+        }
+        else
+        {
+            _delayText->onRender();
+        }
     }
 }
