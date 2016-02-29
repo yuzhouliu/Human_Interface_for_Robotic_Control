@@ -19,7 +19,6 @@
 #include <iostream>
 #include <string>
 
-#include "SDL.h"
 #include "SDL_ttf.h"
 
 #include "Window.h"
@@ -46,7 +45,7 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     //
     // Opens font to use for text
     //
-    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 16);
+    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 20);
     if (font == nullptr)
     {
         std::cout << "[ERROR] PlaybackStreamer::PlaybackStreamer(): Font "\
@@ -54,13 +53,14 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
         return;
     }
 
-    SDL_Color color = {0x27, 0xBE, 0x64, 0xFF}; // Green color
+    //SDL_Color color = {0x27, 0xBE, 0x64}; // Green color
+    SDL_Color color = {0x00, 0x00, 0x00}; // Red color
     SDL_Rect renderRect;
 
     //
     // Creates image for delay text
     //
-    SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
+    SDL_Surface *delayTextSurface = TTF_RenderText_Blended(font,
         "Playback will start in 2 seconds", color);
     if (delayTextSurface == nullptr)
     {
@@ -80,7 +80,7 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     //
     // Creates image for playing text
     //
-    SDL_Surface *playingTextSurface = TTF_RenderText_Solid(font,
+    SDL_Surface *playingTextSurface = TTF_RenderText_Blended(font,
         "Playing", color);
     if (playingTextSurface == nullptr)
     {

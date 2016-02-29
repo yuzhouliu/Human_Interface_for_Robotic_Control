@@ -18,6 +18,7 @@
 #define _PLAYBACKRECORDER_H_
 
 #include <fstream>
+#include <memory>
 
 #include "SDL.h"
 

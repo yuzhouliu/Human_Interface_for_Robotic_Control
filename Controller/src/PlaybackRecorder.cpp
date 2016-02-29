@@ -17,8 +17,8 @@
 #include "PlaybackRecorder.h"
 
 #include <iostream>
+#include <string>
 
-#include "SDL.h"
 #include "SDL_ttf.h"
 
 //*****************************************************************************
@@ -43,7 +43,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     //
     // Opens font to use for text
     //
-    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 16);
+    TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 20);
     if (font == nullptr)
     {
         std::cout << "[ERROR] PlaybackRecorder::PlaybackRecorder(): Font "\
@@ -57,7 +57,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     //
     // Creates image for delay text
     //
-    SDL_Surface *delayTextSurface = TTF_RenderText_Solid(font,
+    SDL_Surface *delayTextSurface = TTF_RenderText_Blended(font,
         "Recording will start in 2 seconds", color);
     if (delayTextSurface == nullptr)
     {
@@ -77,7 +77,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     //
     // Creates image for recording text
     //
-    SDL_Surface *recordingTextSurface = TTF_RenderText_Solid(font,
+    SDL_Surface *recordingTextSurface = TTF_RenderText_Blended(font,
         "Recording", color);
     if (recordingTextSurface == nullptr)
     {
