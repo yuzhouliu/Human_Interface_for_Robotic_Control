@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 28, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -33,6 +33,8 @@
 PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     : _file(), _recording(false), _delayElapsed(false), _timer()
 {
+    //SDL_Color color = {0xFF, 0, 0, 0xFF}; // Red color
+
     //
     // Gets the renderer and window dimensions
     //
@@ -58,7 +60,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     // Creates image for delay text
     //
     SDL_Surface *delayTextSurface = TTF_RenderText_Blended(font,
-        "Recording will start in 2 seconds", color);
+        "Recording will start in 2 seconds...", color);
     if (delayTextSurface == nullptr)
     {
         std::cout << "[ERROR] PlaybackRecorder::PlaybackRecorder(): Surface "\
@@ -69,7 +71,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     _delayText->setRenderer(renderer);
     _delayText->setTexture(delayTextSurface);
     renderRect.x = 200;
-    renderRect.y = 500;
+    renderRect.y = windowHeight - 50;
     renderRect.w = _delayText->getWidth();
     renderRect.h = _delayText->getHeight();
     _delayText->setRenderRect(renderRect);
@@ -88,8 +90,8 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     _recordingText = std::unique_ptr<Image>(new Image());
     _recordingText->setRenderer(renderer);
     _recordingText->setTexture(recordingTextSurface);
-    renderRect.x = 300;
-    renderRect.y = 500;
+    renderRect.x = (windowWidth - _recordingText->getWidth())/2 + 25;
+    renderRect.y = windowHeight - 50;
     renderRect.w = _recordingText->getWidth();
     renderRect.h = _recordingText->getHeight();
     _recordingText->setRenderRect(renderRect);
@@ -98,11 +100,11 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     // Creates image for recording sprite
     //
     _recordingImage = std::unique_ptr<Image>(new Image(renderer,
-        "data/gfx/pressure.png"));
-    renderRect.x = 200;
-    renderRect.y = 500;
-    renderRect.w = _recordingImage->getWidth();
-    renderRect.h = _recordingImage->getHeight();
+        "data/gfx/record.png"));
+    renderRect.x = renderRect.x - 50;
+    renderRect.y = windowHeight - 50;
+    renderRect.w = _recordingText->getHeight();
+    renderRect.h = renderRect.w;
     _recordingImage->setRenderRect(renderRect);
 
     SDL_FreeSurface(delayTextSurface);

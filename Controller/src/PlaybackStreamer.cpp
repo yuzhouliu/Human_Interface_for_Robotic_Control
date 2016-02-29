@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 28, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -35,6 +35,8 @@
 PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     : _file(), _streaming(false), _delayElapsed(false), _fps(0), _timer()
 {
+    //SDL_Color color = {0x27, 0xBE, 0x64, 0xFF}; // Green color
+
     //
     // Gets the renderer and window dimensions
     //
@@ -53,15 +55,18 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
         return;
     }
 
-    //SDL_Color color = {0x27, 0xBE, 0x64}; // Green color
-    SDL_Color color = {0x00, 0x00, 0x00}; // Red color
+    //
+    // TODO (Brandon): Investigate why color does not work if it is declared
+    // here.
+    //
+    SDL_Color color = {0x27, 0xBE, 0x64, 0xFF}; // Green color
     SDL_Rect renderRect;
 
     //
     // Creates image for delay text
     //
     SDL_Surface *delayTextSurface = TTF_RenderText_Blended(font,
-        "Playback will start in 2 seconds", color);
+        "Playback will start in 2 seconds...", color);
     if (delayTextSurface == nullptr)
     {
         std::cout << "[ERROR] PlaybackStreamer::PlaybackStreamer(): Surface "\
@@ -72,7 +77,7 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     _delayText->setRenderer(renderer);
     _delayText->setTexture(delayTextSurface);
     renderRect.x = 200;
-    renderRect.y = 500;
+    renderRect.y = windowHeight - 50;
     renderRect.w = _delayText->getWidth();
     renderRect.h = _delayText->getHeight();
     _delayText->setRenderRect(renderRect);
@@ -91,8 +96,8 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     _playingText = std::unique_ptr<Image>(new Image());
     _playingText->setRenderer(renderer);
     _playingText->setTexture(playingTextSurface);
-    renderRect.x = 300;
-    renderRect.y = 500;
+    renderRect.x = (windowWidth - _playingText->getWidth())/2 + 25;
+    renderRect.y = windowHeight - 50;
     renderRect.w = _playingText->getWidth();
     renderRect.h = _playingText->getHeight();
     _playingText->setRenderRect(renderRect);
@@ -102,10 +107,10 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     //
     _playingImage = std::unique_ptr<Image>(new Image(renderer,
         "data/gfx/play.png"));
-    renderRect.x = 200;
-    renderRect.y = 500;
-    renderRect.w = _playingImage->getWidth();
-    renderRect.h = _playingImage->getHeight();
+    renderRect.x = renderRect.x - 50;
+    renderRect.y = windowHeight - 50;
+    renderRect.w = _playingText->getHeight();
+    renderRect.h = renderRect.w;
     _playingImage->setRenderRect(renderRect);
 
     SDL_FreeSurface(delayTextSurface);
