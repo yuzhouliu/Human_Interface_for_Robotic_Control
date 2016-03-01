@@ -64,7 +64,7 @@ static void delay(int time_ms);
 //! \return 0 if failure, else the results from ADC reading
 //
 //****************************************************************************
-unsigned int readADC(unsigned int channel)
+unsigned short readADC_Breakout(unsigned int channel)
 {
     if (channel > 3) return 0; // channel is from 0 to 3
 
@@ -77,7 +77,9 @@ unsigned int readADC(unsigned int channel)
                         ADS1015_REG_CONFIG_MODE_SINGLE;   // Single-shot mode (default)
 
     //Set voltage range to +- 6.144 V ()
-    config |= ADS1015_REG_CONFIG_PGA_6_144V;
+    //config |= ADS1015_REG_CONFIG_PGA_6_144V;
+    config |= ADS1015_REG_CONFIG_PGA_2_048V;
+
     // Set single-ended input channel
     switch (channel)
     {
@@ -138,7 +140,7 @@ static int writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value)
     if(iRetVal == SUCCESS)
     {
         #ifdef ADC_DEBUG
-        UART_PRINT("I2C Write complete\n\r");
+        //UART_PRINT("I2C Write complete\n\r");
         #endif
         return SUCCESS;
     }
@@ -182,7 +184,7 @@ static int16_t readRegister(uint8_t i2cAddress, uint8_t reg)
     if(iRetVal == SUCCESS)
     {
         #ifdef ADC_DEBUG
-        UART_PRINT("I2C Read complete\n\r");
+        //UART_PRINT("I2C Read complete\n\r");
         #endif 
         return (DataBuf[0] << 8 | DataBuf[1]);
     }
@@ -227,15 +229,6 @@ static void delay(int time_ms)
     MAP_TimerIntDisable(TIMERA0_BASE, TIMER_TIMB_TIMEOUT);
     MAP_TimerIntUnregister(TIMERA0_BASE, TIMER_B);
 }
-
-int I2C_IF_Write(unsigned char ucDevAddr,
- unsigned char *pucData,
- unsigned char ucLen,
- unsigned char ucStop)
-{
-	return 0;
-}
-//I2C_IF_Write
 
 //*****************************************************************************
 //

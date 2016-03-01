@@ -1,6 +1,3 @@
-#ifndef __SERVO_DRIVER_IF_H__
-#define __SERVO_DRIVER_IF_H__
-
 //*****************************************************************************
 //
 // servo_driver_if.h
@@ -19,6 +16,9 @@
 // January 6, 2015
 //
 //*****************************************************************************
+
+#ifndef __SERVO_DRIVER_IF_H__
+#define __SERVO_DRIVER_IF_H__
 
 // Define number of servos (Fingers + Wrist)
 #define NUM_SERVOS 6
@@ -137,5 +137,9 @@ void MoveServo(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint);
 //****************************************************************************
 void MoveServo_PWM_Breakout(unsigned char ucDegrees, enum Servo_Joint_Type eServoJoint);
 
+//****************************************************************************
+// Gets the Position limit of the Finger
+//****************************************************************************
+unsigned char GetFingerPositionLimit(enum Servo_Joint_Type eServoJoint);
 
 #endif //  __SERVO_DRIVER_IF_H__

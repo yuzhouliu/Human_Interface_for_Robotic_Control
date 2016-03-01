@@ -11,7 +11,6 @@
 //
 //*****************************************************************************
 
-
 #ifndef __ADC_BREAK_OUT_IF_H__
 #define __ADC_BREAK_OUT_IF_H__
 
@@ -36,7 +35,7 @@
 //******************************************************************************
 //                      Interface Functions
 //******************************************************************************
-unsigned int readADC(unsigned int channel); //take an ADC reading, channel is 0 to 3
+unsigned short readADC_Breakout(unsigned int channel); //take an ADC reading, channel is 0 to 3
 
 //******************************************************************************
 //                          Constants

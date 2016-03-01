@@ -25,6 +25,12 @@
 // Defines number of samples for averaging ADC reading
 #define NO_OF_SAMPLES 2
 
+// Channel mapping for Breakout Board
+#define FINGER_INDEX_BREAKOUT 0
+#define FINGER_MIDDLE_BREAKOUT 1
+#define FINGER_RING_BREAKOUT 2
+#define FINGER_PINKY_BREAKOUT 3
+
 // Defines for finger-tip sensors
 enum Fingertip_Sensor_Type {
     SENSOR_FINGER_THUMB=0,
@@ -45,8 +51,16 @@ void InitSensorADC(void);
 void DisableSensorADC(void);
 
 //*****************************************************************************
-// Gets the Sensor Reading from Finger-Tip sensors using ADC
+// Gets the Sensor Reading from Finger-Tip sensors using ADC on CC3200
 // Returns the raw ADC value from 0 to 4096
+//*****************************************************************************
+unsigned short GetSensorReading_CC3200(enum Fingertip_Sensor_Type eFingerSensor);
+
+//*****************************************************************************
+// Gets the Sensor Reading from Finger-Tip sensors using ADC
+// Either from Breakout ADC board or CC3200 ADC
+//
+// Returns the Raw ADC value between 0 to 4096
 //*****************************************************************************
 unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor);
 

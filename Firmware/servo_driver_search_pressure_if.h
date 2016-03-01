@@ -26,10 +26,20 @@
 
 #define SCALE_SPEED 1
 
-#define POSITION_INCREMENT 5    // Movement increment in degrees
-#define RETREAT_DECREMENT 2     // Movement to retreat if above threshold
-#define PRESSURE_THRESHOLD 2400  // Threshold pressure before servo stops
-#define TOLERANCE 50           // Tolerance value for holding position
+#define POSITION_INCREMENT 5    		// Movement increment in degrees
+#define RETREAT_DECREMENT 2     		// Movement to retreat if above threshold
+
+// Pressure Threshold values for each finger before servo stops
+#define PRESSURE_THRESHOLD_THUMB 2400  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_INDEX 900  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_MIDDLE 900  // Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_RING 920  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_PINKY 920  	// Threshold pressure before servo stops
+
+#define TOLERANCE 100           			// Tolerance value for holding position
+
+// Position limits
+#define FINGER_OPEN_POS_LIMIT 0
 
 struct ServoPosition {
     // Current servo position
@@ -46,7 +56,7 @@ struct ServoPosition {
 // Moves the servo motor by degrees on the finger specified
 // Moves in increments, checking to see if pressure is over threshold
 //****************************************************************************
-void MoveServo_SearchPressure(unsigned char ucCommand);
+void MoveServo_SearchPressure(unsigned char ucCommand, char * data);
 
 //****************************************************************************
 // Gets the current position of the servo from the ServoPosition struct
@@ -57,5 +67,10 @@ unsigned char GetFingerPosition(struct ServoPosition *PositionRecord, enum Finge
 // Updates the ServoPosition struct with the current position
 //****************************************************************************
 void SetFingerPosition(struct ServoPosition *PositionRecord, enum Fingertip_Sensor_Type eSensorJoint, unsigned char ucDegreesCurrent);
+
+//****************************************************************************
+// Gets the Pressure tolerance value for the finger specified
+//****************************************************************************
+unsigned short GetFingerTolerance( enum Fingertip_Sensor_Type eSensorJoint );
 
 #endif //  __SERVO_DRIVER_IF_H__

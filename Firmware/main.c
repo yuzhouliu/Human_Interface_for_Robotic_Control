@@ -55,6 +55,7 @@
 #include "i2c_if.h"
 
 #include "pwm_break_out_if.h"
+#include "adc_break_out_if.h"
 
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
@@ -144,7 +145,10 @@ void main()
     char data[BUF_SIZE];
     char sent_data[BUF_SIZE];
     unsigned char highByte, lowByte;
+    unsigned short adc_reading;
     int i;
+
+    int freeMovementMode = 0;		// TODO Testing, remove later
 
     //unsigned char freeMovementMode = 1;
 
@@ -184,8 +188,8 @@ void main()
     {
     	lRetVal = BsdTcpServerReceive(data);
 
-        //if (freeMovementMode)
-        //{
+        if (freeMovementMode)
+        {
             for (i = 0; i<NUM_SERVOS; i++)
             {
                 //MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
@@ -194,16 +198,20 @@ void main()
 
             for (i = 0; i< NUM_SENSORS; i++)
             {
-                UnsignedShort_to_UnsignedChar(GetSensorReading((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
+                //UnsignedShort_to_UnsignedChar(GetSensorReading_CC3200((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
+            	adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
+            	UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
+
+            	UnsignedShort_to_UnsignedChar(adc_reading, &highByte, &lowByte);
                 sent_data[i*2] = (char)highByte;
                 sent_data[i*2+1] = (char)lowByte;
             }
-        //}
-        //else
-        //{
-        //    MoveServo_SearchPressure(CMD_CLOSE);
-        //    memset(sent_data, 1, 10);
-        //}
+        }
+        else
+        {
+            MoveServo_SearchPressure(CMD_CLOSE, sent_data);
+            //memset(sent_data, 1, 10);
+        }
     	
     	lRetVal = BsdTcpServerSend(sent_data, 10);
     	UART_PRINT("Sent 10 bytes to client.\n\r");

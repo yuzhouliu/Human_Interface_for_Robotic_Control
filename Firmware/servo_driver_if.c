@@ -234,11 +234,6 @@ float Convert_Degrees_To_DutyCycle_PWM_Breakout(unsigned char ucDegrees, enum Se
             return 0.0;
     }
 
-    UART_PRINT("percent_of_limit: %f\n\r", percent_of_limit);
-    UART_PRINT("intermediate: %f\n\r", intermediate);
-    UART_PRINT("HK15298B_PWM_DUTY_CYCLE_SCALING: %f\n\r", HK15298B_PWM_DUTY_CYCLE_SCALING);
-    UART_PRINT("HK15298B_PWM_0_DEGREES_DUTY_CYCLE: %f\n\r", HK15298B_PWM_0_DEGREES_DUTY_CYCLE);
-    UART_PRINT("pwm_duty_cycle: %f\n\r", pwm_duty_cycle);
     return pwm_duty_cycle;
 }
 
@@ -333,4 +328,27 @@ void MoveServo_PWM_Breakout(unsigned char ucDegrees, enum Servo_Joint_Type eServ
             //UART_PRINT("[MoveServo] Invalid Finger input\n");
         	return;
     }
+}
+
+//****************************************************************************
+// Gets the Position limit of the Finger
+//****************************************************************************
+unsigned char GetFingerPositionLimit(enum Servo_Joint_Type eServoJoint)
+{
+	switch(eServoJoint) {
+		case SERVO_FINGER_THUMB:
+			return FINGER_THUMB_POS_LIMIT;
+		case SERVO_FINGER_INDEX:
+			return FINGER_INDEX_POS_LIMIT;
+		case SERVO_FINGER_MIDDLE:
+			return FINGER_MIDDLE_POS_LIMIT;
+		case SERVO_FINGER_RING:
+			return FINGER_RING_POS_LIMIT;
+		case SERVO_FINGER_PINKY:
+			return FINGER_PINKY_POS_LIMIT;
+		case SERVO_WRIST:
+			return WRIST_POS_LIMIT;
+		default:
+			return 0;
+	}
 }

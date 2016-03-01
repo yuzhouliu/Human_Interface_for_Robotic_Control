@@ -46,6 +46,7 @@
 
 #include "pin_mux_config.h"
 #include "adc_driver_if.h"
+#include "adc_break_out_if.h"
 #include "uart_if.h"
 
 #define FOREVER 1
@@ -87,13 +88,13 @@ void DisableSensorADC(void)
 }
 
 //*****************************************************************************
-// Gets the Sensor Reading from Finger-Tip sensors using ADC
+// Gets the Sensor Reading from Finger-Tip sensors using ADC from CC3200
 //
 // \param eFinger -> finger type (ex: FINGER_THUMB, FINGER_INDEX, etc)
 //
 // \return Raw ADC value between 0 to 4096 (0 to 1.4V)
 //*****************************************************************************
-unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
+unsigned short GetSensorReading_CC3200(enum Fingertip_Sensor_Type eFingerSensor)
 {
     unsigned int uiChannel;
     unsigned char ucCount;
@@ -110,10 +111,10 @@ unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
     // Convert pin number to channel number
     switch(eFingerSensor)
     {
-        case SENSOR_FINGER_THUMB:
+        case SENSOR_FINGER_INDEX:
             uiChannel = ADC_CH_0;    // Pin_57
             break;
-        case SENSOR_FINGER_INDEX:
+        case SENSOR_FINGER_THUMB:
             uiChannel = ADC_CH_1;    // Pin_58
             break;
         case SENSOR_FINGER_MIDDLE:
@@ -140,6 +141,33 @@ unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
     }
 
     return (unsigned short) ulSampleTotal/NO_OF_SAMPLES;
+}
+
+//*****************************************************************************
+// Gets the Sensor Reading from Finger-Tip sensors using ADC
+// Either from Breakout ADC board or CC3200 ADC
+//
+// \param eFinger -> finger type (ex: FINGER_THUMB, FINGER_INDEX, etc)
+//
+// \return Raw ADC value between 0 to 4096
+//*****************************************************************************
+unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
+{
+	switch(eFingerSensor)
+	{
+		case SENSOR_FINGER_THUMB:
+			return GetSensorReading_CC3200(SENSOR_FINGER_THUMB);
+		case SENSOR_FINGER_INDEX:
+			return readADC_Breakout(FINGER_INDEX_BREAKOUT);
+		case SENSOR_FINGER_MIDDLE:
+			return readADC_Breakout(FINGER_MIDDLE_BREAKOUT);
+		case SENSOR_FINGER_RING:
+			return readADC_Breakout(FINGER_RING_BREAKOUT);
+		case SENSOR_FINGER_PINKY:
+			return readADC_Breakout(FINGER_PINKY_BREAKOUT);
+		default:
+			return (unsigned short) 0;
+	}
 }
 
 //*****************************************************************************

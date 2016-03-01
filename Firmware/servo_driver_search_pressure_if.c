@@ -35,33 +35,26 @@
 #include "servo_driver_search_pressure_if.h"
 #include "servo_driver.h"
 #include "adc_driver_if.h"
+#include "msg_util_if.h"
 
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo_SearchPressure(unsigned char ucCommand)
+void MoveServo_SearchPressure(unsigned char ucCommand, char * data)
 {
     static struct ServoPosition ServoPositionRecord;    // Track current position
-    //static unsigned char ucPreviousCommand = 1;         // Store previous command (open/close)
-    //static unsigned char ucDegreesTarget = 0;           // Target degrees
     unsigned char ucDegreesCurrent;                     // Current Position of finger
     
-    unsigned char ucFingerIndex;                        // Temp i
+    unsigned char ucFingerIndex;                        // Temp i for looping through fingers
     unsigned char ucIterationIndex;                     // Temp i for iterations
-    unsigned short usPressureSensorReading;             // Stores pressure sensor reading
 
-    // If command has changed, update target position
-    //if (ucCommand != ucPreviousCommand)
-    //{
-    //    if (ucCommand == CMD_CLOSE)
-    //    {
-    //        ucDegreesTarget = FINGER_THUMB_POS_LIMIT;
-    //    }
-    //    else if (ucCommand == CMD_OPEN)
-    //    {
-    //        ucDegreesTarget = FINGER_MIN_POS_LIMIT;
-    //    }
-    //}
+    unsigned char ucDegreesLimit;						// The position limit for the finger
+    unsigned short usPressureSensorReading;             // Stores pressure sensor reading
+    unsigned short usPressureSensorTolerance;			// Tolerance for the current finger
+
+    unsigned char highByte;								// Storing High Byte of sensor reading
+    unsigned char lowByte;								// Storing Low Byte of sensor reading
+
 
     // Close/Open the hand incrementally _x_ number of times
     for (ucIterationIndex = 0; ucIterationIndex < SCALE_SPEED; ucIterationIndex++)
@@ -72,71 +65,64 @@ void MoveServo_SearchPressure(unsigned char ucCommand)
             // Get the current position of the finger
             ucDegreesCurrent = GetFingerPosition(&ServoPositionRecord, (enum Fingertip_Sensor_Type)ucFingerIndex);
 
-            // If the target has already been reached for this finger, skip to next finger
-            /*
-            if ( ucDegreesCurrent == ucDegreesTarget )
-            {
-                continue;
-            }
-            */
+            // Get the max position for this finger
+            ucDegreesLimit = GetFingerPositionLimit((enum Servo_Joint_Type) ucFingerIndex);
+
+            // Get the Pressure Sensor Tolerance for current finger
+            usPressureSensorTolerance = GetFingerTolerance( (enum Fingertip_Sensor_Type)ucFingerIndex );
 
             // Get the Pressure sensor reading
             usPressureSensorReading = GetSensorReading((enum Fingertip_Sensor_Type)ucFingerIndex);
-            UART_PRINT("Sensor Reading: %d\n\r", usPressureSensorReading);
+            UART_PRINT("Finger: %d, Reading: %d, Tolerance: %d ", ucFingerIndex, usPressureSensorReading, usPressureSensorTolerance);
 
-            // Move servo accordingly with respect to Pressure sensor reading
-            if (usPressureSensorReading > PRESSURE_THRESHOLD)
+            // Close the hand incrementally checking the pressure sensor each time
+            if (ucCommand == CMD_CLOSE)
             {
-                //ADC reading BELOW (smaller value means more pressure) threshold, Move servo towards Target
-                if (ucCommand == CMD_CLOSE)
-                {
-                    if ((ucDegreesCurrent += POSITION_INCREMENT) > FINGER_THUMB_POS_LIMIT)
-                    {
-                       ucDegreesCurrent = FINGER_THUMB_POS_LIMIT;
-                    }
-                }
-                else if (ucCommand == CMD_OPEN)
-                {
-                    if (ucDegreesCurrent < (FINGER_MINIMUM_POS_LIMIT + POSITION_INCREMENT))
-                    {
-                        ucDegreesCurrent = FINGER_MINIMUM_POS_LIMIT;
-                    }
-                    else 
-                    {
-                        ucDegreesCurrent -= POSITION_INCREMENT;
-                    }
-                }       
-            }        
-            else if (usPressureSensorReading < (PRESSURE_THRESHOLD + TOLERANCE) )
-            {
-                // ABOVE threshold+tolerance (smaller value means more pressure), retreat by _x_ degrees each time
-                if (ucCommand == CMD_CLOSE)
-                {
-                    if (ucDegreesCurrent < (FINGER_MINIMUM_POS_LIMIT + RETREAT_DECREMENT))
-                    {
-                        ucDegreesCurrent = FINGER_MINIMUM_POS_LIMIT;
-                    }
-                    else 
-                    {
-                        ucDegreesCurrent -= RETREAT_DECREMENT;
-                    }
-                }
-                else if (ucCommand == CMD_OPEN)
-                {
-                    if ((ucDegreesCurrent += RETREAT_DECREMENT) > FINGER_THUMB_POS_LIMIT)
-                    {
-                       ucDegreesCurrent = FINGER_THUMB_POS_LIMIT;
-                    }
-                }
+            	//ADC reading BELOW threshold(bigger value means less pressure), Move towards Target
+            	if (usPressureSensorReading > usPressureSensorTolerance)
+            	{
+            		UART_PRINT(" ++ ");
+
+            		// Limit the position of the finger
+            		if ((ucDegreesCurrent += POSITION_INCREMENT) > ucDegreesLimit)
+					{
+					   ucDegreesCurrent = ucDegreesLimit;
+					}
+            	}
+            	// ADC reading ABOVE threshold+tolerance (smaller value means more pressure), retreat position
+            	else if (usPressureSensorReading < (usPressureSensorTolerance + TOLERANCE) )
+            	{
+            		UART_PRINT(" -- ");
+            		if (ucDegreesCurrent < (FINGER_OPEN_POS_LIMIT + RETREAT_DECREMENT))
+					{
+						ucDegreesCurrent = FINGER_OPEN_POS_LIMIT;
+					}
+					else
+					{
+						ucDegreesCurrent -= RETREAT_DECREMENT;
+					}
+            	}
+            	// We are right in threshold+tolerance, then do nothing
+            	else
+            	{
+            		UART_PRINT(" // ");
+            	}
             }
-            else
+            // Set the fingers to open position
+            else if (ucCommand == CMD_OPEN)
             {
-                // We are right in threshold+tolerance, then do nothing
-            }              
+            	ucDegreesCurrent = FINGER_OPEN_POS_LIMIT;
+            }
 
+            UART_PRINT(" DegreesCurrent: %d\n\r", ucDegreesCurrent);
             // Move the servo, update the record struct
-            MoveServo(ucDegreesCurrent, (enum Servo_Joint_Type)ucFingerIndex);
+            MoveServo_PWM_Breakout(ucDegreesCurrent, (enum Servo_Joint_Type)ucFingerIndex);
             SetFingerPosition(&ServoPositionRecord, (enum Fingertip_Sensor_Type)ucFingerIndex, ucDegreesCurrent);
+
+            // Convert the sensor reading to it's high and low bytes and store in data array
+            UnsignedShort_to_UnsignedChar(usPressureSensorReading, &highByte, &lowByte);
+            data[ucFingerIndex*2] = (char)highByte;
+            data[ucFingerIndex*2+1] = (char)lowByte;
         }
     }
 }
@@ -187,4 +173,26 @@ void SetFingerPosition(struct ServoPosition *PositionRecord, enum Fingertip_Sens
             PositionRecord->ucPinky_Current = ucDegreesCurrent;
             break;
     }
+}
+
+//****************************************************************************
+// Gets the Pressure tolerance value for the finger specified
+//****************************************************************************
+unsigned short GetFingerTolerance( enum Fingertip_Sensor_Type eSensorJoint )
+{
+	switch(eSensorJoint)
+	{
+		case SENSOR_FINGER_THUMB:
+			return PRESSURE_THRESHOLD_THUMB;
+		case SENSOR_FINGER_INDEX:
+			return PRESSURE_THRESHOLD_INDEX;
+		case SENSOR_FINGER_MIDDLE:
+			return PRESSURE_THRESHOLD_MIDDLE;
+		case SENSOR_FINGER_RING:
+			return PRESSURE_THRESHOLD_RING;
+		case SENSOR_FINGER_PINKY:
+			return PRESSURE_THRESHOLD_PINKY;
+		default:
+			return 0;
+	}
 }
