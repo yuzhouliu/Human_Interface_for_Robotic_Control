@@ -12,15 +12,22 @@
 // January 15, 2016
 //
 // Modified:
-// January 15, 2016
+// Feburary 26, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_H_
 #define _HIRCP_H_
 
-namespace HIRCPConstants
+class HIRCPPacket
 {
-    enum PACKET_TYPE
+private:
+    /* Fields */
+    char *_HIRCP_CONSTANT = "HIRCP";
+    static const int _HIRCP_CONSTANT_LEN = 5;
+    static const int _OPCODE_LEN = 2;
+    static const int _MAX_PAYLOAD_LEN = 10;
+
+    enum TYPE
     {
         CRQ,
         CACK,
@@ -29,51 +36,27 @@ namespace HIRCPConstants
         TRQ,
         TACK,
         ERR,
-    };
+    } _type;
+    unsigned char _data[_HIRCP_CONSTANT_LEN + _OPCODE_LEN + _MAX_PAYLOAD_LEN];
 
-    char *HIRCP_CONSTANT = "HIRCP";
-    const int OPCODE_LEN = 2;
-
-    const int MAX_PAYLOAD_LEN = 10;
-};
-
-template <class Type>
-Type createHIRCPPacketFromBytes(char *data);
-
-class HIRCPPacket
-{
-protected:
-    /* Fields */
-    HIRCPConstants::PACKET_TYPE _type;
-    char _opcode[HIRCPConstants::OPCODE_LEN];
-    char _data[HIRCPConstants::MAX_PAYLOAD_LEN];
-
-public:
     /* Constructor */
     HIRCPPacket();
+
+public:
+    /* Fields */
+    static const int MAX_PACKET_SIZE = _HIRCP_CONSTANT_LEN + _OPCODE_LEN +
+        _MAX_PAYLOAD_LEN;
 
     /* Destructor */
     ~HIRCPPacket();
 
     /* Methods */
-    virtual bool isValid() = 0;
-};
-
-class HIRCPDataPacket : public HIRCPPacket
-{
-private:
-    /* Fields */
-    const int PAYLOAD_LEN = 6;
-
-public:
-    /* Constructor */
-    HIRCPDataPacket(char *data);
-
-    /* Destructor */
-    ~HIRCPDataPacket();
-
-    /* Methods */
     bool isValid();
+    unsigned char *getData();
+
+    /* Static methods */
+    static HIRCPPacket createPacketFromBytes(unsigned char *data);
+    static HIRCPPacket createDATAPacket(unsigned char *payload);
 };
 
 #endif /* _HIRCP_H_ */

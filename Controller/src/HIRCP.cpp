@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// January 15, 2016
+// February 26, 2016
 //
 //*****************************************************************************
 #include "HIRCP.h"
@@ -24,12 +24,35 @@ HIRCPPacket::HIRCPPacket()
 
 }
 
-HIRCPDataPacket::HIRCPDataPacket(char *data)
+HIRCPPacket::~HIRCPPacket()
 {
-    memcpy(_data, data, PAYLOAD_LEN);
+
 }
 
-bool HIRCPDataPacket::isValid()
+bool HIRCPPacket::isValid()
 {
-    
+    return false;
+}
+
+unsigned char *HIRCPPacket::getData()
+{
+    return _data;
+}
+
+HIRCPPacket HIRCPPacket::createPacketFromBytes(unsigned char *data)
+{
+    HIRCPPacket packet;
+
+    // TODO: Implement
+
+    return packet;
+}
+
+HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload)
+{
+    HIRCPPacket packet;
+
+    // TODO: Implement
+
+    return packet;
 }

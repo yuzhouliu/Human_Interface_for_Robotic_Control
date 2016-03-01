@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 29, 2016
+// March 1, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -19,6 +19,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "HIRCP.h"
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
 #include "Window.h"
@@ -127,15 +128,26 @@ void Panel::run()
         if (_connected)
         {
             //
-            // Send data to remote host
+            // Constructs a DATA packet to send over the network
             //
-            if (!send(leapData.data, leapData._MAX_PAYLOAD))
+            HIRCPPacket dataPacket = HIRCPPacket::createDATAPacket(
+                leapData.data);
+
+            //
+            // Sends DATA packet to remote host
+            //
+            if (!send(dataPacket.getData(), dataPacket.MAX_PACKET_SIZE))
             {
                 continue;
             }
 
             //
-            // Receive data from remote host
+            // TODO (Brandon): Create receive packet and change rest of this
+            // block to accomodate changes
+            //
+
+            //
+            // Receives DATA from remote host
             //
             if (!recv(leapData.data, leapData._MAX_PAYLOAD))
             {
