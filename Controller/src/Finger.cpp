@@ -52,9 +52,7 @@ Finger::Finger(FingerType type, SDL_Renderer *renderer)
     // Dynamic image for following finger positions
     //
     _image = std::unique_ptr<Image>(new Image(renderer,
-        "data/gfx/pressure.png"));
-    _image->enableAlphaBlend();
-    _image->setAlphaBlend(0);
+        "data/gfx/tracking.png"));
 
     //
     // Hide image at first
@@ -145,7 +143,6 @@ void Finger::setRenderRect(SDL_Rect &renderRect)
 void Finger::render()
 {
     SDL_RenderSetViewport(_renderer, &Window::gPrimaryViewport);
-    _image->setAlphaBlend(_pressure);
     _image->onRender();
 
     SDL_RenderSetViewport(_renderer, &Window::gSecondaryViewport);
