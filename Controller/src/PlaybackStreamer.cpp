@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 29, 2016
+// March 1, 2016
 //
 //*****************************************************************************
 #include "PlaybackStreamer.h"
@@ -278,7 +278,8 @@ void PlaybackStreamer::update(LeapData &leapData)
     // to synchronize with recorded movement
     //
     unsigned int timeOnTimer = _timer.getTimeOnTimer();
-    if (timeOnTimer < 2000)
+    _delayElapsed = timeOnTimer > 2000;
+    if (!_delayElapsed)
     {
         //
         // Return to start position (continually stream starting position for
@@ -288,10 +289,7 @@ void PlaybackStreamer::update(LeapData &leapData)
 
         std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds has not "\
             "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
-
-        return;
     }
-    _delayElapsed = true;
 
     //
     // Updates struct with recorded data for playback streaming
