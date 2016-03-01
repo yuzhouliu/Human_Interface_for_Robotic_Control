@@ -40,6 +40,12 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 // Initialize static variable
 //
 bool Window::gExit = false;
+SDL_Rect Window::gPrimaryViewport = {PRIMARY_VIEWPORT_X, PRIMARY_VIEWPORT_Y,
+    PRIMARY_VIEWPORT_WIDTH, PRIMARY_VIEWPORT_HEIGHT};
+SDL_Rect Window::gSecondaryViewport = {SECONDARY_VIEWPORT_X, SECONDARY_VIEWPORT_Y,
+    SECONDARY_VIEWPORT_WIDTH, SECONDARY_VIEWPORT_HEIGHT};
+SDL_Rect Window::gTertiaryViewport = {TERTIARY_VIEWPORT_X, TERTIARY_VIEWPORT_Y,
+    TERTIARY_VIEWPORT_WIDTH, TERTIARY_VIEWPORT_HEIGHT};
 
 //*****************************************************************************
 //
@@ -51,8 +57,8 @@ bool Window::gExit = false;
 //
 //*****************************************************************************
 Window::Window()
-    : _window(nullptr), _menu(nullptr), _width(_DEFAULT_WIDTH),
-      _height(_DEFAULT_HEIGHT)
+    : _window(nullptr), _menu(nullptr), _width(WINDOW_WIDTH),
+      _height(WINDOW_HEIGHT)
 {
     //
     // Initialize window

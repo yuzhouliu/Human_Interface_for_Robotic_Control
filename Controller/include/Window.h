@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 23, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -29,6 +29,21 @@
 #include "IObserver.h"
 #include "Panel.h"
 
+#define WINDOW_WIDTH 1100
+#define WINDOW_HEIGHT 600
+#define PRIMARY_VIEWPORT_X 0
+#define PRIMARY_VIEWPORT_Y 0
+#define PRIMARY_VIEWPORT_WIDTH 800
+#define PRIMARY_VIEWPORT_HEIGHT 600
+#define SECONDARY_VIEWPORT_X 850
+#define SECONDARY_VIEWPORT_Y 25
+#define SECONDARY_VIEWPORT_WIDTH 200
+#define SECONDARY_VIEWPORT_HEIGHT 200
+#define TERTIARY_VIEWPORT_X 850
+#define TERTIARY_VIEWPORT_Y 275
+#define TERTIARY_VIEWPORT_WIDTH 200
+#define TERTIARY_VIEWPORT_HEIGHT 300
+
 extern struct SDL_Window;
 extern struct SDL_Renderer;
 
@@ -45,8 +60,6 @@ class Window : public IObserver
 {
 private:
     /* Fields */
-    const int _DEFAULT_WIDTH = 800;
-    const int _DEFAULT_HEIGHT = 600;
     SDL_Window *_window;
     HWND _windowHandle;
     HMENU _menu;
@@ -64,6 +77,9 @@ private:
 public:
     /* Fields */
     static bool gExit;
+    static SDL_Rect gPrimaryViewport;
+    static SDL_Rect gSecondaryViewport;
+    static SDL_Rect gTertiaryViewport;
 
     /* Constructor */
     Window();
