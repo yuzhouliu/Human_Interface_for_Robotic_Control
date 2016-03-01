@@ -179,11 +179,11 @@ bool PlaybackStreamer::startStreaming(char *filePath)
     //
     // Check for HIRC constant
     //
-    char hircBuf[5+1];
-    _file.read(hircBuf, 5);
-    hircBuf[5] = '\0';
+    char hircBuf[4+1];
+    _file.read(hircBuf, 4);
+    hircBuf[4] = '\0';
     std::string hircString(hircBuf);
-    if (hircString != "HIRC\r")
+    if (hircString != "HIRC")
     {
         std::cout << "[ERROR] PlaybackStreamer::startStreaming(): Not an "\
             "HIRC file!"<< std::endl;
@@ -285,7 +285,7 @@ void PlaybackStreamer::update(LeapData &leapData)
         // Return to start position (continually stream starting position for
         // two seconds
         //
-        _file.seekg(6);
+        _file.seekg(5);
 
         std::cout << "[NOTICE] PlaybackStreamer::update(): 2 seconds has not "\
             "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;

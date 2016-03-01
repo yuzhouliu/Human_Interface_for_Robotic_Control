@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 29, 2016
+// March 1, 2016
 //
 //*****************************************************************************
 #include "PlaybackRecorder.h"
@@ -164,7 +164,7 @@ bool PlaybackRecorder::startRecording(char *filePath, int fps)
         return false;
     }
 
-    _file.open(filePath);
+    _file.open(filePath, std::fstream::binary);
     if (!_file.is_open())
     {
         std::cout << "[ERROR] PlaybackRecorder::startRecording(): Cannot "\
@@ -242,14 +242,14 @@ void PlaybackRecorder::update(LeapData &leapData)
     // of hand
     //
     unsigned int timeOnTimer = _timer.getTimeOnTimer();
-    if (timeOnTimer < 2000)
+    _delayElapsed = timeOnTimer > 2000;
+    if (!_delayElapsed)
     {
         std::cout << "[NOTICE] PlaybackRecorder::update(): 2 seconds has not "\
             "yet elasped. Time left = " << (2000 - timeOnTimer) << std::endl;
 
         return;
     }
-    _delayElapsed = true;
 
     //
     // Appends finger rotation data to file
