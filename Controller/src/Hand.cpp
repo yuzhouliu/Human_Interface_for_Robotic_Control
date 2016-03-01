@@ -32,6 +32,8 @@
 Hand::Hand(SDL_Renderer *renderer)
     : _renderer(renderer)
 {
+    SDL_Rect renderRect;
+
     //
     // Creates base hand image
     //
@@ -63,6 +65,15 @@ Hand::Hand(SDL_Renderer *renderer)
             PRIMARY_VIEWPORT_HEIGHT);
     }*/
 
+    renderRect.x = 0; renderRect.y = 0;
+    renderRect.w = SECONDARY_VIEWPORT_WIDTH;
+    renderRect.h = SECONDARY_VIEWPORT_HEIGHT;
+    _staticImage->setRenderRect(renderRect);
+    for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)
+    {
+        (*it)->getStaticImage()->setRenderRect(renderRect);
+    }
+
     TTF_Font *font = TTF_OpenFont("data/font/kenvector_future_thin.ttf", 20);
     if (font == nullptr)
     {
@@ -92,8 +103,6 @@ Hand::Hand(SDL_Renderer *renderer)
             std::endl;
         return;
     }
-
-    SDL_Rect renderRect;
 
     _thumbText = std::unique_ptr<Image>(new Image());
     _thumbText->setRenderer(renderer);
