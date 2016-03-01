@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 28, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKRECORDER_H_
@@ -30,6 +30,7 @@ class PlaybackRecorder
 {
 private:
     /* Fields */
+    SDL_Renderer *_renderer;
     std::ofstream _file;
     bool _recording;
     bool _delayElapsed;

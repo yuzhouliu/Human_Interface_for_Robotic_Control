@@ -19,7 +19,9 @@
 #include <iostream>
 #include <string>
 
-#include "SDL_ttf.h"
+#include <SDL_ttf.h>
+
+#include "Window.h"
 
 //*****************************************************************************
 //
@@ -38,9 +40,9 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     //
     // Gets the renderer and window dimensions
     //
-    SDL_Renderer *renderer = SDL_GetRenderer(window);
-    int windowWidth, windowHeight;
-    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+    _renderer = SDL_GetRenderer(window);
+    int windowWidth = PRIMARY_VIEWPORT_WIDTH - PRIMARY_VIEWPORT_X;
+    int windowHeight = PRIMARY_VIEWPORT_HEIGHT - PRIMARY_VIEWPORT_Y;
 
     //
     // Opens font to use for text
@@ -68,9 +70,9 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
         return;
     }
     _delayText = std::unique_ptr<Image>(new Image());
-    _delayText->setRenderer(renderer);
+    _delayText->setRenderer(_renderer);
     _delayText->setTexture(delayTextSurface);
-    renderRect.x = 200;
+    renderRect.x = (windowWidth - _delayText->getWidth())/2;
     renderRect.y = windowHeight - 50;
     renderRect.w = _delayText->getWidth();
     renderRect.h = _delayText->getHeight();
@@ -88,7 +90,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
         return;
     }
     _recordingText = std::unique_ptr<Image>(new Image());
-    _recordingText->setRenderer(renderer);
+    _recordingText->setRenderer(_renderer);
     _recordingText->setTexture(recordingTextSurface);
     renderRect.x = (windowWidth - _recordingText->getWidth())/2 + 25;
     renderRect.y = windowHeight - 50;
@@ -99,7 +101,7 @@ PlaybackRecorder::PlaybackRecorder(SDL_Window *window)
     //
     // Creates image for recording sprite
     //
-    _recordingImage = std::unique_ptr<Image>(new Image(renderer,
+    _recordingImage = std::unique_ptr<Image>(new Image(_renderer,
         "data/gfx/record.png"));
     renderRect.x = renderRect.x - 50;
     renderRect.y = windowHeight - 50;
@@ -276,6 +278,7 @@ void PlaybackRecorder::render()
 {
     if (_recording)
     {
+        SDL_RenderSetViewport(_renderer, &Window::gPrimaryViewport);
         if (_delayElapsed)
         {
             _recordingImage->onRender();

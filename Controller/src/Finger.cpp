@@ -11,12 +11,14 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #include "Finger.h"
 
 #include <string>
+
+#include "Window.h"
 
 //*****************************************************************************
 //
@@ -28,7 +30,7 @@
 //
 //*****************************************************************************
 Finger::Finger(FingerType type, SDL_Renderer *renderer)
-    : _type(type)
+    : _type(type), _renderer(renderer)
 {
     std::string fingerPaths[] = {
         "data/gfx/hand_right_thumb.png",
@@ -142,6 +144,11 @@ void Finger::setRenderRect(SDL_Rect &renderRect)
 //*****************************************************************************
 void Finger::render()
 {
+    SDL_RenderSetViewport(_renderer, &Window::gPrimaryViewport);
     _image->setAlphaBlend(_pressure);
     _image->onRender();
+
+    SDL_RenderSetViewport(_renderer, &Window::gSecondaryViewport);
+    _staticImage->setAlphaBlend(_pressure);
+    _staticImage->onRender();
 }

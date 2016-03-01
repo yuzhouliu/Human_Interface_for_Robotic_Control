@@ -19,7 +19,7 @@
 #include <iostream>
 #include <string>
 
-#include "SDL_ttf.h"
+#include <SDL_ttf.h>
 
 #include "Window.h"
 
@@ -40,9 +40,9 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     //
     // Gets the renderer and window dimensions
     //
-    SDL_Renderer *renderer = SDL_GetRenderer(window);
-    int windowWidth, windowHeight;
-    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+    _renderer = SDL_GetRenderer(window);
+    int windowWidth = PRIMARY_VIEWPORT_WIDTH - PRIMARY_VIEWPORT_X;
+    int windowHeight = PRIMARY_VIEWPORT_HEIGHT - PRIMARY_VIEWPORT_Y;
 
     //
     // Opens font to use for text
@@ -74,9 +74,9 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
         return;
     }
     _delayText = std::unique_ptr<Image>(new Image());
-    _delayText->setRenderer(renderer);
+    _delayText->setRenderer(_renderer);
     _delayText->setTexture(delayTextSurface);
-    renderRect.x = 200;
+    renderRect.x = (windowWidth - _delayText->getWidth())/2;
     renderRect.y = windowHeight - 50;
     renderRect.w = _delayText->getWidth();
     renderRect.h = _delayText->getHeight();
@@ -94,7 +94,7 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
         return;
     }
     _playingText = std::unique_ptr<Image>(new Image());
-    _playingText->setRenderer(renderer);
+    _playingText->setRenderer(_renderer);
     _playingText->setTexture(playingTextSurface);
     renderRect.x = (windowWidth - _playingText->getWidth())/2 + 25;
     renderRect.y = windowHeight - 50;
@@ -105,7 +105,7 @@ PlaybackStreamer::PlaybackStreamer(SDL_Window *window)
     //
     // Creates image for playing sprite
     //
-    _playingImage = std::unique_ptr<Image>(new Image(renderer,
+    _playingImage = std::unique_ptr<Image>(new Image(_renderer,
         "data/gfx/play.png"));
     renderRect.x = renderRect.x - 50;
     renderRect.y = windowHeight - 50;
@@ -331,6 +331,7 @@ void PlaybackStreamer::render()
 {
     if (_streaming)
     {
+        SDL_RenderSetViewport(_renderer, &Window::gPrimaryViewport);
         if (_delayElapsed)
         {
             _playingImage->onRender();

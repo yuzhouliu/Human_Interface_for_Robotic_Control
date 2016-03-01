@@ -11,7 +11,7 @@
 // Feburary 19, 2016
 //
 // Modified:
-// Feburary 28, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _PLAYBACKSTREAMER_H_
@@ -31,6 +31,7 @@ class PlaybackStreamer : public IObservable
 {
 private:
     /* Fields */
+    SDL_Renderer *_renderer;
     std::ifstream _file;
     bool _streaming;
     bool _delayElapsed;

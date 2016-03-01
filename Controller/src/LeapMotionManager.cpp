@@ -11,28 +11,28 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #include "LeapMotionManager.h"
 
 #include <cassert>
 
+#include "Window.h"
+
 //*****************************************************************************
 //
 //! Constructor for LeapMotionManager.
 //!
-//! \param window SDL_Window that the application is running on.
+//! \param None.
 //!
 //! \return None.
 //
 //*****************************************************************************
-LeapMotionManager::LeapMotionManager(SDL_Window *window)
+LeapMotionManager::LeapMotionManager()
 {
-    //
-    // Get the width and height of the window
-    //
-    SDL_GetWindowSize(window, &_windowWidth, &_windowHeight);
+    _windowWidth = PRIMARY_VIEWPORT_WIDTH - PRIMARY_VIEWPORT_X;
+    _windowHeight = PRIMARY_VIEWPORT_HEIGHT - PRIMARY_VIEWPORT_Y;
     _controller.setPolicy(Leap::Controller::POLICY_IMAGES);
 }
 
@@ -195,11 +195,6 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
                     + 0.7*fingerRect.w;
                 fingerRect.y = center.z*(170/center.y)*0.85 + _windowHeight/2
                     - 1.2*fingerRect.h;
-
-                /*leapData.fingerRects[finger.type].x = fingerRect.x;
-                leapData.fingerRects[finger.type].y = fingerRect.y;
-                leapData.fingerRects[finger.type].w = fingerRect.w;
-                leapData.fingerRects[finger.type].h = fingerRect.h;*/
             }
         }
         leapData.totalAngle[finger.type()] = (unsigned char)

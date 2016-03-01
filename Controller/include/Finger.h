@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _FINGER_H_
@@ -38,6 +38,7 @@ class Finger
 private:
     /* Fields */
     FingerType _type;
+    SDL_Renderer *_renderer;
     std::unique_ptr<Image> _image;
     std::unique_ptr<Image> _staticImage;
     unsigned char _pressure;

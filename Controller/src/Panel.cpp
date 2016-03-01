@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 28, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -81,7 +81,7 @@ Panel::~Panel()
 //*****************************************************************************
 void Panel::run()
 {
-    LeapMotionManager leap(_window);
+    LeapMotionManager leap;
     LeapData leapData;
     FingerPressureStruct fingerPressures;
 
@@ -489,7 +489,7 @@ bool Panel::_initialize()
     //
     // Creates hand model
     //
-    _hand = std::unique_ptr<Hand>(new Hand(_renderer, width, height));
+    _hand = std::unique_ptr<Hand>(new Hand(_renderer));
 
     //
     // Creates socket

@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// Feburary 18, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _HAND_H_
@@ -37,11 +37,18 @@ private:
     std::unique_ptr<Image> _image;
     std::unique_ptr<Image> _staticImage;
     std::vector<std::unique_ptr<Finger>> _fingerList;
+    std::unique_ptr<Image> _thumbText;
+    std::unique_ptr<Image> _indexText;
+    std::unique_ptr<Image> _middleText;
+    std::unique_ptr<Image> _ringText;
+    std::unique_ptr<Image> _pinkyText;
+    std::unique_ptr<Image> _wristText;
+    std::vector<Image*> _numberTexts;
+    int _recentAngles[NUM_FINGERS + 1];
 
 public:
     /* Constructor */
-    Hand(SDL_Renderer *renderer, unsigned short screenWidth,
-        unsigned short screenHeight);
+    Hand(SDL_Renderer *renderer);
 
     /* Destructor */
     ~Hand();

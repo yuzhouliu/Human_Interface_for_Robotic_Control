@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 19, 2016
+// Feburary 29, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -73,7 +73,7 @@ private:
 
 public:
     /* Constructor */
-    LeapMotionManager(SDL_Window *window);
+    LeapMotionManager();
 
     /* Destructor */
     ~LeapMotionManager();
