@@ -51,6 +51,10 @@
 #include "uart_if.h"
 #endif
 
+// HTTP Client lib
+#include <http/client/httpcli.h>
+#include <http/client/common.h>
+
 #include "pin_mux_config.h"
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -78,6 +82,9 @@ int ServerNewSockID; // Hold New Server Socket ID for Client
 static void SetSocketVariables();
 static long ConfigureSimpleLinkToDefaultState();
 static inline _u8 SecurityTypeParser(char * cSecurityType);
+static int ConnectToHTTPServer(HTTPCli_Handle httpClient);
+static int HTTPGetMethod(HTTPCli_Handle httpClient, char * getRequest);
+static int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 //*****************************************************************************
 //                  HELPER FUNCTIONS -- End
 //*****************************************************************************
@@ -128,6 +135,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 {
     SlSecParams_t secParams = {0};// Hold WLAN informations
     long lRetVal = 0;
+    char ipString[15];
 
     //Reset the simplelink before connecting the the network
     lRetVal = ConfigureSimpleLinkToDefaultState();
@@ -164,13 +172,14 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
         _SlNonOsMainLoopTask();
 #endif
     }
-
+    sprintf(ipString,"%d.%d.%d.%d", 
+                    SL_IPV4_BYTE(g_ulIpAddr,3),
+                    SL_IPV4_BYTE(g_ulIpAddr,2),
+                    SL_IPV4_BYTE(g_ulIpAddr,1),
+                    SL_IPV4_BYTE(g_ulIpAddr,0));
     UART_PRINT("Connected to AP: %s \n\r",SSID_NAME);
-    UART_PRINT("Device IP: %d.%d.%d.%d\n\r\n\r",
-                      SL_IPV4_BYTE(g_ulIpAddr,3),
-                      SL_IPV4_BYTE(g_ulIpAddr,2),
-                      SL_IPV4_BYTE(g_ulIpAddr,1),
-                      SL_IPV4_BYTE(g_ulIpAddr,0));
+    UART_PRINT("Device IP: %s\n\r\n\r", ipString);
+    UpdateIPtoServer(ipString);
     return SUCCESS;
 }
 //****************************************************************************
@@ -336,44 +345,123 @@ int BsdTcpServerClose()
 //****************************************************************************
 //                          UTILITY FUNCTIONS
 //****************************************************************************
-
 //****************************************************************************
 //
-//!    \brief Parse the input IP address from the user
+//! \brief Update the IP address of the board to the server
 //!
-//!    \param[in]                     ucCMD (char pointer to input string)
+//! \return     0 on success, -1 on error.
 //!
-//!    \return                        0 : if correct IP, -1 : incorrect IP
-//
 //****************************************************************************
-int IpAddressParser(char *ucCMD)
+static int UpdateIPtoServer(char *ipAddr)
 {
-    volatile int i=0;
-    unsigned int uiUserInputData;
-    unsigned long ulUserIpAddress = 0;
-    char *ucInpString;
-    ucInpString = strtok(ucCMD, ".");
-    uiUserInputData = (int)strtoul(ucInpString,0,10);
-    while(i<4)
+    int lRetVal, count;
+    char getRequest[60];
+    HTTPCli_Struct httpClient;
+    UART_PRINT("Update IP Address to remote server.\n\r");
+    count = 0; //reset count
+    lRetVal = -1;
+    while (lRetVal < 0 && count < MAX_TRIAL)
     {
-        //
-       // Check Whether IP is valid
-       //
-       if((ucInpString != NULL) && (uiUserInputData < 256))
-       {
-           ulUserIpAddress |= uiUserInputData;
-           if(i < 3)
-               ulUserIpAddress = ulUserIpAddress << 8;
-           ucInpString=strtok(NULL,".");
-           uiUserInputData = (int)strtoul(ucInpString,0,10);
-           i++;
-       }
-       else
-       {
-           return -1;
-       }
+        lRetVal = ConnectToHTTPServer(&httpClient);
+        count++;
     }
-    g_ulDestinationIp = ulUserIpAddress;
+    if (lRetVal < 0) 
+    {
+        UART_PRINT("[ERROR] tcp_socket.c cannot connect to remote server.\n\r");
+        return lRetVal;
+    }
+    /* Construct the get request message */
+    sprintf(getRequest,"%s&ip=%s:%d", GET_REQUEST_URI, ipAddr, PORT_NUM);
+    count = 0; // reset count
+    lRetVal = -1;
+    UART_PRINT("GET_REQUEST= %s.\n\r",getRequest);
+    while (lRetVal < 0 && count < MAX_TRIAL)
+    {
+        lRetVal = HTTPGetMethod(&httpClient,getRequest);
+        count++;
+    }
+    if(lRetVal < 0)
+    {
+        UART_PRINT("[ERROR] tcp_socket.c cannot update IP Address on server.\n\r");
+        return lRetVal;
+    }
+    return SUCCESS;
+}
+//*****************************************************************************
+//
+//! Function to connect to HTTP server
+//!
+//! \param  httpClient - Pointer to HTTP Client instance
+//!
+//! \return Error-code or SUCCESS
+//!
+//*****************************************************************************
+static int ConnectToHTTPServer(HTTPCli_Handle httpClient)
+{
+    long lRetVal = -1;
+    struct sockaddr_in addr;
+    unsigned long ServerIP;
+    /* Resolve HOST NAME/IP */
+    lRetVal = sl_NetAppDnsGetHostByName((signed char *)HOST_NAME,
+                                          strlen((const char *)HOST_NAME),
+                                          &ServerIP, SL_AF_INET);
+    if(lRetVal < 0)
+    {
+        return lRetVal;
+    }
+
+    /* Set up the input parameters for HTTP Connection */
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(HOST_PORT);
+    addr.sin_addr.s_addr = sl_Htonl(ServerIP);
+
+    /* Testing HTTPCli open call: handle, address params only */
+    HTTPCli_construct(httpClient);
+    lRetVal = HTTPCli_connect(httpClient, (struct sockaddr *)&addr, 0, NULL);
+    if (lRetVal < 0)
+    {
+        UART_PRINT("[ERROR]tcp_socket.c connection to server failed\n\r");
+        return lRetVal;
+    }    
+    return SUCCESS;
+}
+//*****************************************************************************
+//
+//! \brief HTTP GET
+//!
+//! \param[in]  httpClient - Pointer to http client
+//!
+//! \return 0 on success else error code on failure
+//!
+//*****************************************************************************
+static int HTTPGetMethod(HTTPCli_Handle httpClient, char* getRequest)
+{
+  
+    long lRetVal = 0;
+    HTTPCli_Field fields[4] = {
+                                {HTTPCli_FIELD_NAME_HOST, HOST_NAME},
+                                {HTTPCli_FIELD_NAME_ACCEPT, "*/*"},
+                                {HTTPCli_FIELD_NAME_CONTENT_LENGTH, "0"},
+                                {NULL, NULL}
+                            };
+    bool        moreFlags;
+    
+    
+    /* Set request header fields to be send for HTTP request. */
+    HTTPCli_setRequestFields(httpClient, fields);
+
+    /* Send GET method request. */
+    /* Here we are setting moreFlags = 0 as there are no more header fields need to send
+       at later stage. Please refer HTTP Library API documentaion @ HTTPCli_sendRequest
+       for more information.
+    */
+    moreFlags = 0;
+    lRetVal = HTTPCli_sendRequest(httpClient, HTTPCli_METHOD_GET, getRequest, moreFlags);
+    if(lRetVal < 0)
+    {
+        UART_PRINT("[ERROR] tcp_socket.c failed to send HTTP GET request.\n\r");
+        return lRetVal;
+    }
     return SUCCESS;
 }
 
