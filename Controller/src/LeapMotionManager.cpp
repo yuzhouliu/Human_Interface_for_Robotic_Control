@@ -202,16 +202,17 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
                 // Calculates position on screen to render to
                 // This makes it pretty accurate... don't ask...
                 //
-                fingerRect.w = 25 - 25 * (center.y / 500);
+                fingerRect.w = static_cast<int>(25 - 25 * (center.y / 500));
                 if (fingerRect.w < 5)
                 {
                     fingerRect.w = 5;
                 }
                 fingerRect.h = fingerRect.w;
-                fingerRect.x = -center.x*(170/center.y)*0.85 + _windowWidth/2
-                    + 0.7*fingerRect.w;
-                fingerRect.y = center.z*(170/center.y)*0.85 + _windowHeight/2
-                    - 1.2*fingerRect.h;
+//*****************************************************************************
+                fingerRect.x = static_cast<int>(-center.x*(170/center.y)*0.85
+                    + _windowWidth/2 + 0.7*fingerRect.w);
+                fingerRect.y = static_cast<int>(center.z*(170/center.y)*0.85
+                    + _windowHeight/2 - 1.2*fingerRect.h);
             }
         }
         leapData.totalAngle[finger.type()] = (unsigned char)
@@ -263,7 +264,7 @@ void LeapMotionManager::serialize(LeapData &leapAngles, unsigned char *buf,
     const int BITS_PER_BYTE = 8;
     int angleSize = sizeof(leapAngles.totalAngle[0]);
     int wristSize = sizeof(leapAngles.wristAngle);
-    assert(buflen >= (angleSize*NUM_FINGERS + wristSize));
+    assert(buflen >= (unsigned int)(angleSize*NUM_FINGERS + wristSize));
 
     //
     // Serialize data
