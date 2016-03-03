@@ -57,6 +57,10 @@
 #include "pwm_break_out_if.h"
 #include "adc_break_out_if.h"
 
+// HTTP Client lib
+#include <http/client/httpcli.h>
+#include <http/client/common.h>
+
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
 #define APPLICATION_VERSION     "0.0.1"
