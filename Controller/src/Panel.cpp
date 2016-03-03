@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 1, 2016
+// March 2, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -19,7 +19,6 @@
 #include <cassert>
 #include <iostream>
 
-#include "HIRCP.h"
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
 #include "Window.h"
@@ -130,29 +129,34 @@ void Panel::run()
             //
             // Constructs a DATA packet to send over the network
             //
-            HIRCPPacket dataPacket = HIRCPPacket::createDATAPacket(
-                leapData.data);
+            HIRCPPacket sendPacket = HIRCPPacket::createDATAPacket(
+                leapData.data, leapData._MAX_PAYLOAD);
 
             //
             // Sends DATA packet to remote host
             //
-            if (!send(dataPacket.getData(), dataPacket.MAX_PACKET_SIZE))
+            if (!send(sendPacket))
             {
                 continue;
             }
 
             //
-            // TODO (Brandon): Create receive packet and change rest of this
-            // block to accomodate changes
+            // Constructs an empty packet to receive over the network
             //
+            HIRCPPacket recvPacket = HIRCPPacket::createEmptyPacket();
 
             //
             // Receives DATA from remote host
             //
-            if (!recv(leapData.data, leapData._MAX_PAYLOAD))
+            if (!recv(recvPacket))
             {
                 continue;
             }
+
+            //
+            // TODO (Brandon): Validate packet and take appropriate measures
+            //
+
 
             //
             // Populates FingerPressureStruct with finger pressure information
@@ -261,14 +265,13 @@ bool Panel::disconnect()
 //
 //! Sends data to remote host. Synchronized by mutex.
 //!
-//! \param message buffer containing message to send.
-//! \param len length of the buffer
+//! \param packet HIRCP packet with data to send.
 //!
 //! \return Returns \b true if the packet was sent successfully and \b false
 //! otherwise.
 //
 //*****************************************************************************
-bool Panel::send(unsigned char *message, unsigned short len)
+bool Panel::send(HIRCPPacket packet)
 {
     if (_connected)
     {
@@ -276,17 +279,26 @@ bool Panel::send(unsigned char *message, unsigned short len)
         // Locks mutex protecting socket
         //
         std::lock_guard<std::mutex> lock(_socket_mutex);
+        
+        //
+        // Get packet data
+        //
+        unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+        packet.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
 
-        if (!_socket->send(message, len))
+        //
+        // Send packet data to remote host
+        //
+        if (!_socket->send(message, HIRCPPacket::MAX_PACKET_SIZE))
         {
-            std::cout << "Send failed." << std::endl;
+            std::cout << "[ERROR] Panel::send(): Send failed." << std::endl;
             return false;
         }
 
         return true;
     }
 
-    std::cout << "Not connected." << std::endl;
+    std::cout << "[WARNING] Panel::send(): Not connected." << std::endl;
     return false;
 }
 
@@ -294,14 +306,13 @@ bool Panel::send(unsigned char *message, unsigned short len)
 //
 //! Receives data from remote host. Synchronized by mutex.
 //!
-//! \param message buffer to store message to be received.
-//! \param len length of the buffer.
+//! \param packet HIRCP packet to hold received data.
 //!
 //! \return Returns \b true if the packet was received successfully and \b
 //! false otherwise.
 //
 //*****************************************************************************
-bool Panel::recv(unsigned char *message, unsigned short len)
+bool Panel::recv(HIRCPPacket packet)
 {
     if (_connected)
     {
@@ -310,16 +321,24 @@ bool Panel::recv(unsigned char *message, unsigned short len)
         //
         std::lock_guard<std::mutex> lock(_socket_mutex);
 
-        if (!_socket->recv(message, len))
+        //
+        // Buffer to store packet data
+        //
+        unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+
+        //
+        // Receives packet from remote host
+        //
+        if (!_socket->recv(message, HIRCPPacket::MAX_PACKET_SIZE))
         {
-            std::cout << "Receive failed." << std::endl;
+            std::cout << "[ERROR] Panel::recv(): Receive failed." << std::endl;
             return false;
         }
 
         return true;
     }
 
-    std::cout << "Not connected." << std::endl;
+    std::cout << "[WARNING] Panel::recv(): Not connected." << std::endl;
     return false;
 }
 
@@ -585,7 +604,7 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     const int BITS_PER_BYTE = 8;
     //int pressureSize = sizeof(fingerPressures.pressure[0]);
     int pressureSize = sizeof(unsigned short);
-    assert(buflen >= pressureSize*NUM_FINGERS);
+    assert(buflen >= (unsigned int)pressureSize*NUM_FINGERS);
 
     //
     // Parses through buf and populate structure
