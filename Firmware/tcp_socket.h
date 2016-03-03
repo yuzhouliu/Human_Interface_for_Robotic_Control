@@ -40,6 +40,11 @@
 #define BUF_SIZE            1400 /*Defaut BUFFER SIZE */
 #define TCP_PACKET_COUNT    1000 /*Default TCP Packet Count */
 
+/* Server */
+#define HOST_NAME "robotarm.net23.net"
+#define HOST_PORT 80
+#define GET_REQUEST_URI "/update_ip.php?id=1"
+#define MAX_TRIAL 5 /* number of connection trials allowed */
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
@@ -64,6 +69,7 @@ typedef enum{
 long WlanStart();//start the Wlan
 long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
+int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
 int BsdTcpServerReceive(char *data);//Recieve data
 int BsdTcpServerSend(char *data, int length); //send data
