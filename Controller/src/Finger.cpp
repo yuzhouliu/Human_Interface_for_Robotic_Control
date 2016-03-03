@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #include "Finger.h"
@@ -52,7 +52,7 @@ Finger::Finger(FingerType type, SDL_Renderer *renderer)
     // Dynamic image for following finger positions
     //
     _image = std::unique_ptr<Image>(new Image(renderer,
-        "data/gfx/tracking.png"));
+        "data/gfx/finger_tracking.png"));
 
     //
     // Hide image at first

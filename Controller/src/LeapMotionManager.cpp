@@ -115,8 +115,10 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     }
 
     //
-    // Hide finger pressure by default
+    // Hide palm and finger tracking by default
     //
+    leapData.palmRect.w = 0;
+    leapData.palmRect.h = 0;
     for (int i=0; i<NUM_FINGERS; i++)
     {
         SDL_Rect &fingerRect = leapData.fingerRects[i];
@@ -159,6 +161,21 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
         leapData.data[bufIndex++] = 0;
         return false;
     }
+
+    //
+    // Gets position of hand and populates LeapData structure
+    //
+    Leap::Vector palmPosition = hand.palmPosition();
+    leapData.palmRect.w = 25 - 25 * (palmPosition.y / 500);
+    if (leapData.palmRect.w < 5)
+    {
+        leapData.palmRect.w = 5;
+    }
+    leapData.palmRect.h = leapData.palmRect.w;
+    leapData.palmRect.x = -palmPosition.x*(170/palmPosition.y)*0.85
+        + _windowWidth/2 + 0.7*leapData.palmRect.w;
+    leapData.palmRect.y = palmPosition.z*(170/palmPosition.y)*0.85
+        + _windowHeight/2 - 1.2*leapData.palmRect.h;
 
     //
     // Populates LeapData structure with finger info

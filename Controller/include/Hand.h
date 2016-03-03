@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _HAND_H_
@@ -36,6 +36,7 @@ private:
     SDL_Renderer *_renderer;
     std::unique_ptr<Image> _image;
     std::unique_ptr<Image> _staticImage;
+    std::unique_ptr<Image> _trackedPalm;
     std::vector<std::unique_ptr<Finger>> _fingerList;
     std::unique_ptr<Image> _thumbText;
     std::unique_ptr<Image> _indexText;

@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -40,7 +40,7 @@
 #define SECONDARY_VIEWPORT_WIDTH 200
 #define SECONDARY_VIEWPORT_HEIGHT 200
 #define TERTIARY_VIEWPORT_X 850
-#define TERTIARY_VIEWPORT_Y 275
+#define TERTIARY_VIEWPORT_Y 250
 #define TERTIARY_VIEWPORT_WIDTH 200
 #define TERTIARY_VIEWPORT_HEIGHT 300
 

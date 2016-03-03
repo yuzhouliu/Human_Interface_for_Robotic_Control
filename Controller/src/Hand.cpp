@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #include "Hand.h"
@@ -39,6 +39,12 @@ Hand::Hand(SDL_Renderer *renderer)
     //
     _staticImage = std::unique_ptr<Image>(new Image(renderer,
         "data/gfx/hand_right_base.png"));
+
+    //
+    // Creates palm tracking dot
+    //
+    _trackedPalm = std::unique_ptr<Image>(new Image(renderer,
+        "data/gfx/palm_tracking.png"));
 
     //
     // Creates and add fingers to list
@@ -217,6 +223,14 @@ void Hand::update(LeapData &leapData,
 
         SDL_FreeSurface(surface);
 
+        //
+        // Updates tracked palm dot
+        //
+        _trackedPalm->setRenderRect(leapData.palmRect);
+
+        //
+        // Updates tracked finger dots
+        //
         for (int i=0; i<NUM_FINGERS; i++)
         {
             _fingerList[i]->setRenderRect(leapData.fingerRects[i]);
@@ -264,6 +278,7 @@ void Hand::render()
     {
         SDL_RenderSetViewport(_renderer, &Window::gPrimaryViewport);
         _image->onRender();
+        _trackedPalm->onRender();
     }
 
     for (auto it = _fingerList.begin(); it != _fingerList.end(); it++)

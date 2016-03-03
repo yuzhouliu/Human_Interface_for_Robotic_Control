@@ -47,6 +47,7 @@ struct LeapData
     int imagePitch = 0;
     unsigned char *imageDataRGBA = nullptr;
     SDL_Rect imageRenderRect;
+    SDL_Rect palmRect;
 
     LeapData()
     {
