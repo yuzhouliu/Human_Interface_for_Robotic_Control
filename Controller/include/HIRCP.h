@@ -12,23 +12,32 @@
 // January 15, 2016
 //
 // Modified:
-// Feburary 26, 2016
+// March 2, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_H_
 #define _HIRCP_H_
 
+#define D_SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
+
+#include <string>
+
 class HIRCPPacket
 {
-private:
+public:
     /* Fields */
-    char *_HIRCP_CONSTANT = "HIRCP";
-    static const int _HIRCP_CONSTANT_LEN = 5;
-    static const int _OPCODE_LEN = 2;
-    static const int _MAX_PAYLOAD_LEN = 10;
+    static const unsigned char HIRCP_CONSTANT[];
+    static const std::string HIRCP_CONSTANT_STRING;
+    static const int HIRCP_CONSTANT_LEN = 4;
+    static const int OPCODE_LEN = 1;
+    static const int MAX_PAYLOAD_LEN = 10;
+    static const int MAX_PACKET_SIZE = HIRCP_CONSTANT_LEN + OPCODE_LEN +
+        MAX_PAYLOAD_LEN;
 
     enum TYPE
     {
+        INVALID_TYPE = 0,
         CRQ,
         CACK,
         DATA,
@@ -36,27 +45,38 @@ private:
         TRQ,
         TACK,
         ERR,
-    } _type;
-    unsigned char _data[_HIRCP_CONSTANT_LEN + _OPCODE_LEN + _MAX_PAYLOAD_LEN];
+    };
 
     /* Constructor */
     HIRCPPacket();
-
-public:
-    /* Fields */
-    static const int MAX_PACKET_SIZE = _HIRCP_CONSTANT_LEN + _OPCODE_LEN +
-        _MAX_PAYLOAD_LEN;
 
     /* Destructor */
     ~HIRCPPacket();
 
     /* Methods */
     bool isValid();
-    unsigned char *getData();
+    void setType(TYPE type);
+    TYPE getType();
+    void setPayload(unsigned char *payload, int len);
+    void getData(unsigned char *buf, int len);
+    void populate(unsigned char *buf, int len);
 
     /* Static methods */
-    static HIRCPPacket createPacketFromBytes(unsigned char *data);
-    static HIRCPPacket createDATAPacket(unsigned char *payload);
+    static HIRCPPacket createDATAPacket(unsigned char *payload, int len);
+    static HIRCPPacket createEmptyPacket();
+
+private:
+    /* Fields */
+    static const int CRQ_PAYLOAD_LEN = 0;
+    static const int CACK_PAYLOAD_LEN = 0;
+    static const int DATA_PAYLOAD_LEN = 6;
+    static const int DACK_PAYLOAD_LEN = 10;
+    static const int TRQ_PAYLOAD_LEN = 0;
+    static const int TACK_PAYLOAD_LEN = 0;
+    static const int ERR_PAYLOAD_LEN = 1;
+
+    TYPE _type;
+    unsigned char _payload[MAX_PAYLOAD_LEN];
 };
 
 #endif /* _HIRCP_H_ */

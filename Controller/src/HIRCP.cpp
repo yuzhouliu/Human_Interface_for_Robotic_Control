@@ -12,14 +12,20 @@
 // January 15, 2016
 //
 // Modified:
-// February 26, 2016
+// March 2, 2016
 //
 //*****************************************************************************
 #include "HIRCP.h"
 
+#include <algorithm>
+#include <cassert>
 #include <cstring>
 
+const unsigned char HIRCPPacket::HIRCP_CONSTANT[] = "HIRC";
+const std::string HIRCPPacket::HIRCP_CONSTANT_STRING = "HIRC";
+
 HIRCPPacket::HIRCPPacket()
+    : _type(INVALID_TYPE)
 {
 
 }
@@ -34,25 +40,72 @@ bool HIRCPPacket::isValid()
     return false;
 }
 
-unsigned char *HIRCPPacket::getData()
+void HIRCPPacket::setType(TYPE type)
 {
-    return _data;
+    _type = type;
 }
 
-HIRCPPacket HIRCPPacket::createPacketFromBytes(unsigned char *data)
+HIRCPPacket::TYPE HIRCPPacket::getType()
+{
+    return _type;
+}
+
+void HIRCPPacket::setPayload(unsigned char *payload, int len)
+{
+    assert(len >= MAX_PAYLOAD_LEN);
+    std::copy(payload, payload+len, _payload);
+}
+
+void HIRCPPacket::getData(unsigned char *buf, int len)
+{
+    assert(len >= MAX_PACKET_SIZE);
+
+    int offset = 0;
+    std::copy(HIRCP_CONSTANT, HIRCP_CONSTANT+HIRCP_CONSTANT_LEN, buf+offset);
+    offset += HIRCP_CONSTANT_LEN;
+    buf[offset++] = _type;
+    std::copy(_payload, _payload+MAX_PAYLOAD_LEN, buf+offset);
+    offset += MAX_PAYLOAD_LEN;
+}
+
+void HIRCPPacket::populate(unsigned char *buf, int len)
+{
+    assert(len >= MAX_PACKET_SIZE);
+
+    int offset = 0;
+    unsigned char hircpConstant[HIRCP_CONSTANT_LEN];
+    std::copy(buf, buf+HIRCP_CONSTANT_LEN, hircpConstant);
+    offset += HIRCP_CONSTANT_LEN;
+    std::string hircpConstantString((char*)hircpConstant);
+    if (hircpConstantString == HIRCP_CONSTANT_STRING)
+    {
+        TYPE type = (TYPE)(buf[offset++]);
+        //
+        // TODO (Brandon): Complete implementation
+        //
+    }
+    else
+    {
+        TYPE type = INVALID_TYPE;
+        return;
+    }
+}
+
+HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload, int len)
 {
     HIRCPPacket packet;
 
-    // TODO: Implement
+    packet.setType(TYPE::DATA);
+    packet.setPayload(payload, len);
 
     return packet;
 }
 
-HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload)
+HIRCPPacket HIRCPPacket::createEmptyPacket()
 {
     HIRCPPacket packet;
 
-    // TODO: Implement
+    packet.setType(TYPE::INVALID_TYPE);
 
     return packet;
 }
