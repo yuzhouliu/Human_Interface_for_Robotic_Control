@@ -90,7 +90,6 @@ extern uVectorEntry __vector_table;
 //*****************************************************************************
 
 
-
 //*****************************************************************************
 //
 //! Application startup display on UART
@@ -178,7 +177,6 @@ void main()
     I2C_IF_Open(I2C_MASTER_MODE_STD);
 
     // Initialize the PWM outputs on the board
-    //InitServos();
     InitServos_PWM_Breakout();
 
     // Initialize the sensor ADC
@@ -191,9 +189,9 @@ void main()
     // Setup the TCP Server Socket
     BsdTcpServerSetup(PORT_NUM);
 
-    // Recieve Data
     while (lRetVal >= 0)
     {
+        // Receive packet data
     	lRetVal = BsdTcpServerReceive(recv_data, HIRCP_MAX_PACKET_LEN);
 
     	// Populates packet structure and checks validity
@@ -211,15 +209,15 @@ void main()
 
         if (freeMovementMode)
         {
+            // Moves servo motors using data from packet
             for (i = 0; i<NUM_SERVOS; i++)
             {
-                //MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
             	MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
             }
 
+            // Gets pressure readings from sensors and populates buffer to be used as payload for sending
             for (i = 0; i<NUM_SENSORS; i++)
             {
-                //UnsignedShort_to_UnsignedChar(GetSensorReading_CC3200((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
             	adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
             	UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
 
@@ -231,24 +229,27 @@ void main()
         else
         {
             MoveServo_SearchPressure(CMD_CLOSE, send_payload);
-            //memset(send_data, 1, 10);
         }
 
-        // Configure packet fields to send
+        // Configure packet fields and gets packet data to send
         HIRCP_SetType(sendPacket, HIRCP_DACK);
         HIRCP_SetPayload(sendPacket, send_payload, HIRCP_MAX_PAYLOAD_LEN);
         HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
     	
+        // Sends data
     	lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
     	UART_PRINT("Sent DACK packet.\n\r");
-
     }
     UART_PRINT("Exiting Application ...\n\r");
 
-    // power of the Network processor
-    lRetVal = sl_Stop(SL_STOP_TIMEOUT);
+    // Frees resources held by HIRCP_Packet
+    HIRCP_DestroyPacket(sendPacket);
+    HIRCP_DestroyPacket(recvPacket);
 
+    // Power off the network processor
+    lRetVal = sl_Stop(SL_STOP_TIMEOUT);
 }
+
 //*****************************************************************************
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/

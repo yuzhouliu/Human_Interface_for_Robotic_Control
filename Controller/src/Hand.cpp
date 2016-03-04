@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// March 3, 2016
+// March 4, 2016
 //
 //*****************************************************************************
 #include "Hand.h"
@@ -164,7 +164,7 @@ Hand::Hand(SDL_Renderer *renderer)
                 << std::endl;
             return;
         }
-        _numberTexts.push_back(new Image());
+        _numberTexts.push_back(std::unique_ptr<Image>(new Image()));
         _numberTexts[i]->setRenderer(renderer);
         _numberTexts[i]->setTexture(tempSurface);
         SDL_FreeSurface(tempSurface);

@@ -11,7 +11,7 @@
 // December 29, 2015
 //
 // Modified:
-// March 3, 2016
+// March 4, 2016
 //
 //*****************************************************************************
 #ifndef _HAND_H_
@@ -44,7 +44,7 @@ private:
     std::unique_ptr<Image> _ringText;
     std::unique_ptr<Image> _pinkyText;
     std::unique_ptr<Image> _wristText;
-    std::vector<Image*> _numberTexts;
+    std::vector<std::unique_ptr<Image>> _numberTexts;
     int _recentAngles[NUM_FINGERS + 1];
 
 public:
