@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 2, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -101,7 +101,7 @@ void Panel::run()
         //
         for (int i=0; i<NUM_FINGERS; i++)
         {
-            fingerPressures.pressure[i] = 255;
+            fingerPressures.pressure[i] = 0;
         }
 
         //
@@ -161,8 +161,7 @@ void Panel::run()
             //
             // Populates FingerPressureStruct with finger pressure information
             //
-            _populateFingerPressureStruct(fingerPressures, leapData.data,
-                leapData._MAX_PAYLOAD);
+            _populateFingerPressureStruct(fingerPressures, recvPacket);
         }
 
         //
@@ -271,7 +270,7 @@ bool Panel::disconnect()
 //! otherwise.
 //
 //*****************************************************************************
-bool Panel::send(HIRCPPacket packet)
+bool Panel::send(HIRCPPacket &packet)
 {
     if (_connected)
     {
@@ -285,6 +284,13 @@ bool Panel::send(HIRCPPacket packet)
         //
         unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
         packet.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+        std::cout << "Sending packet: ";
+        for (int i=0; i<HIRCPPacket::MAX_PACKET_SIZE; i++)
+        {
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
 
         //
         // Send packet data to remote host
@@ -312,7 +318,7 @@ bool Panel::send(HIRCPPacket packet)
 //! false otherwise.
 //
 //*****************************************************************************
-bool Panel::recv(HIRCPPacket packet)
+bool Panel::recv(HIRCPPacket &packet)
 {
     if (_connected)
     {
@@ -334,6 +340,18 @@ bool Panel::recv(HIRCPPacket packet)
             std::cout << "[ERROR] Panel::recv(): Receive failed." << std::endl;
             return false;
         }
+
+        //
+        // Populates packet with received data
+        //
+        packet.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+        std::cout << "Receiving packet: ";
+        for (int i=0; i<HIRCPPacket::MAX_PACKET_SIZE; i++)
+        {
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
 
         return true;
     }
@@ -588,15 +606,14 @@ void Panel::_render()
 //! Populates structure with pressure information decoded from buf.
 //!
 //! \param fingerPressures structure for storing results.
-//! \param buf buffer with encoded pressure data.
-//! \param buflen the size of the buffer.
+//! \param packet HIRCP packet with finger pressure data.
 //!
 //! \return Returns \b true if the structure was populated successfully and
 //! \b false otherwise.
 //
 //*****************************************************************************
 bool Panel::_populateFingerPressureStruct(FingerPressureStruct
-    &fingerPressures, unsigned char *buf, unsigned int buflen)
+    &fingerPressures, HIRCPPacket packet)
 {
     //
     // Buffer needs to be at least this size
@@ -604,6 +621,9 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     const int BITS_PER_BYTE = 8;
     //int pressureSize = sizeof(fingerPressures.pressure[0]);
     int pressureSize = sizeof(unsigned short);
+    const unsigned int buflen = packet.MAX_PAYLOAD_LEN;
+    unsigned char buf[buflen];
+    packet.getPayload(buf, buflen);
     assert(buflen >= (unsigned int)pressureSize*NUM_FINGERS);
 
     //

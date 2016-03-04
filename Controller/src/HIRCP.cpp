@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 2, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #include "HIRCP.h"
@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 const unsigned char HIRCPPacket::HIRCP_CONSTANT[] = "HIRC";
 const std::string HIRCPPacket::HIRCP_CONSTANT_STRING = "HIRC";
@@ -53,7 +54,13 @@ HIRCPPacket::TYPE HIRCPPacket::getType()
 void HIRCPPacket::setPayload(unsigned char *payload, int len)
 {
     assert(len >= MAX_PAYLOAD_LEN);
-    std::copy(payload, payload+len, _payload);
+    std::copy(payload, payload+MAX_PAYLOAD_LEN, _payload);
+}
+
+void HIRCPPacket::getPayload(unsigned char *payload, int len)
+{
+    assert(len >= MAX_PAYLOAD_LEN);
+    std::copy(_payload, _payload+MAX_PAYLOAD_LEN, payload);
 }
 
 void HIRCPPacket::getData(unsigned char *buf, int len)
@@ -70,19 +77,18 @@ void HIRCPPacket::getData(unsigned char *buf, int len)
 
 void HIRCPPacket::populate(unsigned char *buf, int len)
 {
-    assert(len >= MAX_PACKET_SIZE);
+    assert((len <= MAX_PACKET_SIZE) && (len >= HIRCP_CONSTANT_LEN+OPCODE_LEN));
 
     int offset = 0;
-    unsigned char hircpConstant[HIRCP_CONSTANT_LEN];
+    unsigned char hircpConstant[HIRCP_CONSTANT_LEN+1];
     std::copy(buf, buf+HIRCP_CONSTANT_LEN, hircpConstant);
     offset += HIRCP_CONSTANT_LEN;
+    hircpConstant[offset] = '\0';
     std::string hircpConstantString((char*)hircpConstant);
     if (hircpConstantString == HIRCP_CONSTANT_STRING)
     {
         TYPE type = (TYPE)(buf[offset++]);
-        //
-        // TODO (Brandon): Complete implementation
-        //
+        std::copy(buf+offset, buf+MAX_PACKET_SIZE, _payload);
     }
     else
     {

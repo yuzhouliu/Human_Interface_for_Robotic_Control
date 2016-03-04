@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 2, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -58,7 +58,7 @@ private:
         FingerPressureStruct &fingerPressures);
     void _render();
     bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
-        unsigned char *buf, unsigned int buflen);
+        HIRCPPacket packet);
 
 public:
     /* Constructor */
@@ -71,8 +71,8 @@ public:
     void run();
     bool connect(char *ipAddressString);
     bool disconnect();
-    bool send(HIRCPPacket packet);
-    bool recv(HIRCPPacket packet);
+    bool send(HIRCPPacket &packet);
+    bool recv(HIRCPPacket &packet);
     bool startRecording(char *filePath);
     bool stopRecording();
     bool startStreaming(char *filePath);

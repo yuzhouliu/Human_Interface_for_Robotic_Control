@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 2, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_H_
@@ -58,6 +58,7 @@ public:
     void setType(TYPE type);
     TYPE getType();
     void setPayload(unsigned char *payload, int len);
+    void getPayload(unsigned char *payload, int len);
     void getData(unsigned char *buf, int len);
     void populate(unsigned char *buf, int len);
 

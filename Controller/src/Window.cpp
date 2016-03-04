@@ -554,7 +554,7 @@ BOOL CALLBACK Window::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                     //
                     // Connect to remote host
                     //
-                    //_panel->connect(addressInput);
+                    _panel->connect(addressInput);
 
                     //
                     // Insert IP address into combo box and save IP address if
