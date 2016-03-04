@@ -87,12 +87,12 @@ void HIRCPPacket::populate(unsigned char *buf, int len)
     std::string hircpConstantString((char*)hircpConstant);
     if (hircpConstantString == HIRCP_CONSTANT_STRING)
     {
-        TYPE type = (TYPE)(buf[offset++]);
+        _type = (TYPE)(buf[offset++]);
         std::copy(buf+offset, buf+MAX_PACKET_SIZE, _payload);
     }
     else
     {
-        TYPE type = INVALID_TYPE;
+        _type = INVALID_TYPE;
         return;
     }
 }
