@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #include "LeapMotionManager.h"
@@ -208,7 +208,6 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
                     fingerRect.w = 5;
                 }
                 fingerRect.h = fingerRect.w;
-//*****************************************************************************
                 fingerRect.x = static_cast<int>(-center.x*(170/center.y)*0.85
                     + _windowWidth/2 + 0.7*fingerRect.w);
                 fingerRect.y = static_cast<int>(center.z*(170/center.y)*0.85
