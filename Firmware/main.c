@@ -1,22 +1,20 @@
 //*****************************************************************************
 // main.c
 //
-// main function to control the robot arm
+// Application that controls the InMoov 3D printed robotic arm.
+//
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
 //
 // This source file uses code snippets from Texas Instruments Incorporated's
 // CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
 // this file.
 //
-// Author: Minh Mai
-//
 // Created: Dec 21 2015
 //
-// Modified: January 6, 2015
+// Modified: March 4, 2016
 //
 //*****************************************************************************
-
-#include "tcp_socket.h"
-
 // Standard includes
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +45,7 @@
 #endif
 
 #include "pin_mux_config.h"
+#include "tcp_socket.h"
 #include "servo_driver_if.h"
 #include "servo_driver_search_pressure_if.h"
 #include "adc_driver_if.h"
@@ -60,6 +59,8 @@
 // HTTP Client lib
 #include <http/client/httpcli.h>
 #include <http/client/common.h>
+
+#include "hircp.h"
 
 /* Config for the TCP */
 #define APPLICATION_NAME        "Human Interface for Robotic Control"
@@ -101,7 +102,6 @@ extern uVectorEntry __vector_table;
 //*****************************************************************************
 static void DisplayBanner(char * AppName)
 {
-
     Report("\n\n\n\r");
     Report("\t\t *************************************************\n\r");
     Report("\t\t      CC3200 %s Application       \n\r", AppName);
@@ -146,17 +146,22 @@ static void BoardInit(void)
 void main()
 {
     long lRetVal = 0;
-    char data[BUF_SIZE];
-    char sent_data[BUF_SIZE];
+    char recv_data[HIRCP_MAX_PACKET_LEN];
+    char send_data[HIRCP_MAX_PACKET_LEN];
+    char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
+    char send_payload[HIRCP_MAX_PAYLOAD_LEN];
     unsigned char highByte, lowByte;
     unsigned short adc_reading;
     int i;
-
     int freeMovementMode = 0;		// TODO Testing, remove later
 
-    //unsigned char freeMovementMode = 1;
+    HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
+    HIRCP_Packet *recvPacket = HIRCP_CreatePacket();
 
-    memset(sent_data, 0, 10);
+    // Zeroes out memory buffers
+    memset(recv_data, 0, HIRCP_MAX_PACKET_LEN);
+    memset(send_data, 0, HIRCP_MAX_PACKET_LEN);
+
     // Board Initialization
     BoardInit();
 
@@ -180,7 +185,6 @@ void main()
     InitSensorADC();
 
     // Connect to WIFI using default info
-    //WlanConnect(NULL, NULL, NULL);
     WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
@@ -190,35 +194,53 @@ void main()
     // Recieve Data
     while (lRetVal >= 0)
     {
-    	lRetVal = BsdTcpServerReceive(data);
+    	lRetVal = BsdTcpServerReceive(recv_data, HIRCP_MAX_PACKET_LEN);
+
+    	// Populates packet structure and checks validity
+    	HIRCP_Populate(recvPacket, recv_data, HIRCP_MAX_PACKET_LEN);
+    	if (HIRCP_IsValid(recvPacket) && (HIRCP_GetType(recvPacket) == HIRCP_DATA))
+    	{
+    	    // Get packet payload
+    	    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN)
+    	    UART_PRINT("Received DATA packet.\n\r");
+    	}
+    	else
+    	{
+    	    // TODO (Brandon): Handle invalid packets
+    	}
 
         if (freeMovementMode)
         {
             for (i = 0; i<NUM_SERVOS; i++)
             {
                 //MoveServo((unsigned char)data[i], (enum Servo_Joint_Type)i);
-            	MoveServo_PWM_Breakout((unsigned char)data[i], (enum Servo_Joint_Type)i);
+            	MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
             }
 
-            for (i = 0; i< NUM_SENSORS; i++)
+            for (i = 0; i<NUM_SENSORS; i++)
             {
                 //UnsignedShort_to_UnsignedChar(GetSensorReading_CC3200((enum Fingertip_Sensor_Type)i), &highByte, &lowByte);
             	adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
             	UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
 
             	UnsignedShort_to_UnsignedChar(adc_reading, &highByte, &lowByte);
-                sent_data[i*2] = (char)highByte;
-                sent_data[i*2+1] = (char)lowByte;
+                send_payload[i*2] = (char)highByte;
+                send_payload[i*2+1] = (char)lowByte;
             }
         }
         else
         {
-            MoveServo_SearchPressure(CMD_CLOSE, sent_data);
-            //memset(sent_data, 1, 10);
+            MoveServo_SearchPressure(CMD_CLOSE, send_payload);
+            //memset(send_data, 1, 10);
         }
+
+        // Configure packet fields to send
+        HIRCP_SetType(sendPacket, HIRCP_DACK);
+        HIRCP_SetPayload(sendPacket, send_payload, HIRCP_MAX_PAYLOAD_LEN);
+        HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
     	
-    	lRetVal = BsdTcpServerSend(sent_data, 10);
-    	UART_PRINT("Sent 10 bytes to client.\n\r");
+    	lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
+    	UART_PRINT("Sent DACK packet.\n\r");
 
     }
     UART_PRINT("Exiting Application ...\n\r");

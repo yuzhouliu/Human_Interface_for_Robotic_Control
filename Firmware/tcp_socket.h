@@ -37,7 +37,6 @@
 /* Config for the TCP Socket Server */
 #define IP_ADDR             0xc0a8006E /* Default IP: 192.168.0.110 */
 #define PORT_NUM            5001 /*Default PORT_NUM */
-#define BUF_SIZE            1400 /*Defaut BUFFER SIZE */
 #define TCP_PACKET_COUNT    1000 /*Default TCP Packet Count */
 
 /* Server */
@@ -71,7 +70,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
 int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
-int BsdTcpServerReceive(char *data);//Recieve data
+int BsdTcpServerReceive(char *data, int len);//Recieve data
 int BsdTcpServerSend(char *data, int length); //send data
 int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address

@@ -17,7 +17,7 @@
 //
 // Created: Dec 20 2015
 //
-// Modified: Dec 28 2015
+// Modified: March 4, 2016
 //
 //*****************************************************************************
 
@@ -69,7 +69,6 @@ volatile unsigned long  g_ulPacketCount = TCP_PACKET_COUNT;
 unsigned char  g_ucConnectionStatus = 0;
 unsigned char  g_ucSimplelinkstarted = 0;
 unsigned long  g_ulIpAddr = 0;
-char g_cBsdBuf[BUF_SIZE];
 int ServerSockID; //Hold Server Socket ID
 int ServerNewSockID; // Hold New Server Socket ID for Client
 //*****************************************************************************
@@ -206,12 +205,6 @@ int BsdTcpServerSetup(unsigned short usPort)
     //Set variables for the socket
     SetSocketVariables();
 
-    // filling the buffer
-    for (iCounter=0 ; iCounter<BUF_SIZE ; iCounter++)
-    {
-        g_cBsdBuf[iCounter] = (char)(iCounter % 10);
-    }
-
     //filling the TCP server socket address
     sLocalAddr.sin_family = SL_AF_INET;
     sLocalAddr.sin_port = sl_Htons((unsigned short)usPort);
@@ -286,15 +279,16 @@ int BsdTcpServerSetup(unsigned short usPort)
 //! \brief Recieving data from the client
 //!
 //! \param [in]: pointer to data, the recieving packet will be store in data
+//! \param [in]: length of data buffer
 //!
 //! \return     0 on success, -1 on error.
 //!
 //****************************************************************************
-int BsdTcpServerReceive(char *data)
+int BsdTcpServerReceive(char *data, int len)
 {
     int iStatus;
 
-    iStatus = sl_Recv(ServerNewSockID, g_cBsdBuf, BUF_SIZE, 0);
+    iStatus = sl_Recv(ServerNewSockID, data, len, 0);
     if( iStatus <= 0 )
     {
        // error
@@ -304,8 +298,7 @@ int BsdTcpServerReceive(char *data)
     }
     else
     {
-        UART_PRINT("RECEIVED BUFF:%s\n\r", g_cBsdBuf);
-        strcpy(data, g_cBsdBuf);
+        UART_PRINT("RECEIVED BUFF:%s\n\r", data);
     }
     return SUCCESS;
 }
