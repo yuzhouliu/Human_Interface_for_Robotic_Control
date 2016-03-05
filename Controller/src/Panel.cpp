@@ -137,6 +137,9 @@ void Panel::run()
             //
             if (!send(sendPacket))
             {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
                 continue;
             }
 
@@ -150,6 +153,9 @@ void Panel::run()
             //
             if (!recv(recvPacket))
             {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
                 continue;
             }
 
@@ -770,9 +776,9 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         float multiplier = (float)(1) - (float)(encodedPressure)/4096;
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);
-        std::cout << "pressure = "
+        /*std::cout << "pressure = "
             << static_cast<unsigned int>(fingerPressures.pressure[i])
-            << std::endl;
+            << std::endl;*/
     }
 
     return true;

@@ -149,7 +149,7 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     //
     if (!hand.isValid() || !hand.isRight())
     {
-        std::cout << "No hand detected." << std::endl;
+        //std::cout << "No hand detected." << std::endl;
         unsigned int bufIndex = 0;
         for (int i=0; i<NUM_FINGERS; i++)
         {

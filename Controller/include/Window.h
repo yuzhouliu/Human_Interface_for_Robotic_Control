@@ -53,7 +53,8 @@ void CenterWindow(HWND hwnd);
 
 enum WindowEvents
 {
-    EVENT_STOP_STREAMING = 1,
+    EVENT_DISCONNECTED,
+    EVENT_STOP_STREAMING,
 };
 
 class Window : public IObserver

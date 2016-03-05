@@ -37,7 +37,7 @@
 
 class Window;
 
-class Panel
+class Panel : public IObservable
 {
 private:
     /* Fields */

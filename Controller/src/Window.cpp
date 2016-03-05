@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 23, 2016
+// March 5, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -101,6 +101,7 @@ bool Window::run()
     // Creates panel
     //
     _panel = std::shared_ptr<Panel>(new Panel(this, _window));
+    _panel->addObserver(this);
 
     //
     // Creates thread
@@ -554,7 +555,20 @@ BOOL CALLBACK Window::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                     //
                     // Connect to remote host
                     //
-                    _panel->connect(addressInput);
+                    if (!_panel->connect(addressInput))
+                    {
+                        //
+                        // Creates daemon thread
+                        //
+                        std::thread messageBoxThread(messageBoxTask,
+                            _windowHandle,
+                            "Unable to connect to remote host",
+                            "Connect failed");
+                        messageBoxThread.detach();
+
+                        EndDialog(hwnd, 0);
+                        break;
+                    }
 
                     //
                     // Insert IP address into combo box and save IP address if
@@ -664,6 +678,23 @@ void Window::onNotify(int event)
 {
     switch (event)
     {
+    case EVENT_DISCONNECTED:
+    {
+        //
+        // Event occurs when PlaybackStreamer reaches end of file
+        //
+        EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_GRAYED);
+        EnableMenuItem(_menu, ID_FILE_CONNECT, MF_ENABLED);
+
+        //
+        // Creates daemon thread
+        //
+        std::thread messageBoxThread(messageBoxTask, _windowHandle,
+            "Connection to InMoov lost", "Disconnected");
+        messageBoxThread.detach();
+
+        break;
+    }
     case EVENT_STOP_STREAMING:
     {
         //
@@ -679,7 +710,7 @@ void Window::onNotify(int event)
         // Creates daemon thread
         //
         std::thread messageBoxThread(messageBoxTask, _windowHandle,
-            "Playback Complete", "Playback Complete");
+            "Playback reached end of file", "Playback Complete");
         messageBoxThread.detach();
 
         break;
