@@ -152,7 +152,7 @@ void main()
     unsigned char highByte, lowByte;
     unsigned short adc_reading;
     int i;
-    int freeMovementMode = 0;		// TODO Testing, remove later
+    int freeMovementMode = 1;		// TODO Testing, remove later
     tBoolean connected;
 
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
@@ -197,7 +197,11 @@ void main()
         while (!connected)
         {
             // Accept incoming connections
-            BsdTcpServerAccept();
+            if (BsdTcpServerAccept() != SUCCESS)
+            {
+                UART_PRINT("Accept() failed.n\r");
+                continue;
+            }
 
             if (!HIRCP_InitiateConnectionSequence())
             {
@@ -212,6 +216,10 @@ void main()
         {
             // Receive packet data
             lRetVal = BsdTcpServerReceive(recv_data, HIRCP_MAX_PACKET_LEN);
+            if (lRetVal < 0)
+            {
+            	break;
+            }
 
             // Populates packet structure and checks validity
             HIRCP_Populate(recvPacket, recv_data, HIRCP_MAX_PACKET_LEN);
@@ -273,6 +281,10 @@ void main()
 
             // Sends data
             lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
+            if (lRetVal < 0)
+            {
+            	break;
+            }
             UART_PRINT("Sent DACK packet.\n\r");
         }
     }

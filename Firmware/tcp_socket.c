@@ -254,10 +254,18 @@ int BsdTcpServerAccept()
 {
     SlSockAddrIn_t  sAddr;
     int iAddrSize;
+    int iStatus;
 
     iAddrSize = sizeof(SlSockAddrIn_t);
 
     UART_PRINT("WAIT FOR CLIENT TO CONNECT....\n\r");
+
+    // Close previous connected socket
+    if (ServerNewSockID != SL_EAGAIN)
+    {
+    	iStatus = sl_Close(ServerNewSockID);
+    }
+
     ServerNewSockID = SL_EAGAIN;
 
     // waiting for an incoming TCP connection
@@ -281,6 +289,8 @@ int BsdTcpServerAccept()
         }
     }
     UART_PRINT("CLIENT CONNECTED. new SOCKID: %d.\n\r",ServerNewSockID);
+
+    return SUCCESS;
 }
 
 //****************************************************************************
