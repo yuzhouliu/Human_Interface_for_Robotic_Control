@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 3, 2016
+// March 4, 2016
 //
 //*****************************************************************************
 #include "HIRCP.h"
@@ -28,7 +28,10 @@ const std::string HIRCPPacket::HIRCP_CONSTANT_STRING = "HIRC";
 HIRCPPacket::HIRCPPacket()
     : _type(INVALID_TYPE)
 {
-
+    for (int i=0; i<MAX_PAYLOAD_LEN; i++)
+    {
+        _payload[i] = 0;
+    }
 }
 
 HIRCPPacket::~HIRCPPacket()
@@ -38,7 +41,7 @@ HIRCPPacket::~HIRCPPacket()
 
 bool HIRCPPacket::isValid()
 {
-    return false;
+    return true;
 }
 
 void HIRCPPacket::setType(TYPE type)
@@ -97,12 +100,30 @@ void HIRCPPacket::populate(unsigned char *buf, int len)
     }
 }
 
+HIRCPPacket HIRCPPacket::createCRQPacket()
+{
+    HIRCPPacket packet;
+
+    packet.setType(TYPE::CRQ);
+
+    return packet;
+}
+
 HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload, int len)
 {
     HIRCPPacket packet;
 
     packet.setType(TYPE::DATA);
     packet.setPayload(payload, len);
+
+    return packet;
+}
+
+HIRCPPacket HIRCPPacket::createTRQPacket()
+{
+    HIRCPPacket packet;
+
+    packet.setType(TYPE::TRQ);
 
     return packet;
 }

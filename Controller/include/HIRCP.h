@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 3, 2016
+// March 4, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_H_
@@ -63,7 +63,9 @@ public:
     void populate(unsigned char *buf, int len);
 
     /* Static methods */
+    static HIRCPPacket createCRQPacket();
     static HIRCPPacket createDATAPacket(unsigned char *payload, int len);
+    static HIRCPPacket createTRQPacket();
     static HIRCPPacket createEmptyPacket();
 
 private:

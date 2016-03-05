@@ -277,11 +277,11 @@ void LeapMotionManager::serialize(LeapData &leapAngles, unsigned char *buf,
         // Stores angle sequentially in buf
         //
         buf[bufIndex++] = angle;
-        std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
+        //std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << " ";
     }
     buf[bufIndex++] = leapAngles.wristAngle;
-    std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
-    std::cout << std::endl;
+    //std::cout << static_cast<unsigned int>(buf[bufIndex - 1]) << std::endl;
+    //std::cout << std::endl;
 }
 
 //*****************************************************************************
