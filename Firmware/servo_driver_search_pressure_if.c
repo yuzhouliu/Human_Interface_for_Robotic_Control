@@ -35,7 +35,6 @@
 #include "servo_driver_search_pressure_if.h"
 #include "servo_driver.h"
 #include "adc_driver_if.h"
-#include "msg_util_if.h"
 
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
@@ -195,4 +194,15 @@ unsigned short GetFingerTolerance( enum Fingertip_Sensor_Type eSensorJoint )
 		default:
 			return 0;
 	}
+}
+
+//****************************************************************************
+// Converts 16-bit unsigned short to 2 8-bit unsigned chars
+// highByte is MSB, lowByte is LSB following Big Endian notation
+//****************************************************************************
+void UnsignedShort_to_UnsignedChar(unsigned short input_16_bits, unsigned char *highByte, unsigned char *lowByte)
+{
+    *highByte = (input_16_bits >> 8) & 0xFF;         // MSB
+    *lowByte = input_16_bits & 0xFF;                 // LSB
+    return;
 }

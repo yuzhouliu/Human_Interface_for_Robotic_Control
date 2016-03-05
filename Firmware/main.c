@@ -10,9 +10,9 @@
 // CC3200-LAUNCHXL sample projects. Copyright notice is moved to the end of
 // this file.
 //
-// Created: Dec 21 2015
+// Created: December 21, 2015
 //
-// Modified: March 4, 2016
+// Modified: March 5, 2016
 //
 //*****************************************************************************
 // Standard includes
@@ -49,7 +49,6 @@
 #include "servo_driver_if.h"
 #include "servo_driver_search_pressure_if.h"
 #include "adc_driver_if.h"
-#include "msg_util_if.h"
 //#include "adc_break_out_if.h"
 #include "i2c_if.h"
 
@@ -107,6 +106,7 @@ static void DisplayBanner(char * AppName)
     Report("\t\t *************************************************\n\r");
     Report("\n\n\n\r");
 }
+
 //*****************************************************************************
 //
 //! Board Initialization & Configuration
@@ -153,6 +153,7 @@ void main()
     unsigned short adc_reading;
     int i;
     int freeMovementMode = 0;		// TODO Testing, remove later
+    tBoolean connected;
 
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
     HIRCP_Packet *recvPacket = HIRCP_CreatePacket();
@@ -183,68 +184,107 @@ void main()
     InitSensorADC();
 
     // Connect to WIFI using default info
-    WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
+    //WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
+    WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
-    // Setup the TCP Server Socket
+    // Setup the TCP Server Socket for listening
     BsdTcpServerSetup(PORT_NUM);
 
-    while (lRetVal >= 0)
+    while (TRUE)
     {
-        // Receive packet data
-    	lRetVal = BsdTcpServerReceive(recv_data, HIRCP_MAX_PACKET_LEN);
-
-    	// Populates packet structure and checks validity
-    	HIRCP_Populate(recvPacket, recv_data, HIRCP_MAX_PACKET_LEN);
-    	if (HIRCP_IsValid(recvPacket) && (HIRCP_GetType(recvPacket) == HIRCP_DATA))
-    	{
-    	    // Get packet payload
-    	    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN)
-    	    UART_PRINT("Received DATA packet.\n\r");
-    	}
-    	else
-    	{
-    	    // TODO (Brandon): Handle invalid packets
-    	}
-
-        if (freeMovementMode)
+        connected = false;
+        while (!connected)
         {
-            // Moves servo motors using data from packet
-            for (i = 0; i<NUM_SERVOS; i++)
+            // Accept incoming connections
+            BsdTcpServerAccept();
+
+            if (!HIRCP_InitiateConnectionSequence())
             {
-            	MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
+                UART_PRINT("Received invalid packet... aborting connection\n\r");
+                continue;
             }
 
-            // Gets pressure readings from sensors and populates buffer to be used as payload for sending
-            for (i = 0; i<NUM_SENSORS; i++)
-            {
-            	adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
-            	UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
-
-            	UnsignedShort_to_UnsignedChar(adc_reading, &highByte, &lowByte);
-                send_payload[i*2] = (char)highByte;
-                send_payload[i*2+1] = (char)lowByte;
-            }
+            connected = true;
         }
-        else
+
+        while (lRetVal >= 0)
         {
-            MoveServo_SearchPressure(CMD_CLOSE, send_payload);
-        }
+            // Receive packet data
+            lRetVal = BsdTcpServerReceive(recv_data, HIRCP_MAX_PACKET_LEN);
 
-        // Configure packet fields and gets packet data to send
-        HIRCP_SetType(sendPacket, HIRCP_DACK);
-        HIRCP_SetPayload(sendPacket, send_payload, HIRCP_MAX_PAYLOAD_LEN);
-        HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
-    	
-        // Sends data
-    	lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
-    	UART_PRINT("Sent DACK packet.\n\r");
+            // Populates packet structure and checks validity
+            HIRCP_Populate(recvPacket, recv_data, HIRCP_MAX_PACKET_LEN);
+            if (HIRCP_IsValid(recvPacket))
+            {
+                if (HIRCP_GetType(recvPacket) == HIRCP_DATA)
+                {
+                    // Get packet payload
+                    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN);
+                    UART_PRINT("Received DATA packet.\n\r");
+                }
+                else if (HIRCP_GetType(recvPacket) == HIRCP_TRQ)
+                {
+                    UART_PRINT("Received TRQ packet.\n\r");
+                    HIRCP_InitiateTerminationSequence();
+                    break;
+                }
+                else
+                {
+                    // TODO (Brandon): Handle invalid types
+                    continue;
+                }
+            }
+            else
+            {
+                // TODO (Brandon): Handle invalid packets
+                continue;
+            }
+
+            if (freeMovementMode)
+            {
+                // Moves servo motors using data from packet
+                for (i = 0; i<NUM_SERVOS; i++)
+                {
+                    //MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
+                }
+
+                // Gets pressure readings from sensors and populates buffer to be used as payload for sending
+                for (i = 0; i<NUM_SENSORS; i++)
+                {
+                    //adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
+                    adc_reading = 2048;
+                    UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
+
+                    UnsignedShort_to_UnsignedChar(adc_reading, &highByte, &lowByte);
+                    send_payload[i*2] = (char)highByte;
+                    send_payload[i*2+1] = (char)lowByte;
+                }
+            }
+            else
+            {
+                MoveServo_SearchPressure(CMD_CLOSE, send_payload);
+            }
+
+            // Configure packet fields and gets packet data to send
+            HIRCP_SetType(sendPacket, HIRCP_DACK);
+            HIRCP_SetPayload(sendPacket, send_payload, HIRCP_MAX_PAYLOAD_LEN);
+            HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
+
+            // Sends data
+            lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
+            UART_PRINT("Sent DACK packet.\n\r");
+        }
     }
+
     UART_PRINT("Exiting Application ...\n\r");
 
     // Frees resources held by HIRCP_Packet
     HIRCP_DestroyPacket(sendPacket);
     HIRCP_DestroyPacket(recvPacket);
+
+    // Closes listening socket
+    BsdTcpServerClose();
 
     // Power off the network processor
     lRetVal = sl_Stop(SL_STOP_TIMEOUT);

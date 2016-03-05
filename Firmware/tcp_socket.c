@@ -15,9 +15,9 @@
 //
 // Author: Minh Mai
 //
-// Created: Dec 20 2015
+// Created: December 20, 2015
 //
-// Modified: March 4, 2016
+// Modified: March 5, 2016
 //
 //*****************************************************************************
 
@@ -181,6 +181,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
     UpdateIPtoServer(ipString);
     return SUCCESS;
 }
+
 //****************************************************************************
 //
 //! \brief Opening a TCP server side socket
@@ -195,7 +196,6 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 //****************************************************************************
 int BsdTcpServerSetup(unsigned short usPort)
 {
-    SlSockAddrIn_t  sAddr;
     SlSockAddrIn_t  sLocalAddr;
     int             iCounter;
     int             iAddrSize;
@@ -245,10 +245,20 @@ int BsdTcpServerSetup(unsigned short usPort)
         sl_Close(ServerSockID);
         ASSERT_ON_ERROR(SOCKET_OPT_ERROR);
     }
-    ServerNewSockID = SL_EAGAIN;
 
     UART_PRINT("SERVER SOCKET CREATED AT PORT: %d, SOCKID: %d.\n\r", usPort, ServerSockID);
+    return SUCCESS;
+}
+
+int BsdTcpServerAccept()
+{
+    SlSockAddrIn_t  sAddr;
+    int iAddrSize;
+
+    iAddrSize = sizeof(SlSockAddrIn_t);
+
     UART_PRINT("WAIT FOR CLIENT TO CONNECT....\n\r");
+    ServerNewSockID = SL_EAGAIN;
 
     // waiting for an incoming TCP connection
     while( ServerNewSockID < 0 )
@@ -271,7 +281,6 @@ int BsdTcpServerSetup(unsigned short usPort)
         }
     }
     UART_PRINT("CLIENT CONNECTED. new SOCKID: %d.\n\r",ServerNewSockID);
-    return SUCCESS;
 }
 
 //****************************************************************************

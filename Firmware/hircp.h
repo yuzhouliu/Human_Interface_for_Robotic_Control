@@ -11,7 +11,7 @@
 // March 4, 2016
 //
 // Modified:
-// March 4, 2016
+// March 5, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_C_
@@ -48,8 +48,9 @@ typedef enum HIRCP_Type
 
 typedef struct HIRCP_Packet HIRCP_Packet;
 
-HIRCP_Packet *HIRCP_CreatePacket();
+HIRCP_Packet *HIRCP_CreatePacket(void);
 void HIRCP_DestroyPacket(HIRCP_Packet *packet);
+void HIRCP_ClearPacket(HIRCP_Packet *packet);
 tBoolean HIRCP_IsValid(HIRCP_Packet *packet);
 void HIRCP_SetType(HIRCP_Packet *packet, HIRCP_Type type);
 HIRCP_Type HIRCP_GetType(HIRCP_Packet *packet);
@@ -57,5 +58,7 @@ void HIRCP_SetPayload(HIRCP_Packet *packet, unsigned char *payload, int len);
 void HIRCP_GetPayload(HIRCP_Packet *packet, unsigned char *payload, int len);
 void HIRCP_GetData(HIRCP_Packet *packet, unsigned char *data, int len);
 void HIRCP_Populate(HIRCP_Packet *packet, unsigned char *data, int len);
+tBoolean HIRCP_InitiateConnectionSequence(void);
+tBoolean HIRCP_InitiateTerminationSequence(void);
 
 #endif /* _HIRCP_C_ */
