@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// March 3, 2016
+// March 5, 2016
 //
 //*****************************************************************************
 #ifndef _WINDOW_H_
@@ -74,6 +74,7 @@ private:
     void _terminate();
     void _processInput();
     bool _saveIPAddress(std::string ipAddress);
+    bool _getRemoteIPAddress(char *buf, int buflen);
 
 public:
     /* Fields */
