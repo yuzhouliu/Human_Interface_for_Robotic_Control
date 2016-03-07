@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 4, 2016
+// March 7, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -33,8 +33,8 @@
 //
 //*****************************************************************************
 Panel::Panel(Window *window, SDL_Window *sdlWindow)
-    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr), _connected(false),
-    _cachedFPS(0)
+    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr),
+    _connected(false), _cachedFPS(0)
 {
     //
     // Initialize panel

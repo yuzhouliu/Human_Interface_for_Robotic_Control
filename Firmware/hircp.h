@@ -11,7 +11,7 @@
 // March 4, 2016
 //
 // Modified:
-// March 5, 2016
+// March 7, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_C_
@@ -19,6 +19,9 @@
 
 #include "hw_types.h"   /* tBoolean */
 
+//****************************************************************************
+//         	                    CONSTANTS
+//****************************************************************************
 #define HIRCP_CRQ_PAYLOAD_LEN 0
 #define HIRCP_CACK_PAYLOAD_LEN 0
 #define HIRCP_DATA_PAYLOAD_LEN 6
@@ -46,8 +49,16 @@ typedef enum HIRCP_Type
     HIRCP_ERR,
 } HIRCP_Type;
 
+
+//****************************************************************************
+//         	                    DATA STRUCTURES
+//****************************************************************************
 typedef struct HIRCP_Packet HIRCP_Packet;
 
+
+//****************************************************************************
+//         	                    INTERFACE FUNCTIONS
+//****************************************************************************
 HIRCP_Packet *HIRCP_CreatePacket(void);
 void HIRCP_DestroyPacket(HIRCP_Packet *packet);
 void HIRCP_ClearPacket(HIRCP_Packet *packet);
@@ -62,3 +73,4 @@ tBoolean HIRCP_InitiateConnectionSequence(void);
 tBoolean HIRCP_InitiateTerminationSequence(void);
 
 #endif /* _HIRCP_C_ */
+
