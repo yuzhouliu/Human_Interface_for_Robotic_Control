@@ -144,10 +144,10 @@ static void BoardInit(void)
 void main()
 {
     long lRetVal = 0;
-    char recv_data[HIRCP_MAX_PACKET_LEN];
-    char send_data[HIRCP_MAX_PACKET_LEN];
-    char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
-    char send_payload[HIRCP_MAX_PAYLOAD_LEN];
+    unsigned char recv_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char send_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
+    unsigned char send_payload[HIRCP_MAX_PAYLOAD_LEN];
     unsigned char highByte, lowByte;
     unsigned short adc_reading;
     int i;
@@ -183,8 +183,8 @@ void main()
     InitSensorADC();
 
     // Connect to WIFI using default info
-    //WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
-    WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
+    WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
+    //WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
     // Setup the TCP Server Socket for listening
@@ -286,14 +286,10 @@ void main()
             }
             UART_PRINT("Sent DACK packet.\n\r");
         }
+        // Frees resources held by HIRCP_Packet
+        HIRCP_DestroyPacket(sendPacket);
+        HIRCP_DestroyPacket(recvPacket);
     }
-
-    UART_PRINT("Exiting Application ...\n\r");
-
-    // Frees resources held by HIRCP_Packet
-    HIRCP_DestroyPacket(sendPacket);
-    HIRCP_DestroyPacket(recvPacket);
-
     // Closes listening socket
     BsdTcpServerClose();
 

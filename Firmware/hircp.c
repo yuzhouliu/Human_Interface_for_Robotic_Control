@@ -23,6 +23,26 @@
 #include "common.h"
 #include "tcp_socket.h"
 
+// driverlib includes
+#include "hw_ints.h"
+#include "hw_types.h"
+#include "hw_memmap.h"
+#include "hw_apps_rcm.h"
+#include "hw_common_reg.h"
+#include "rom.h"
+#include "timer.h"
+#include "rom_map.h"
+#include "interrupt.h"
+#include "prcm.h"
+#include "uart.h"
+#include "utils.h"
+// common interface includes
+#include "udma_if.h"
+#include "common.h"
+#ifndef NOTERM
+#include "uart_if.h"
+#endif
+
 const unsigned char HIRCP_CONSTANT[] = "HIRC";
 
 //
@@ -244,8 +264,8 @@ void HIRCP_Populate(HIRCP_Packet *packet, unsigned char *data, int len)
 tBoolean HIRCP_InitiateConnectionSequence(void)
 {
     long lRetVal = 0;
-    char recv_data[HIRCP_MAX_PACKET_LEN];
-    char send_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char recv_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char send_data[HIRCP_MAX_PACKET_LEN];
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
     HIRCP_Packet *recvPacket = HIRCP_CreatePacket();
 
@@ -262,6 +282,7 @@ tBoolean HIRCP_InitiateConnectionSequence(void)
     {
         return false;
     }
+
     UART_PRINT("Received CRQ packet.\n\r");
 
     //
@@ -295,7 +316,7 @@ tBoolean HIRCP_InitiateConnectionSequence(void)
 tBoolean HIRCP_InitiateTerminationSequence(void)
 {
     long lRetVal = 0;
-    char send_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char send_data[HIRCP_MAX_PACKET_LEN];
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
 
     //

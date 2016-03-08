@@ -39,7 +39,7 @@
 //****************************************************************************
 // Moves the servo motor by degrees on the finger specified
 //****************************************************************************
-void MoveServo_SearchPressure(unsigned char ucCommand, char * data)
+void MoveServo_SearchPressure(unsigned char ucCommand, unsigned char * data)
 {
     static struct ServoPosition ServoPositionRecord;    // Track current position
     unsigned char ucDegreesCurrent;                     // Current Position of finger

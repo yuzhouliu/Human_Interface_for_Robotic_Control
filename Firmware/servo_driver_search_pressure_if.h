@@ -56,7 +56,7 @@ struct ServoPosition {
 // Moves the servo motor by degrees on the finger specified
 // Moves in increments, checking to see if pressure is over threshold
 //****************************************************************************
-void MoveServo_SearchPressure(unsigned char ucCommand, char * data);
+void MoveServo_SearchPressure(unsigned char ucCommand, unsigned char * data);
 
 //****************************************************************************
 // Gets the current position of the servo from the ServoPosition struct

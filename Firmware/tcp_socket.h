@@ -69,11 +69,10 @@ typedef enum{
 long WlanStart();//start the Wlan
 long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
-int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
 int BsdTcpServerAccept(); //Accept connection
-int BsdTcpServerReceive(char *data, int len);//Recieve data
-int BsdTcpServerSend(char *data, int length); //send data
+int BsdTcpServerReceive(unsigned char *data, int len);//Recieve data
+int BsdTcpServerSend(unsigned char *data, int length); //send data
 int BsdTcpServerClose();//Close the TCP socket
 int IpAddressParser(char *ucCMD);//convert string IP address to hex IP address
 

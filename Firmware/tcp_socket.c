@@ -196,7 +196,6 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 int BsdTcpServerSetup(unsigned short usPort)
 {
     SlSockAddrIn_t  sLocalAddr;
-    int             iCounter;
     int             iAddrSize;
     int             iStatus;
     long            lNonBlocking = 1;
@@ -236,9 +235,11 @@ int BsdTcpServerSetup(unsigned short usPort)
         ASSERT_ON_ERROR(LISTEN_ERROR);
     }
 
+    //The code should be BLOCKING
+    //TO-DO: investigate the effects of BLOCKING CODE, SO FAR SO GOOD
     // setting socket option to make the socket as non blocking
-    iStatus = sl_SetSockOpt(ServerSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
-                            &lNonBlocking, sizeof(lNonBlocking));
+    /* iStatus = sl_SetSockOpt(ServerSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
+                           &lNonBlocking, sizeof(lNonBlocking)); */
     if( iStatus < 0 )
     {
         sl_Close(ServerSockID);
@@ -286,7 +287,6 @@ int BsdTcpServerAccept()
         // otherwise returns SL_EAGAIN
     	ServerNewSockID = sl_Accept(ServerSockID, ( struct SlSockAddr_t *)&sAddr,
                                 (SlSocklen_t*)&iAddrSize);
-
         if( ServerNewSockID == SL_EAGAIN )
         {
            MAP_UtilsDelay(10000);
@@ -300,7 +300,6 @@ int BsdTcpServerAccept()
         }
     }
     UART_PRINT("CLIENT CONNECTED. new SOCKID: %d.\n\r",ServerNewSockID);
-
     return SUCCESS;
 }
 
@@ -314,11 +313,11 @@ int BsdTcpServerAccept()
 //! \return     0 on success, -1 on error.
 //!
 //****************************************************************************
-int BsdTcpServerReceive(char *data, int len)
+int BsdTcpServerReceive(unsigned char *data, int len)
 {
     int iStatus;
 
-    iStatus = sl_Recv(ServerNewSockID, data, len, 0);
+    iStatus = sl_Recv(ServerNewSockID, (void*) data, len, 0);
     if( iStatus <= 0 )
     {
        // error
@@ -342,9 +341,9 @@ int BsdTcpServerReceive(char *data, int len)
 //! \return     0 on success, -1 on error.
 //!
 //****************************************************************************
-int BsdTcpServerSend(char *data, int length)
+int BsdTcpServerSend(unsigned char *data, int length)
 {
-	return sl_Send(ServerNewSockID, data, length, 0);
+	return sl_Send(ServerNewSockID, (void*) data, length, 0);
 }
 
 //****************************************************************************
