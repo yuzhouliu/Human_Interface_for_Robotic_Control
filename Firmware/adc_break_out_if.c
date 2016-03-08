@@ -1,4 +1,5 @@
 //*****************************************************************************
+//
 // adc_break_out_if.c
 //
 // This implements the driver for Adafruit ADS1015 ADC breakout board
@@ -12,9 +13,9 @@
 //
 // Author: Minh Mai
 //
-// Created: February 16 2016
+// Created: February 16, 2016
 //
-// Modified: February 16 2016
+// Modified: February 16, 2016
 //
 //*****************************************************************************
 #include "adc_break_out_if.h"

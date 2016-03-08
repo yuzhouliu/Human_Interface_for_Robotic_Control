@@ -1,4 +1,5 @@
 //*****************************************************************************
+//
 // tcp_socket.c
 //
 // This implements TCP socket on TI CC3200 by providing those functions:
@@ -17,7 +18,7 @@
 //
 // Created: December 20, 2015
 //
-// Modified: March 5, 2016
+// Modified: March 8, 2016
 //
 //*****************************************************************************
 
@@ -90,7 +91,7 @@ static int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 
 //****************************************************************************
 //
-// Start the SimpleLink in Station Mode in order to connect to a WIFI Router
+//! Start the SimpleLink in Station Mode in order to connect to a WIFI Router
 //!
 //! \return     0 on success, -1 on error.
 //!
@@ -171,7 +172,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
         _SlNonOsMainLoopTask();
 #endif
     }
-    sprintf(ipString,"%d.%d.%d.%d", 
+    sprintf(ipString,"%d.%d.%d.%d",
                     SL_IPV4_BYTE(g_ulIpAddr,3),
                     SL_IPV4_BYTE(g_ulIpAddr,2),
                     SL_IPV4_BYTE(g_ulIpAddr,1),
@@ -191,8 +192,6 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 //!
 //! \return     0 on success, -1 on error.
 //!
-//! \note   This function will wait for an incoming connection till
-//!                     one is established
 //****************************************************************************
 int BsdTcpServerSetup(unsigned short usPort)
 {
@@ -250,6 +249,18 @@ int BsdTcpServerSetup(unsigned short usPort)
     return SUCCESS;
 }
 
+//****************************************************************************
+//
+//! \brief Accept incoming client connection.
+//!
+//! \param None
+//!
+//! \return     0 on success, -1 on error.
+//!
+//! \note   This function will wait for an incoming connection till
+//!                     one is established
+//
+//****************************************************************************
 int BsdTcpServerAccept()
 {
     SlSockAddrIn_t  sAddr;
@@ -866,12 +877,12 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
         case SL_SOCKET_TX_FAILED_EVENT:
             switch( pSock->socketAsyncEvent.SockTxFailData.status)
             {
-                case SL_ECLOSE: 
+                case SL_ECLOSE:
                     UART_PRINT("[SOCK ERROR] - close socket (%d) operation "
                                 "failed to transmit all queued packets\n\n", 
                                     pSock->socketAsyncEvent.SockTxFailData.sd);
                     break;
-                default: 
+                default:
                     UART_PRINT("[SOCK ERROR] - TX FAILED  :  socket %d , reason "
                                 "(%d) \n\n",
                                 pSock->socketAsyncEvent.SockTxFailData.sd, \

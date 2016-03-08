@@ -1,4 +1,5 @@
 //*****************************************************************************
+//
 // tcp_socket.h
 //
 // TCP socket on TI CC3200 by providing those functions:
@@ -17,7 +18,7 @@
 //
 // Created: December 20, 2015
 //
-// Modified: March 5, 2016
+// Modified: March 8, 2016
 //
 //****************************************************************************
 // simplelink includes
@@ -70,7 +71,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, \
                     char*cSecurityKey); //connect to the WIFI network
 int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 int BsdTcpServerSetup(unsigned short usPort); //Create a TCP server socket
-int BsdTcpServerAccept();
+int BsdTcpServerAccept(); //Accept connection
 int BsdTcpServerReceive(char *data, int len);//Recieve data
 int BsdTcpServerSend(char *data, int length); //send data
 int BsdTcpServerClose();//Close the TCP socket

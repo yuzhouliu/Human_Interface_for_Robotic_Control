@@ -1,4 +1,5 @@
 //*****************************************************************************
+//
 // pwm_break_out_if.h
 //
 // This is the driver library for Adafruit PCA9685 16 x 12 bit PWM board
@@ -8,9 +9,9 @@
 //
 // Author: Minh Mai
 //
-// Created: February 16 2016
+// Created: February 16, 2016
 //
-// Modified: February 16 2016
+// Modified: February 16, 2016
 //
 //*****************************************************************************
 
