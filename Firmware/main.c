@@ -286,10 +286,12 @@ void main()
             }
             UART_PRINT("Sent DACK packet.\n\r");
         }
-        // Frees resources held by HIRCP_Packet
-        HIRCP_DestroyPacket(sendPacket);
-        HIRCP_DestroyPacket(recvPacket);
     }
+
+    // Frees resources held by HIRCP_Packet
+    HIRCP_DestroyPacket(sendPacket);
+    HIRCP_DestroyPacket(recvPacket);
+
     // Closes listening socket
     BsdTcpServerClose();
 
