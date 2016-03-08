@@ -1,4 +1,5 @@
 //*****************************************************************************
+//
 // tcp_socket.c
 //
 // This implements TCP socket on TI CC3200 by providing those functions:
@@ -15,9 +16,9 @@
 //
 // Author: Minh Mai
 //
-// Created: Dec 20 2015
+// Created: December 20, 2015
 //
-// Modified: Dec 28 2015
+// Modified: March 8, 2016
 //
 //*****************************************************************************
 
@@ -69,7 +70,6 @@ volatile unsigned long  g_ulPacketCount = TCP_PACKET_COUNT;
 unsigned char  g_ucConnectionStatus = 0;
 unsigned char  g_ucSimplelinkstarted = 0;
 unsigned long  g_ulIpAddr = 0;
-char g_cBsdBuf[BUF_SIZE];
 int ServerSockID; //Hold Server Socket ID
 int ServerNewSockID; // Hold New Server Socket ID for Client
 //*****************************************************************************
@@ -91,7 +91,7 @@ static int UpdateIPtoServer(char *ipAddr);//update the ipAddr to the Server
 
 //****************************************************************************
 //
-// Start the SimpleLink in Station Mode in order to connect to a WIFI Router
+//! Start the SimpleLink in Station Mode in order to connect to a WIFI Router
 //!
 //! \return     0 on success, -1 on error.
 //!
@@ -172,7 +172,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
         _SlNonOsMainLoopTask();
 #endif
     }
-    sprintf(ipString,"%d.%d.%d.%d", 
+    sprintf(ipString,"%d.%d.%d.%d",
                     SL_IPV4_BYTE(g_ulIpAddr,3),
                     SL_IPV4_BYTE(g_ulIpAddr,2),
                     SL_IPV4_BYTE(g_ulIpAddr,1),
@@ -182,6 +182,7 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
     UpdateIPtoServer(ipString);
     return SUCCESS;
 }
+
 //****************************************************************************
 //
 //! \brief Opening a TCP server side socket
@@ -191,12 +192,9 @@ long WlanConnect(char *cSSID, char *cSecurityType, char*cSecurityKey)
 //!
 //! \return     0 on success, -1 on error.
 //!
-//! \note   This function will wait for an incoming connection till
-//!                     one is established
 //****************************************************************************
 int BsdTcpServerSetup(unsigned short usPort)
 {
-    SlSockAddrIn_t  sAddr;
     SlSockAddrIn_t  sLocalAddr;
     int             iCounter;
     int             iAddrSize;
@@ -205,12 +203,6 @@ int BsdTcpServerSetup(unsigned short usPort)
 
     //Set variables for the socket
     SetSocketVariables();
-
-    // filling the buffer
-    for (iCounter=0 ; iCounter<BUF_SIZE ; iCounter++)
-    {
-        g_cBsdBuf[iCounter] = (char)(iCounter % 10);
-    }
 
     //filling the TCP server socket address
     sLocalAddr.sin_family = SL_AF_INET;
@@ -252,10 +244,40 @@ int BsdTcpServerSetup(unsigned short usPort)
         sl_Close(ServerSockID);
         ASSERT_ON_ERROR(SOCKET_OPT_ERROR);
     }
-    ServerNewSockID = SL_EAGAIN;
 
     UART_PRINT("SERVER SOCKET CREATED AT PORT: %d, SOCKID: %d.\n\r", usPort, ServerSockID);
+    return SUCCESS;
+}
+
+//****************************************************************************
+//
+//! \brief Accept incoming client connection.
+//!
+//! \param None
+//!
+//! \return     0 on success, -1 on error.
+//!
+//! \note   This function will wait for an incoming connection till
+//!                     one is established
+//
+//****************************************************************************
+int BsdTcpServerAccept()
+{
+    SlSockAddrIn_t  sAddr;
+    int iAddrSize;
+    int iStatus;
+
+    iAddrSize = sizeof(SlSockAddrIn_t);
+
     UART_PRINT("WAIT FOR CLIENT TO CONNECT....\n\r");
+
+    // Close previous connected socket
+    if (ServerNewSockID != SL_EAGAIN)
+    {
+    	iStatus = sl_Close(ServerNewSockID);
+    }
+
+    ServerNewSockID = SL_EAGAIN;
 
     // waiting for an incoming TCP connection
     while( ServerNewSockID < 0 )
@@ -278,6 +300,7 @@ int BsdTcpServerSetup(unsigned short usPort)
         }
     }
     UART_PRINT("CLIENT CONNECTED. new SOCKID: %d.\n\r",ServerNewSockID);
+
     return SUCCESS;
 }
 
@@ -286,15 +309,16 @@ int BsdTcpServerSetup(unsigned short usPort)
 //! \brief Recieving data from the client
 //!
 //! \param [in]: pointer to data, the recieving packet will be store in data
+//! \param [in]: length of data buffer
 //!
 //! \return     0 on success, -1 on error.
 //!
 //****************************************************************************
-int BsdTcpServerReceive(char *data)
+int BsdTcpServerReceive(char *data, int len)
 {
     int iStatus;
 
-    iStatus = sl_Recv(ServerNewSockID, g_cBsdBuf, BUF_SIZE, 0);
+    iStatus = sl_Recv(ServerNewSockID, data, len, 0);
     if( iStatus <= 0 )
     {
        // error
@@ -304,8 +328,7 @@ int BsdTcpServerReceive(char *data)
     }
     else
     {
-        UART_PRINT("RECEIVED BUFF:%s\n\r", g_cBsdBuf);
-        strcpy(data, g_cBsdBuf);
+        UART_PRINT("RECEIVED BUFF:%s\n\r", data);
     }
     return SUCCESS;
 }
@@ -854,12 +877,12 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
         case SL_SOCKET_TX_FAILED_EVENT:
             switch( pSock->socketAsyncEvent.SockTxFailData.status)
             {
-                case SL_ECLOSE: 
+                case SL_ECLOSE:
                     UART_PRINT("[SOCK ERROR] - close socket (%d) operation "
                                 "failed to transmit all queued packets\n\n", 
                                     pSock->socketAsyncEvent.SockTxFailData.sd);
                     break;
-                default: 
+                default:
                     UART_PRINT("[SOCK ERROR] - TX FAILED  :  socket %d , reason "
                                 "(%d) \n\n",
                                 pSock->socketAsyncEvent.SockTxFailData.sd, \

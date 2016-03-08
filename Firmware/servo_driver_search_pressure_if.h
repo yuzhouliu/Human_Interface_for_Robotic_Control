@@ -73,4 +73,10 @@ void SetFingerPosition(struct ServoPosition *PositionRecord, enum Fingertip_Sens
 //****************************************************************************
 unsigned short GetFingerTolerance( enum Fingertip_Sensor_Type eSensorJoint );
 
+//****************************************************************************
+// Converts 16-bit unsigned short to 2 8-bit unsigned chars
+// highByte is MSB, lowByte is LSB following Big Endian notation
+//****************************************************************************
+void UnsignedShort_to_UnsignedChar(unsigned short input_16_bits, unsigned char *highByte, unsigned char *lowByte);
+
 #endif //  __SERVO_DRIVER_IF_H__

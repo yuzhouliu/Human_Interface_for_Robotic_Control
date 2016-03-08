@@ -11,12 +11,13 @@
 // December 27, 2015
 //
 // Modified:
-// Feburary 23, 2016
+// March 5, 2016
 //
 //*****************************************************************************
 #include "Window.h"
 
 #include <Commdlg.h> /* OPENFILENAME */
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -25,6 +26,7 @@
 #include <SDL_syswm.h>
 
 #include "IPv4Address.h"
+#include "TCPSocket.h"
 
 #include "resource.h"
 
@@ -101,6 +103,7 @@ bool Window::run()
     // Creates panel
     //
     _panel = std::shared_ptr<Panel>(new Panel(this, _window));
+    _panel->addObserver(this);
 
     //
     // Creates thread
@@ -253,6 +256,63 @@ void Window::_processInput()
                         MAKEINTRESOURCE(IDD_CONNECT), NULL,
                         Window::ConnectDlgProcRouter, (LPARAM)(this));
                     break;
+                case ID_FILE_AUTO:
+                {
+                    //
+                    // File -> Auto-connect
+                    //
+                    char ipAddress[IPv4Address::MAX_IP_ADDR_BUF_LEN];
+
+                    // Fetch IP address from server
+                    if (!_getRemoteIPAddress(ipAddress,
+                        IPv4Address::MAX_IP_ADDR_BUF_LEN))
+                    {
+                        //
+                        // Creates daemon thread
+                        //
+                        std::thread messageBoxThread(messageBoxTask,
+                            _windowHandle,
+                            "Unable to fetch IP address from server",
+                            "Auto-connect failed");
+                        messageBoxThread.detach();
+                        break;
+                    }
+
+                    if (!IPv4Address::validateIPAddress(ipAddress))
+                    {
+                        //
+                        // Creates daemon thread
+                        //
+                        std::thread messageBoxThread(messageBoxTask,
+                            _windowHandle,
+                            "Invalid IP address found from server",
+                            "Auto-connect failed");
+                        messageBoxThread.detach();
+                        break;
+                    }
+
+                    //
+                    // Connect to remote host
+                    //
+                    if (!_panel->connect(ipAddress))
+                    {
+                        //
+                        // Creates daemon thread
+                        //
+                        std::thread messageBoxThread(messageBoxTask,
+                            _windowHandle,
+                            "Unable to auto-connect to remote host",
+                            "Auto-connect failed");
+                        messageBoxThread.detach();
+                        break;
+                    }
+
+                    EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_FILE_CONNECT, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_FILE_AUTO, MF_GRAYED);
+                    EndDialog(_windowHandle, 0);
+                    break;
+                }
                 case ID_FILE_DISCONNECT:
                     //
                     // File -> Disconnect
@@ -260,6 +320,7 @@ void Window::_processInput()
                     _panel->disconnect();
                     EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_GRAYED);
                     EnableMenuItem(_menu, ID_FILE_CONNECT, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_FILE_AUTO, MF_ENABLED);
                     break;
                 case ID_FILE_QUIT:
                     //
@@ -378,7 +439,7 @@ void Window::_processInput()
 
 //*****************************************************************************
 //
-//! Save IP address to file
+//! Save IP address to file.
 //!
 //! \param ipAddress IP address to save.
 //!
@@ -406,6 +467,180 @@ bool Window::_saveIPAddress(std::string ipAddress)
     addressFile << ipAddress << std::endl;
 
     addressFile.close();
+    return true;
+}
+
+//*****************************************************************************
+//
+//! Fetches IP address of remote host.
+//!
+//! \param buf buffer to store the fetched IP address.
+//! \param buflen size of buffer.
+//!
+//! \return Returns \b true if the address was fetched successfully and \b
+//! false otherwise.
+//
+//*****************************************************************************
+bool Window::_getRemoteIPAddress(char *buf, int buflen)
+{
+    assert(buflen >= IPv4Address::MAX_IP_ADDR_BUF_LEN);
+    struct hostent *he;
+    struct in_addr **addr_list;
+    char *hostName = "robotarm.net23.net";
+    char *http_request_format = "GET /fetch_ip.php?id=1 HTTP/1.1\r\n"
+                                "Host: %s\r\n"
+                                "\r\n";
+
+    //
+    // Populate hostent structure with IP address information
+    //
+    if ((he = gethostbyname(hostName)) == NULL) 
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Could not locate"\
+            " host." << std::endl;
+        return false;
+    }
+    addr_list = (struct in_addr**)he->h_addr_list;
+     
+    //
+    // Iterate through list of IP addresses and use first one found
+    //
+    char hostAddress[IPv4Address::MAX_IP_ADDR_BUF_LEN];
+    bool hostAddressFound = false;
+    for(int i=0; addr_list[i]!=NULL; i++) 
+    {
+        //The first IP address that matches;
+        strncpy_s(hostAddress, inet_ntoa(*addr_list[i]),
+            IPv4Address::MAX_IP_ADDR_BUF_LEN);
+        hostAddressFound = true;
+    }
+    //std::cout << "Host address = " << hostAddress << std::endl;
+
+    //
+    // Check if an IP address was found
+    //
+    if (!hostAddressFound)
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Host address not"\
+            " found." << std::endl;
+        return false;
+    }
+
+    //
+    // Validate IP address
+    //
+    if (!IPv4Address::validateIPAddress(hostAddress))
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Invalid host "\
+            "address found." << std::endl;
+        return false;
+    }
+
+    //
+    // Creates and opens socket
+    //
+    TCPSocket socket;
+    if (!socket.open())
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Could not open "\
+            "socket." << std::endl;
+        return false;
+    }
+
+    //
+    // Connects to host
+    //
+    const int HTTP_PORT = 80;
+    IPv4Address ipAddress(hostAddress, HTTP_PORT);
+    if (!socket.connect(&ipAddress))
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Could not "\
+            "connect to host." << std::endl;
+        return false;
+    }
+
+    //
+    // Send HTTP request to host
+    //
+    const int MAX_HTTP_BUF_LEN = 256;
+    char http_request[MAX_HTTP_BUF_LEN];
+    sprintf_s(http_request, http_request_format, hostName);
+    //std::cout << "HTTP REQUEST\n" << http_request << std::endl;
+    if (!socket.send((unsigned char*)http_request, MAX_HTTP_BUF_LEN))
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Could not "\
+            "send HTTP request to host." << std::endl;
+        return false;
+    }
+
+    //
+    // Receive HTTP response from host
+    //
+    char http_response[MAX_HTTP_BUF_LEN];
+    if (!socket.recv((unsigned char*)http_response, MAX_HTTP_BUF_LEN))
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Could not "\
+            "receive HTTP response from host." << std::endl;
+        return false;
+    }
+    //std::cout << "HTTP RESPONSE\n" << http_response << std::endl;
+
+    //
+    // Find Content-Length header
+    //
+    int pos = 0;
+    std::string httpResponseString(http_response);
+    std::string contentLengthHeader("Content-Length: ");
+    if ((pos = httpResponseString.find(contentLengthHeader)) ==
+        std::string::npos)
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Content-Length "\
+            "header not present in HTTP response." << std::endl;
+        return false;
+    }
+    httpResponseString.erase(0, pos+contentLengthHeader.length());
+
+    //
+    // Get Content-Length value
+    //
+    std::string CRLF("\r\n");
+    if ((pos = httpResponseString.find(CRLF)) == std::string::npos)
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Content-Length "\
+            "value not present in HTTP response." << std::endl;
+        return false;
+    }
+    std::string contentLengthString = httpResponseString.substr(0, pos);
+    int contentLength = atoi(contentLengthString.c_str());
+
+    //
+    // Get HTTP response body
+    //
+    std::string httpHeaderBodyDelimiter("\r\n\r\n");
+    if ((pos = httpResponseString.find(httpHeaderBodyDelimiter)) ==
+        std::string::npos)
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): Body not present"\
+            " in HTTP response." << std::endl;
+        return false;
+    }
+    httpResponseString.erase(0, pos+httpHeaderBodyDelimiter.length());
+    std::string httpResponseBody = httpResponseString.substr(0, contentLength);
+    std::cout << "HTTP RESPONSE BODY\n" << httpResponseBody << std::endl;
+
+    //
+    // Get IP address from HTTP response body
+    //
+    std::string colonDelimiter(":");
+    if ((pos = httpResponseBody.find(colonDelimiter)) == std::string::npos)
+    {
+        std::cout << "[ERROR] Window::_getRemoteIPAddress(): HTTP response "\
+            "body mal-formed." << std::endl;
+        return false;
+    }
+    std::string ipAddressString = httpResponseBody.substr(0, pos);
+    strncpy_s(buf, buflen, ipAddressString.c_str(), buflen);
+
     return true;
 }
 
@@ -554,7 +789,20 @@ BOOL CALLBACK Window::ConnectDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
                     //
                     // Connect to remote host
                     //
-                    //_panel->connect(addressInput);
+                    if (!_panel->connect(addressInput))
+                    {
+                        //
+                        // Creates daemon thread
+                        //
+                        std::thread messageBoxThread(messageBoxTask,
+                            _windowHandle,
+                            "Unable to connect to remote host",
+                            "Connect failed");
+                        messageBoxThread.detach();
+
+                        EndDialog(hwnd, 0);
+                        break;
+                    }
 
                     //
                     // Insert IP address into combo box and save IP address if
@@ -664,6 +912,24 @@ void Window::onNotify(int event)
 {
     switch (event)
     {
+    case EVENT_DISCONNECTED:
+    {
+        //
+        // Event occurs when PlaybackStreamer reaches end of file
+        //
+        EnableMenuItem(_menu, ID_FILE_DISCONNECT, MF_GRAYED);
+        EnableMenuItem(_menu, ID_FILE_CONNECT, MF_ENABLED);
+        EnableMenuItem(_menu, ID_FILE_AUTO, MF_ENABLED);
+
+        //
+        // Creates daemon thread
+        //
+        std::thread messageBoxThread(messageBoxTask, _windowHandle,
+            "Connection to InMoov lost", "Disconnected");
+        messageBoxThread.detach();
+
+        break;
+    }
     case EVENT_STOP_STREAMING:
     {
         //
@@ -679,7 +945,7 @@ void Window::onNotify(int event)
         // Creates daemon thread
         //
         std::thread messageBoxThread(messageBoxTask, _windowHandle,
-            "Playback Complete", "Playback Complete");
+            "Playback reached end of file", "Playback Complete");
         messageBoxThread.detach();
 
         break;

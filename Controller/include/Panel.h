@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 23, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -28,6 +28,7 @@
 
 #include "FrameRateManager.h"
 #include "Hand.h"
+#include "HIRCP.h"
 #include "IObservable.h"
 #include "Network.h"
 #include "PlaybackRecorder.h"
@@ -36,7 +37,7 @@
 
 class Window;
 
-class Panel
+class Panel : public IObservable
 {
 private:
     /* Fields */
@@ -57,7 +58,7 @@ private:
         FingerPressureStruct &fingerPressures);
     void _render();
     bool _populateFingerPressureStruct(FingerPressureStruct &fingerPressures,
-        unsigned char *buf, unsigned int buflen);
+        HIRCPPacket packet);
 
 public:
     /* Constructor */
@@ -70,8 +71,8 @@ public:
     void run();
     bool connect(char *ipAddressString);
     bool disconnect();
-    bool send(unsigned char *message, unsigned short len);
-    bool recv(unsigned char *message, unsigned short len);
+    bool send(HIRCPPacket &packet);
+    bool recv(HIRCPPacket &packet);
     bool startRecording(char *filePath);
     bool stopRecording();
     bool startStreaming(char *filePath);

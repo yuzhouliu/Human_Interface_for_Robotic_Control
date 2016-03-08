@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// Feburary 29, 2016
+// March 7, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -33,8 +33,8 @@
 //
 //*****************************************************************************
 Panel::Panel(Window *window, SDL_Window *sdlWindow)
-    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr), _connected(false),
-    _cachedFPS(0)
+    : _window(sdlWindow), _renderer(nullptr), _hand(nullptr),
+    _connected(false), _cachedFPS(0)
 {
     //
     // Initialize panel
@@ -101,7 +101,7 @@ void Panel::run()
         //
         for (int i=0; i<NUM_FINGERS; i++)
         {
-            fingerPressures.pressure[i] = 255;
+            fingerPressures.pressure[i] = 0;
         }
 
         //
@@ -127,26 +127,53 @@ void Panel::run()
         if (_connected)
         {
             //
-            // Send data to remote host
+            // Constructs a DATA packet to send over the network
             //
-            if (!send(leapData.data, leapData._MAX_PAYLOAD))
+            HIRCPPacket sendPacket = HIRCPPacket::createDATAPacket(
+                leapData.data, leapData._MAX_PAYLOAD);
+
+            //
+            // Sends DATA packet to remote host
+            //
+            if (!send(sendPacket))
             {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
                 continue;
             }
 
             //
-            // Receive data from remote host
+            // Constructs an empty packet to receive over the network
             //
-            if (!recv(leapData.data, leapData._MAX_PAYLOAD))
+            HIRCPPacket recvPacket = HIRCPPacket::createEmptyPacket();
+
+            //
+            // Receives DATA from remote host
+            //
+            if (!recv(recvPacket))
             {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
                 continue;
+            }
+
+            //
+            // Validate packet and take appropriate measures
+            //
+            if (!recvPacket.isValid() ||
+                (recvPacket.getType() != HIRCPPacket::DACK))
+            {
+                //
+                // TODO (Brandon): Create and send error packet
+                //
             }
 
             //
             // Populates FingerPressureStruct with finger pressure information
             //
-            _populateFingerPressureStruct(fingerPressures, leapData.data,
-                leapData._MAX_PAYLOAD);
+            _populateFingerPressureStruct(fingerPressures, recvPacket);
         }
 
         //
@@ -197,21 +224,84 @@ bool Panel::connect(char *ipAddressString)
     std::lock_guard<std::mutex> lock(_socket_mutex);
 
     //
-    // Opens socket and connects to remote host
+    // Opens socket
     //
     if (!_socket->open())
     {
         return false;
     }
 
+    //
+    // Connects to remote host
+    //
     if (!_socket->connect(&address))
     {
         std::cout << "Unable to connect to " << ipAddressString << std::endl;
         return false;
     }
-    _connected = true;
     std::cout << "Connected to " << ipAddressString << std::endl;
 
+    //
+    // Constructs a CRQ packet to send to remote host
+    //
+    HIRCPPacket crqPacket = HIRCPPacket::createCRQPacket();
+    unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+    crqPacket.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+    std::cout << "Sending packet: ";
+    for (int i = 0; i < HIRCPPacket::MAX_PACKET_SIZE; i++)
+    {
+        std::cout << static_cast<unsigned int>(message[i]) << " ";
+    }
+    std::cout << std::endl;
+
+    //
+    // Sends packet to remote host
+    //
+    if (!_socket->send(message, HIRCPPacket::MAX_PACKET_SIZE))
+    {
+        std::cout << "[ERROR] Panel::connect(): Send failed." << std::endl;
+        return false;
+    }
+
+    //
+    // Creates an empty packet to store CACK received from remote host
+    //
+    HIRCPPacket cackPacket = HIRCPPacket::createEmptyPacket();
+
+    //
+    // Receives packet from remote host
+    //
+    if (!_socket->recv(message, HIRCPPacket::MAX_PACKET_SIZE))
+    {
+        std::cout << "[ERROR] Panel::connect(): Receive failed." << std::endl;
+        return false;
+    }
+
+    std::cout << "Receiving packet: ";
+    for (int i = 0; i < HIRCPPacket::MAX_PACKET_SIZE; i++)
+    {
+        std::cout << static_cast<unsigned int>(message[i]) << " ";
+    }
+    std::cout << std::endl;
+
+    //
+    // Populates packet with received data
+    //
+    cackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+    if (!cackPacket.isValid() || (cackPacket.getType() != HIRCPPacket::CACK))
+    {
+        //
+        // Packet received was not a CACK packet so terminate connection
+        //
+        _socket->close();
+
+        std::cout << "Connection rejected." << std::endl;
+        std::cout << "Disconnected from socket." << std::endl;
+    }
+
+    _connected = true;
     return true;
 }
 
@@ -234,6 +324,66 @@ bool Panel::disconnect()
         //
         std::lock_guard<std::mutex> lock(_socket_mutex);
 
+        //
+        // Constructs a TRQ packet to send to remote host
+        //
+        HIRCPPacket trqPacket = HIRCPPacket::createTRQPacket();
+        unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+        trqPacket.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+        std::cout << "Sending packet: ";
+        for (int i = 0; i < HIRCPPacket::MAX_PACKET_SIZE; i++)
+        {
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
+
+        //
+        // Sends packet to remote host
+        //
+        if (!_socket->send(message, HIRCPPacket::MAX_PACKET_SIZE))
+        {
+            std::cout << "[ERROR] Panel::disconnect(): Send failed." <<
+                std::endl;
+            return false;
+        }
+
+        //
+        // Creates an empty packet to store TACK received from remote host
+        //
+        HIRCPPacket tackPacket = HIRCPPacket::createEmptyPacket();
+
+        //
+        // Receives packet from remote host
+        //
+        if (!_socket->recv(message, HIRCPPacket::MAX_PACKET_SIZE))
+        {
+            std::cout << "[ERROR] Panel::Disconnect(): Receive failed." <<
+                std::endl;
+            return false;
+        }
+
+        std::cout << "Receiving packet: ";
+        for (int i = 0; i < HIRCPPacket::MAX_PACKET_SIZE; i++)
+        {
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
+
+        //
+        // Populates packet with received data
+        //
+        tackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+        if (!tackPacket.isValid() || (tackPacket.getType() != HIRCPPacket::TACK))
+        {
+            //
+            // Packet received was not a TACK packet so terminate connection
+            //
+            std::cout << "Safe disconnection failed... forcing disconnect" <<
+                std::endl;
+        }
+
         _socket->close();
         _connected = false;
 
@@ -249,14 +399,13 @@ bool Panel::disconnect()
 //
 //! Sends data to remote host. Synchronized by mutex.
 //!
-//! \param message buffer containing message to send.
-//! \param len length of the buffer
+//! \param packet HIRCP packet with data to send.
 //!
 //! \return Returns \b true if the packet was sent successfully and \b false
 //! otherwise.
 //
 //*****************************************************************************
-bool Panel::send(unsigned char *message, unsigned short len)
+bool Panel::send(HIRCPPacket &packet)
 {
     if (_connected)
     {
@@ -264,17 +413,33 @@ bool Panel::send(unsigned char *message, unsigned short len)
         // Locks mutex protecting socket
         //
         std::lock_guard<std::mutex> lock(_socket_mutex);
+        
+        //
+        // Get packet data
+        //
+        unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+        packet.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
 
-        if (!_socket->send(message, len))
+        std::cout << "Sending packet: ";
+        for (int i=0; i<HIRCPPacket::MAX_PACKET_SIZE; i++)
         {
-            std::cout << "Send failed." << std::endl;
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
+
+        //
+        // Send packet data to remote host
+        //
+        if (!_socket->send(message, HIRCPPacket::MAX_PACKET_SIZE))
+        {
+            std::cout << "[ERROR] Panel::send(): Send failed." << std::endl;
             return false;
         }
 
         return true;
     }
 
-    std::cout << "Not connected." << std::endl;
+    std::cout << "[WARNING] Panel::send(): Not connected." << std::endl;
     return false;
 }
 
@@ -282,14 +447,13 @@ bool Panel::send(unsigned char *message, unsigned short len)
 //
 //! Receives data from remote host. Synchronized by mutex.
 //!
-//! \param message buffer to store message to be received.
-//! \param len length of the buffer.
+//! \param packet HIRCP packet to hold received data.
 //!
 //! \return Returns \b true if the packet was received successfully and \b
 //! false otherwise.
 //
 //*****************************************************************************
-bool Panel::recv(unsigned char *message, unsigned short len)
+bool Panel::recv(HIRCPPacket &packet)
 {
     if (_connected)
     {
@@ -298,16 +462,36 @@ bool Panel::recv(unsigned char *message, unsigned short len)
         //
         std::lock_guard<std::mutex> lock(_socket_mutex);
 
-        if (!_socket->recv(message, len))
+        //
+        // Buffer to store packet data
+        //
+        unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
+
+        //
+        // Receives packet from remote host
+        //
+        if (!_socket->recv(message, HIRCPPacket::MAX_PACKET_SIZE))
         {
-            std::cout << "Receive failed." << std::endl;
+            std::cout << "[ERROR] Panel::recv(): Receive failed." << std::endl;
             return false;
         }
+
+        //
+        // Populates packet with received data
+        //
+        packet.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+
+        std::cout << "Receiving packet: ";
+        for (int i=0; i<HIRCPPacket::MAX_PACKET_SIZE; i++)
+        {
+            std::cout << static_cast<unsigned int>(message[i]) << " ";
+        }
+        std::cout << std::endl;
 
         return true;
     }
 
-    std::cout << "Not connected." << std::endl;
+    std::cout << "[WARNING] Panel::recv(): Not connected." << std::endl;
     return false;
 }
 
@@ -557,15 +741,14 @@ void Panel::_render()
 //! Populates structure with pressure information decoded from buf.
 //!
 //! \param fingerPressures structure for storing results.
-//! \param buf buffer with encoded pressure data.
-//! \param buflen the size of the buffer.
+//! \param packet HIRCP packet with finger pressure data.
 //!
 //! \return Returns \b true if the structure was populated successfully and
 //! \b false otherwise.
 //
 //*****************************************************************************
 bool Panel::_populateFingerPressureStruct(FingerPressureStruct
-    &fingerPressures, unsigned char *buf, unsigned int buflen)
+    &fingerPressures, HIRCPPacket packet)
 {
     //
     // Buffer needs to be at least this size
@@ -573,7 +756,10 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     const int BITS_PER_BYTE = 8;
     //int pressureSize = sizeof(fingerPressures.pressure[0]);
     int pressureSize = sizeof(unsigned short);
-    assert(buflen >= pressureSize*NUM_FINGERS);
+    const unsigned int buflen = packet.MAX_PAYLOAD_LEN;
+    unsigned char buf[buflen];
+    packet.getPayload(buf, buflen);
+    assert(buflen >= (unsigned int)pressureSize*NUM_FINGERS);
 
     //
     // Parses through buf and populate structure
@@ -590,9 +776,9 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         float multiplier = (float)(1) - (float)(encodedPressure)/4096;
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);
-        std::cout << "pressure = "
+        /*std::cout << "pressure = "
             << static_cast<unsigned int>(fingerPressures.pressure[i])
-            << std::endl;
+            << std::endl;*/
     }
 
     return true;

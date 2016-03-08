@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 3, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -52,6 +52,10 @@ struct LeapData
     LeapData()
     {
         imageDataRGBA = new unsigned char[LeapData::_IMAGE_DATA_SIZE];
+        for (int i=0; i<NUM_FINGERS; i++)
+        {
+            totalAngle[i] = 0;
+        }
     }
 
     ~LeapData()

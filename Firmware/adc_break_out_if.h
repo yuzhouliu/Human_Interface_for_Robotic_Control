@@ -1,13 +1,17 @@
 //*****************************************************************************
+//
 // adc_break_out_if.h
 //
 // This is the driver library for Adafruit ADS1015 ADC breakout board
 //
+// Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu
+// This code is licensed under BSD license (see LICENSE.txt for details)
+//
 // Author: Minh Mai
 //
-// Created: February 16 2016
+// Created: February 16, 2016
 //
-// Modified: February 16 2016
+// Modified: February 16, 2016
 //
 //*****************************************************************************
 
