@@ -100,9 +100,11 @@ extern uVectorEntry __vector_table;
 static void DisplayBanner(char * AppName)
 {
     Report("\n\n\n\r");
-    Report("\t\t *************************************************\n\r");
-    Report("\t\t      CC3200 %s Application       \n\r", AppName);
-    Report("\t\t *************************************************\n\r");
+    Report("\t **************************************************************\n\r");
+    Report("\t      HUMAN INTERFACE FOR ROBOTIC CONTROL       \n\r", AppName);
+    Report("\t      \n\r");
+    Report("\t      Copyright (c) 2015-2016 Brandon To, Minh Mai, Yuzhou Liu \n\r");
+    Report("\t **************************************************************\n\r");
     Report("\n\n\n\r");
 }
 
@@ -183,6 +185,7 @@ void main()
     InitSensorADC();
 
     // Connect to WIFI using default info
+
     WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
     //WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
