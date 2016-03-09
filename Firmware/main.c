@@ -72,7 +72,7 @@
 //****************************************************************************
 static void DisplayBanner();
 static void BoardInit();
-
+static void UserInput(char *input_message, char* output_message, long out_length);
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
@@ -146,6 +146,9 @@ static void BoardInit(void)
 void main()
 {
     long lRetVal = 0;
+    char ssid[50];
+    char password[50];
+    char security_type[50];
     unsigned char recv_data[HIRCP_MAX_PACKET_LEN];
     unsigned char send_data[HIRCP_MAX_PACKET_LEN];
     unsigned char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
@@ -172,9 +175,6 @@ void main()
     // Configuring UART
     InitTerm();
 
-    // Display banner
-    DisplayBanner(APPLICATION_NAME);
-
     // Configure I2C
     I2C_IF_Open(I2C_MASTER_MODE_STD);
 
@@ -184,9 +184,14 @@ void main()
     // Initialize the sensor ADC
     InitSensorADC();
 
-    // Connect to WIFI using default info
+    // Display banner
+    DisplayBanner(APPLICATION_NAME);
 
-    WlanConnect("Nagui's Network", "SL_SEC_TYPE_WPA", "19520605");
+    // Connect to WIFI using default info
+    UserInput("Enter SSID:",ssid, sizeof(ssid));
+    UserInput("Enter Password:", password, sizeof(password));
+    UserInput("Enter Security_Type:", security_type, sizeof(security_type));
+    WlanConnect(ssid, security_type, password);
     //WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
@@ -302,6 +307,34 @@ void main()
     lRetVal = sl_Stop(SL_STOP_TIMEOUT);
 }
 
+//*****************************************************************************
+//
+//! UserInput
+//!
+//! This function
+//!        1. Function for reading the user input for UDP RX/TX
+//!
+//!  \return 0 : Success, -ve : failure
+//
+//*****************************************************************************
+static void UserInput(char *input_message, char* output_message, long out_length)
+{
+    int lRetVal;
+    do
+    {
+
+        UART_PRINT("%s",input_message);
+        lRetVal = GetCmd(output_message, out_length);
+        if(lRetVal == 0)
+        {
+          //
+          // No input. Just an enter pressed probably. Display a prompt.
+          //
+          UART_PRINT("\n\n\rPlease Enter Valid Input.\n\r");
+        }
+        UART_PRINT("\n\r");
+    }while(lRetVal <= 0);
+}
 //*****************************************************************************
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/

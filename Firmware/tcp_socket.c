@@ -26,7 +26,7 @@
 // Standard includes
 #include <stdlib.h>
 #include <string.h>
-
+#include <ctype.h>
 // simplelink includes 
 #include "simplelink.h"
 #include "wlan.h"
@@ -498,16 +498,21 @@ static int HTTPGetMethod(HTTPCli_Handle httpClient, char* getRequest)
 //*****************************************************************************
 static inline _u8 SecurityTypeParser(char * cSecurityType)
 {
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_OPEN") == 0) return SL_SEC_TYPE_OPEN;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WEP") == 0) return SL_SEC_TYPE_WEP;
-    if (strcmp(cSecurityType, "SL_SEC_TYPE_WPA") == 0) return SL_SEC_TYPE_WPA;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_WPA2") == 0) return SL_SEC_TYPE_WPA_WPA2;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PBC") == 0) return SL_SEC_TYPE_WPS_PBC;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPS_PIN") == 0) return SL_SEC_TYPE_WPS_PIN;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_WPA_ENT") == 0) return SL_SEC_TYPE_WPA_ENT;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PBC") == 0) return SL_SEC_TYPE_P2P_PBC;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_KEYPAD") == 0) return SL_SEC_TYPE_P2P_PIN_KEYPAD;
-    if (strcmp(cSecurityType,"SL_SEC_TYPE_P2P_PIN_DISPLAY") == 0) return SL_SEC_TYPE_P2P_PIN_DISPLAY;
+	long i = 0;
+    while (cSecurityType[i])
+    {
+      cSecurityType[i] = toupper(cSecurityType[i]);
+      i++;
+    }
+    if (strstr("SL_SEC_TYPE_OPEN",cSecurityType) != NULL) return SL_SEC_TYPE_OPEN;
+    if (strstr("SL_SEC_TYPE_WEP", cSecurityType) != NULL) return SL_SEC_TYPE_WEP;
+    if (strstr("SL_SEC_TYPE_WPA_WPA2",cSecurityType) != NULL ) return SL_SEC_TYPE_WPA_WPA2;
+    if (strstr("SL_SEC_TYPE_WPS_PBC",cSecurityType) != NULL) return SL_SEC_TYPE_WPS_PBC;
+    if (strstr("SL_SEC_TYPE_WPS_PIN",cSecurityType) != NULL) return SL_SEC_TYPE_WPS_PIN;
+    if (strstr("SL_SEC_TYPE_WPA_ENT", cSecurityType) != NULL) return SL_SEC_TYPE_WPA_ENT;
+    if (strstr("SL_SEC_TYPE_P2P_PBC", cSecurityType) != NULL) return SL_SEC_TYPE_P2P_PBC;
+    if (strstr("SL_SEC_TYPE_P2P_PIN_KEYPAD",cSecurityType) != NULL) return SL_SEC_TYPE_P2P_PIN_KEYPAD;
+    if (strstr("SL_SEC_TYPE_P2P_PIN_DISPLAY",cSecurityType) != NULL) return SL_SEC_TYPE_P2P_PIN_DISPLAY;
     return SL_SEC_TYPE_OPEN;
 }
 //*****************************************************************************
