@@ -26,7 +26,7 @@ Summary
 
 1. Purpose
 
-    HIRCCP is a simple protocol to transfer servo motor position data from
+    HIRCCP is a simple protocol used to transfer servo motor position data from
     controller application to microcontroller and transfer pressure data from
     microcontroller to controller application. It is an application layer
     protocol that is implemented on top of Internet Transmission Control
@@ -45,12 +45,12 @@ Summary
     request, it sends a connection acknowledgement packet to signal that it is
     ready to receive data packets. Every data packet is acknowledged by a data
     acknowledgement packet. Connection is terminated by sending a termination
-    request packet to the microcotroller. Connection can also be terminated on
+    request packet to the microcontroller. Connection can also be terminated on
     error detection by sending an error packet.
 
     As previously mentioned, HIRCP is an application layer protocol. This means
     that a HIRCP header will be between the TCP header and the data as shown in
-    Figure 2-1. More information on the HIRCP header will be discused later in
+    Figure 2-1. More information on the HIRCP header will be discussed later in
     the document.
 
                  --------------------------------------------
@@ -103,7 +103,7 @@ Summary
     degrees for the wrist and each of the five fingers on the right hand are
     encoded into their corresponding fields.
 
-3.3 Data Ackowledgement Packets
+3.3 Data Acknowledgement Packets
 
          4 bytes      1 byte  2 bytes  2 bytes  2 bytes  2 bytes  2 bytes
     ----------------------------------------------------------------------
@@ -157,7 +157,7 @@ Summary
     to ensure that proper steps are taken in such cases. All sockets should be
     set to non-blocking mode and have a timeout associated with its operations.
     Applications implementing HIRCP should assume that connection is lost on a
-    socket timeout and take the neccessary actions to free any memory allocated
+    socket timeout and take the necessary actions to free any memory allocated
     for that session. The server should then return to listening for new
     connections on the listen socket. The client should idle for a time greater
     than the timeout before attempting a reconnection. A watchdog timer can be
