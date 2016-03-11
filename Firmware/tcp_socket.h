@@ -44,7 +44,7 @@
 #define HOST_NAME "robotarm.net23.net"
 #define HOST_PORT 80
 #define GET_REQUEST_URI "/update_ip.php?id=1"
-#define MAX_TRIAL 5 /* number of connection trials allowed */
+#define MAX_TRIAL 2 /* number of connection trials allowed */
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
