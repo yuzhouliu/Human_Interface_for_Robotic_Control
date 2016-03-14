@@ -321,9 +321,7 @@ int BsdTcpServerReceive(unsigned char *data, int len)
     if( iStatus <= 0 )
     {
        // error
-       sl_Close(ServerNewSockID);
-       sl_Close(ServerSockID);
-       ASSERT_ON_ERROR(RECV_ERROR);
+    	UART_PRINT("ERROR RECEIVING DATA.\n\r");
     }
     else
     {

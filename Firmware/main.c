@@ -188,10 +188,15 @@ void main()
     DisplayBanner(APPLICATION_NAME);
 
     // Connect to WIFI using default info
+    /* Getting user WIFI by user input */
+    /*
     UserInput("Enter SSID:",ssid, sizeof(ssid));
     UserInput("Enter Password:", password, sizeof(password));
     UserInput("Enter Security_Type:", security_type, sizeof(security_type));
     WlanConnect(ssid, security_type, password);
+    */
+    /*Hard-coded approach*/
+    WlanConnect("Nagui's Network", "wpa", "19520605");
     //WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
 
@@ -261,14 +266,14 @@ void main()
                 // Moves servo motors using data from packet
                 for (i = 0; i<NUM_SERVOS; i++)
                 {
-                    //MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
+                    MoveServo_PWM_Breakout((unsigned char)recv_payload[i], (enum Servo_Joint_Type)i);
                 }
 
                 // Gets pressure readings from sensors and populates buffer to be used as payload for sending
                 for (i = 0; i<NUM_SENSORS; i++)
                 {
-                    //adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
-                    adc_reading = 2048;
+                    adc_reading = GetSensorReading((enum Fingertip_Sensor_Type)i);
+                    //adc_reading = 2048;
                     UART_PRINT("Finger: %d, reading: %d,\n\r", i, adc_reading);
 
                     UnsignedShort_to_UnsignedChar(adc_reading, &highByte, &lowByte);
