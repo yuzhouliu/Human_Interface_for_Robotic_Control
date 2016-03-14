@@ -156,9 +156,9 @@ unsigned short GetSensorReading(enum Fingertip_Sensor_Type eFingerSensor)
 	switch(eFingerSensor)
 	{
 		case SENSOR_FINGER_THUMB:
-			return GetSensorReading_CC3200(SENSOR_FINGER_THUMB);
+            return readADC_Breakout(FINGER_THUMB_BREAKOUT);			
 		case SENSOR_FINGER_INDEX:
-			return readADC_Breakout(FINGER_INDEX_BREAKOUT);
+			return GetSensorReading_CC3200(SENSOR_FINGER_INDEX);
 		case SENSOR_FINGER_MIDDLE:
 			return readADC_Breakout(FINGER_MIDDLE_BREAKOUT);
 		case SENSOR_FINGER_RING:

@@ -26,7 +26,8 @@
 #define NO_OF_SAMPLES 2
 
 // Channel mapping for Breakout Board
-#define FINGER_INDEX_BREAKOUT 0
+//#define FINGER_INDEX_BREAKOUT 0
+#define FINGER_THUMB_BREAKOUT 0
 #define FINGER_MIDDLE_BREAKOUT 1
 #define FINGER_RING_BREAKOUT 2
 #define FINGER_PINKY_BREAKOUT 3
