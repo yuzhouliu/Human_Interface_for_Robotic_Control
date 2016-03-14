@@ -1,0 +1,89 @@
+Human Interface for Robotic Control Group
+Carleton University
+March 9, 2016
+
+                         HIRC File Format (Revision 1)
+
+
+Copyright Notice
+
+    Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. The contents of
+    this file is licensed under BSD license (see LICENSE.txt for details). In
+    short, you may use, copy, modify, or distribute this protocol provided
+    that the names of the authors are not used to endorse any work that is
+    derived from this.
+
+
+Summary
+
+    The HIRC file format is a simple file format used by the Human Interface
+    for Robotic Control group at Carleton University for storing a sequence of
+    finger movement data from the controller application. This file format was
+    created as a byproduct of adding the recorded movement playback feature to
+    the application. This document describes the file format and the reasons
+    behind some of the design decisions.
+
+
+1. File Format
+
+1.1 Header
+
+                                 4 bytes     1 byte
+                             ---------------------
+                            | HIRC constant | FPS |
+                             ---------------------
+
+                          Figure 1-1: HIRC File Header
+
+    The HIRC file header have the format shown in Figure 1-1. The HIRC constant
+    is a sequence of bytes with ascii values 'H', 'I', 'R', and 'C', in that
+    order. The HIRC constant is used to identify that this file is a valid HIRC
+    file. Any file with a .hirc extension that does not have this constant in
+    the header should be dismissed by the controller application. The FPS field
+    is required to ensure that playback of the recording runs at the same speed
+    that it was recorded at.
+
+1.2 Body
+
+                1 byte  1 byte  1 byte   1 byte  1 byte  1 byte
+                ------------------------------------------------
+               | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+                ------------------------------------------------
+
+                        Figure 1-2: HIRC File Body Block
+
+    The HIRC file body is composed of a sequence of blocks with the format
+    shown in Figure 1-2. The end of the sequence of blocks signals the end of
+    the file. Rotation in degrees for the wrist and each of the five fingers on
+    the right hand are encoded into their corresponding fields.
+
+
+I. Appendix
+
+Full File Format
+
+                             ---------------------
+                            | HIRC constant | FPS |
+                             ---------------------
+                ------------------------------------------------
+         1     | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+                ------------------------------------------------
+                ------------------------------------------------
+         2     | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+                ------------------------------------------------
+                                    ........
+                                    ........
+                ------------------------------------------------
+         N     | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+                ------------------------------------------------
+
+References
+
+    [1] Sollins, J., "The TFTP Protocol (Revision 2)", RFC 1350, Massachusetts
+        Institute of Technology, July 1992.
+
+Author's Contact
+
+    Human Interface for Robotic Control Group
+    Email: brandonto@cmail.carleton.ca
+
