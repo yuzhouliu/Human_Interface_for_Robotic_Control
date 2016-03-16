@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
@@ -773,7 +774,14 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         encodedPressure <<= BITS_PER_BYTE;
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
-        float multiplier = (float)(1) - (float)(encodedPressure)/4096;
+        //float multiplier = (float)(1) - (float)(encodedPressure)/4096;
+		
+		// Setting encodedPressure if limit exceeded
+		if (encodedPressure > MAX_SENSOR_READING)
+		{
+			encodedPressure = MAX_SENSOR_READING;
+		}
+		double multiplier = (double) (log10((double)(MAX_SENSOR_READING - encodedPressure + 1)) )/SENSOR_SCALAR;
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);
         /*std::cout << "pressure = "
