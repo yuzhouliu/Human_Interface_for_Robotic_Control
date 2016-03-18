@@ -196,9 +196,10 @@ void main()
     WlanConnect(ssid, security_type, password);
     */
     /*Hard-coded approach*/
-    WlanConnect("Nagui's Network", "wpa", "19520605");
+    //WlanConnect("Nagui's Network", "wpa", "19520605");
     //WlanConnect("NETGEAR31", "SL_SEC_TYPE_WPA", "happystar329");
     //WlanConnect("Minh's iPhone", "SL_SEC_TYPE_WPA", "minh1234");
+    WlanConnect("robotic", "wpa", "robotichand");
 
     // Setup the TCP Server Socket for listening
     BsdTcpServerSetup(PORT_NUM);
