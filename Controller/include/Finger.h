@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// Feburary 29, 2016
+// March 18, 2016
 //
 //*****************************************************************************
 #ifndef _FINGER_H_
@@ -23,9 +23,6 @@
 #include "Image.h"
 
 #define NUM_FINGERS 5
-
-#define MAX_SENSOR_READING 1100
-#define SENSOR_SCALING 3.05
 
 enum class FingerType : unsigned char
 {

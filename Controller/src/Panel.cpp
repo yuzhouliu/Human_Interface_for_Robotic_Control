@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 14, 2016
+// March 18, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -89,7 +89,7 @@ void Panel::run()
     //
     // Main panel logic
     //
-    _fpsManager.setFPS(20);
+    _fpsManager.setFPS(30);
     while (!Window::gExit)
     {
         //
@@ -752,8 +752,10 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     &fingerPressures, HIRCPPacket packet)
 {
     const int BITS_PER_BYTE = 8;
-    const int MAX_ENCODED_PRESSURE = 1100;
-    const int MIN_ENCODED_PRESSURE = 800;
+    //const int MIN_ENCODED_PRESSURE = 800;
+    const int MAX_ENCODED_PRESSURE[NUM_FINGERS] =
+        { 1020, 800, 930, 1030, 990 };
+    const float SENSOR_SCALING = 3.05;
 
     //
     // Buffer needs to be at least this size
@@ -776,17 +778,17 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         encodedPressure <<= BITS_PER_BYTE;
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
-        //float multiplier = (float)(1) - (float)(encodedPressure)/4096;
 		//float multiplier = (float)(1) +
 		//	(float)(MIN_ENCODED_PRESSURE / MAX_ENCODED_PRESSURE) -
 		//	(float)(encodedPressure) / 4096;
 		
 		// Setting encodedPressure if limit exceeded
-		if (encodedPressure > MAX_SENSOR_READING)
+		if (encodedPressure > MAX_ENCODED_PRESSURE[i])
 		{
-			encodedPressure = MAX_SENSOR_READING;
+			encodedPressure = MAX_ENCODED_PRESSURE[i];
 		}
-		double multiplier = (double) (log10((double)(MAX_SENSOR_READING - encodedPressure + 1)) )/SENSOR_SCALING;
+		double multiplier = (double) (log10((double)(MAX_ENCODED_PRESSURE[i]
+            - encodedPressure + 1)) )/SENSOR_SCALING;
 
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);

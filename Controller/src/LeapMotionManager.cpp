@@ -177,6 +177,15 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     leapData.palmRect.y = palmPosition.z*(170/palmPosition.y)*0.85
         + _windowHeight/2 - 1.2*leapData.palmRect.h;
 
+        /////////////////////////
+        // Test
+
+        Leap::Vector palmYZplane = hand.palmNormal().cross(hand.direction()).normalized();
+        Leap::Vector palmXZplane = hand.palmNormal().normalized();
+
+        // End Test
+        /////////////////////////
+
     //
     // Populates LeapData structure with finger info
     //
@@ -185,11 +194,25 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     {
         Leap::Finger finger = (*it);
         Leap::Vector direction[4];
+
         for (auto b=0; b<4; b++)
         {
             Leap::Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
             Leap::Bone bone = finger.bone(boneType);
             direction[b] = bone.direction();
+
+        /////////////////////////
+        // Test
+            if (finger.type() == Leap::Finger::TYPE_THUMB)
+            {
+                direction[b] = direction[b] - (direction[b].dot(palmXZplane))*palmXZplane;
+            }
+            else
+            {
+                direction[b] = direction[b] - (direction[b].dot(palmYZplane))*palmYZplane;
+            }
+        // End Test
+        /////////////////////////
 
             if (boneType == Leap::Bone::TYPE_DISTAL)
             {
@@ -214,8 +237,24 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
                     + _windowHeight/2 - 1.2*fingerRect.h);
             }
         }
-        leapData.totalAngle[finger.type()] = (unsigned char)
-            (_radiansToDegrees(_calculateTotalAngle(direction, 4)));
+
+        // Calculate angles and scale for middle finger
+        if (finger.type() == Leap::Finger::TYPE_MIDDLE ||
+            finger.type() == Leap::Finger::TYPE_RING)
+        {
+            leapData.totalAngle[finger.type()] = (unsigned char)
+                (_radiansToDegrees(_calculateTotalAngle(direction, 4, 1.2)));
+        }
+        else if (finger.type() == Leap::Finger::TYPE_PINKY)
+        {
+            leapData.totalAngle[finger.type()] = (unsigned char)
+                (_radiansToDegrees(_calculateTotalAngle(direction, 4, 1.1)));
+        }
+        else
+        {
+            leapData.totalAngle[finger.type()] = (unsigned char)
+                (_radiansToDegrees(_calculateTotalAngle(direction, 4, 1.0)));
+        }
     }
 
     //
@@ -295,14 +334,23 @@ void LeapMotionManager::serialize(LeapData &leapAngles, unsigned char *buf,
 //
 //*****************************************************************************
 float LeapMotionManager::_calculateTotalAngle(Leap::Vector *vectors,
-    unsigned int size)
+    unsigned int size, float scale)
 {
     float angle = 0;
 
     for (unsigned int i=0; i<size-1; i++)
     {
-        float temp = vectors[i].angleTo(vectors[i+1]);
+        float temp = vectors[i].angleTo(vectors[i+1])*scale;
         angle += temp;
+        if (i==0 && (angle>40))
+        {
+            angle += 50;
+        }
+    }
+
+    if (angle > 255)
+    {
+        angle = 255;
     }
 
     return angle;

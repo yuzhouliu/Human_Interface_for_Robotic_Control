@@ -11,7 +11,7 @@
 // December 28, 2015
 //
 // Modified:
-// March 3, 2016
+// March 18, 2016
 //
 //*****************************************************************************
 #ifndef _LEAPMOTIONMANAGER_H_
@@ -73,7 +73,7 @@ private:
     int _windowHeight;
 
     /* Methods */
-    float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size);
+    float _calculateTotalAngle(Leap::Vector *vectors, unsigned int size, float scale);
     float _radiansToDegrees(float angle);
 
 public:
