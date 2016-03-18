@@ -11,13 +11,14 @@
 // January 3, 2016
 //
 // Modified:
-// March 7, 2016
+// March 14, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 #include "IPv4Address.h"
 #include "LeapMotionManager.h"
@@ -88,7 +89,7 @@ void Panel::run()
     //
     // Main panel logic
     //
-    _fpsManager.setFPS(10);
+    _fpsManager.setFPS(20);
     while (!Window::gExit)
     {
         //
@@ -750,11 +751,13 @@ void Panel::_render()
 bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     &fingerPressures, HIRCPPacket packet)
 {
+    const int BITS_PER_BYTE = 8;
+    const int MAX_ENCODED_PRESSURE = 1100;
+    const int MIN_ENCODED_PRESSURE = 800;
+
     //
     // Buffer needs to be at least this size
     //
-    const int BITS_PER_BYTE = 8;
-    //int pressureSize = sizeof(fingerPressures.pressure[0]);
     int pressureSize = sizeof(unsigned short);
     const unsigned int buflen = packet.MAX_PAYLOAD_LEN;
     unsigned char buf[buflen];
@@ -773,7 +776,18 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         encodedPressure <<= BITS_PER_BYTE;
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
-        float multiplier = (float)(1) - (float)(encodedPressure)/4096;
+        //float multiplier = (float)(1) - (float)(encodedPressure)/4096;
+		//float multiplier = (float)(1) +
+		//	(float)(MIN_ENCODED_PRESSURE / MAX_ENCODED_PRESSURE) -
+		//	(float)(encodedPressure) / 4096;
+		
+		// Setting encodedPressure if limit exceeded
+		if (encodedPressure > MAX_SENSOR_READING)
+		{
+			encodedPressure = MAX_SENSOR_READING;
+		}
+		double multiplier = (double) (log10((double)(MAX_SENSOR_READING - encodedPressure + 1)) )/SENSOR_SCALING;
+
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);
         /*std::cout << "pressure = "
