@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 4, 2016
+// March 18, 2016
 //
 //*****************************************************************************
 #include "HIRCP.h"
@@ -198,16 +198,38 @@ void HIRCPPacket::populate(unsigned char *buf, int len)
 //
 //! Static method for creating a CRQ packet.
 //!
-//! \param None.
+//! \param mode FEEDBACK_MODE to set.
 //!
-//! \return None.
+//! \return an HIRCP CRQ packet.
 //
 //*****************************************************************************
-HIRCPPacket HIRCPPacket::createCRQPacket()
+HIRCPPacket HIRCPPacket::createCRQPacket(FEEDBACK_MODE mode)
 {
     HIRCPPacket packet;
 
     packet.setType(TYPE::CRQ);
+    unsigned char payload[CRQ_PAYLOAD_LEN] = {mode};
+    packet.setPayload(payload, CRQ_PAYLOAD_LEN);
+
+    return packet;
+}
+
+//*****************************************************************************
+//
+//! Static method for creating a MODE packet.
+//!
+//! \param mode FEEDBACK_MODE to set.
+//!
+//! \return an HIRCP MODE packet.
+//
+//*****************************************************************************
+HIRCPPacket HIRCPPacket::createMODEPacket(FEEDBACK_MODE mode)
+{
+    HIRCPPacket packet;
+
+    packet.setType(TYPE::MODE);
+    unsigned char payload[MODE_PAYLOAD_LEN] = {mode};
+    packet.setPayload(payload, MODE_PAYLOAD_LEN);
 
     return packet;
 }
@@ -219,7 +241,7 @@ HIRCPPacket HIRCPPacket::createCRQPacket()
 //! \param payload buffer holding the payload.
 //! \param len size of the buffer.
 //!
-//! \return None.
+//! \return an HIRCP DATA packet.
 //
 //*****************************************************************************
 HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload, int len)
@@ -238,7 +260,7 @@ HIRCPPacket HIRCPPacket::createDATAPacket(unsigned char *payload, int len)
 //!
 //! \param None.
 //!
-//! \return None.
+//! \return an HIRCP TRQ packet.
 //
 //*****************************************************************************
 HIRCPPacket HIRCPPacket::createTRQPacket()
@@ -256,7 +278,7 @@ HIRCPPacket HIRCPPacket::createTRQPacket()
 //!
 //! \param None.
 //!
-//! \return None.
+//! \return an empty HIRCP packet.
 //
 //*****************************************************************************
 HIRCPPacket HIRCPPacket::createEmptyPacket()

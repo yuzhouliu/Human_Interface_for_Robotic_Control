@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 18, 2016
+// March 19, 2016
 //
 //*****************************************************************************
 #include "Panel.h"
@@ -35,7 +35,8 @@
 //*****************************************************************************
 Panel::Panel(Window *window, SDL_Window *sdlWindow)
     : _window(sdlWindow), _renderer(nullptr), _hand(nullptr),
-    _connected(false), _cachedFPS(0)
+    _connected(false), _mode(HIRCPPacket::FEEDBACK_MODE::NORMAL_MODE),
+    _cachedFPS(0)
 {
     //
     // Initialize panel
@@ -245,7 +246,7 @@ bool Panel::connect(char *ipAddressString)
     //
     // Constructs a CRQ packet to send to remote host
     //
-    HIRCPPacket crqPacket = HIRCPPacket::createCRQPacket();
+    HIRCPPacket crqPacket = HIRCPPacket::createCRQPacket(_mode);
     unsigned char message[HIRCPPacket::MAX_PACKET_SIZE];
     crqPacket.getData(message, HIRCPPacket::MAX_PACKET_SIZE);
 
@@ -266,9 +267,9 @@ bool Panel::connect(char *ipAddressString)
     }
 
     //
-    // Creates an empty packet to store CACK received from remote host
+    // Creates an empty packet to store ACK received from remote host
     //
-    HIRCPPacket cackPacket = HIRCPPacket::createEmptyPacket();
+    HIRCPPacket ackPacket = HIRCPPacket::createEmptyPacket();
 
     //
     // Receives packet from remote host
@@ -289,12 +290,12 @@ bool Panel::connect(char *ipAddressString)
     //
     // Populates packet with received data
     //
-    cackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+    ackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
 
-    if (!cackPacket.isValid() || (cackPacket.getType() != HIRCPPacket::CACK))
+    if (!ackPacket.isValid() || (ackPacket.getType() != HIRCPPacket::ACK))
     {
         //
-        // Packet received was not a CACK packet so terminate connection
+        // Packet received was not an ACK packet so terminate connection
         //
         _socket->close();
 
@@ -350,9 +351,9 @@ bool Panel::disconnect()
         }
 
         //
-        // Creates an empty packet to store TACK received from remote host
+        // Creates an empty packet to store ACK received from remote host
         //
-        HIRCPPacket tackPacket = HIRCPPacket::createEmptyPacket();
+        HIRCPPacket ackPacket = HIRCPPacket::createEmptyPacket();
 
         //
         // Receives packet from remote host
@@ -374,12 +375,12 @@ bool Panel::disconnect()
         //
         // Populates packet with received data
         //
-        tackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
+        ackPacket.populate(message, HIRCPPacket::MAX_PACKET_SIZE);
 
-        if (!tackPacket.isValid() || (tackPacket.getType() != HIRCPPacket::TACK))
+        if (!ackPacket.isValid() || (ackPacket.getType() != HIRCPPacket::ACK))
         {
             //
-            // Packet received was not a TACK packet so terminate connection
+            // Packet received was not an ACK packet so terminate connection
             //
             std::cout << "Safe disconnection failed... forcing disconnect" <<
                 std::endl;
@@ -617,6 +618,56 @@ bool Panel::stopStreaming()
 
 //*****************************************************************************
 //
+//! Sets feedback mode.
+//!
+//! \param mode the FEEDBACK_MODE to set.
+//!
+//! \return Returns \b true if mode set successfully and \b false otherwise.
+//
+//*****************************************************************************
+bool Panel::setFeedbackMode(HIRCPPacket::FEEDBACK_MODE mode)
+{
+    if (mode == HIRCPPacket::FEEDBACK_MODE::NORMAL_MODE
+        && _mode != HIRCPPacket::FEEDBACK_MODE::NORMAL_MODE)
+    {
+        if (_connected)
+        {
+            HIRCPPacket modePacket = HIRCPPacket::createMODEPacket(mode);
+            if (!send(modePacket))
+            {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
+                return false;
+            }
+        }
+        _mode = HIRCPPacket::FEEDBACK_MODE::NORMAL_MODE;
+        return true;
+    }
+    else if (mode == HIRCPPacket::FEEDBACK_MODE::CLOSED_LOOP_MODE
+        && _mode != HIRCPPacket::FEEDBACK_MODE::CLOSED_LOOP_MODE)
+    {
+        if (_connected)
+        {
+            HIRCPPacket modePacket = HIRCPPacket::createMODEPacket(mode);
+            if (!send(modePacket))
+            {
+                _socket->close();
+                _connected = false;
+                notify(EVENT_DISCONNECTED);
+                return false;
+            }
+        }
+        _mode = HIRCPPacket::FEEDBACK_MODE::CLOSED_LOOP_MODE;
+        return true;
+    }
+    std::cout << "[ERROR] Panel::setFeedbackMode(): Feedback mode could not "\
+        "be set!" << std::endl;
+    return false;
+}
+
+//*****************************************************************************
+//
 //! Initializes the panel.
 //!
 //! \param None.
@@ -772,15 +823,11 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
     unsigned int bufIndex = 0;
     for (int i=0; i<NUM_FINGERS; i++)
     {
-        //fingerPressures.pressure[i] = buf[bufIndex++];
         unsigned short encodedPressure = 0;
         encodedPressure += buf[bufIndex++];
         encodedPressure <<= BITS_PER_BYTE;
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
-		//float multiplier = (float)(1) +
-		//	(float)(MIN_ENCODED_PRESSURE / MAX_ENCODED_PRESSURE) -
-		//	(float)(encodedPressure) / 4096;
 		
 		// Setting encodedPressure if limit exceeded
 		if (encodedPressure > MAX_ENCODED_PRESSURE[i])

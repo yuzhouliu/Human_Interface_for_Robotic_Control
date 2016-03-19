@@ -12,7 +12,7 @@
 // January 15, 2016
 //
 // Modified:
-// March 4, 2016
+// March 18, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_H_
@@ -39,12 +39,18 @@ public:
     {
         INVALID_TYPE = 0,
         CRQ,
-        CACK,
+        MODE,
         DATA,
         DACK,
         TRQ,
-        TACK,
+        ACK,
         ERR,
+    };
+
+    enum FEEDBACK_MODE
+    {
+        NORMAL_MODE = 0,
+        CLOSED_LOOP_MODE,
     };
 
     /* Constructor */
@@ -63,19 +69,20 @@ public:
     void populate(unsigned char *buf, int len);
 
     /* Static methods */
-    static HIRCPPacket createCRQPacket();
+    static HIRCPPacket createCRQPacket(FEEDBACK_MODE mode);
+    static HIRCPPacket createMODEPacket(FEEDBACK_MODE mode);
     static HIRCPPacket createDATAPacket(unsigned char *payload, int len);
     static HIRCPPacket createTRQPacket();
     static HIRCPPacket createEmptyPacket();
 
 private:
     /* Fields */
-    static const int CRQ_PAYLOAD_LEN = 0;
-    static const int CACK_PAYLOAD_LEN = 0;
+    static const int CRQ_PAYLOAD_LEN = 1;
+    static const int MODE_PAYLOAD_LEN = 1;
     static const int DATA_PAYLOAD_LEN = 6;
     static const int DACK_PAYLOAD_LEN = 10;
     static const int TRQ_PAYLOAD_LEN = 0;
-    static const int TACK_PAYLOAD_LEN = 0;
+    static const int ACK_PAYLOAD_LEN = 0;
     static const int ERR_PAYLOAD_LEN = 1;
 
     TYPE _type;

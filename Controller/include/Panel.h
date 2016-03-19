@@ -11,7 +11,7 @@
 // January 3, 2016
 //
 // Modified:
-// March 3, 2016
+// March 19, 2016
 //
 //*****************************************************************************
 #ifndef _PANEL_H_
@@ -50,6 +50,7 @@ private:
     std::unique_ptr<PlaybackRecorder> _playbackRecorder;
     std::unique_ptr<PlaybackStreamer> _playbackStreamer;
     bool _connected;
+    HIRCPPacket::FEEDBACK_MODE _mode;
     int _cachedFPS;
 
     /* Methods */
@@ -77,6 +78,7 @@ public:
     bool stopRecording();
     bool startStreaming(char *filePath);
     bool stopStreaming();
+    bool setFeedbackMode(HIRCPPacket::FEEDBACK_MODE mode);
 };
 
 #endif /* _PANEL_H_ */

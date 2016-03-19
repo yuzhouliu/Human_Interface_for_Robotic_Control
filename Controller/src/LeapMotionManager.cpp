@@ -177,14 +177,12 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
     leapData.palmRect.y = palmPosition.z*(170/palmPosition.y)*0.85
         + _windowHeight/2 - 1.2*leapData.palmRect.h;
 
-        /////////////////////////
-        // Test
-
-        Leap::Vector palmYZplane = hand.palmNormal().cross(hand.direction()).normalized();
-        Leap::Vector palmXZplane = hand.palmNormal().normalized();
-
-        // End Test
-        /////////////////////////
+    //
+    // Calculate the equation of the YZ-plane and XZ-plane
+    //
+    Leap::Vector palmYZplane = 
+        hand.palmNormal().cross(hand.direction()).normalized();
+    Leap::Vector palmXZplane = hand.palmNormal().normalized();
 
     //
     // Populates LeapData structure with finger info
@@ -201,18 +199,22 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
             Leap::Bone bone = finger.bone(boneType);
             direction[b] = bone.direction();
 
-        /////////////////////////
-        // Test
+            //
+            // Project thumb joint vectors onto XZ plane
+            //
             if (finger.type() == Leap::Finger::TYPE_THUMB)
             {
-                direction[b] = direction[b] - (direction[b].dot(palmXZplane))*palmXZplane;
+                direction[b] = direction[b] -
+                    (direction[b].dot(palmXZplane))*palmXZplane;
             }
+            //
+            // Project non-thumb joint vectors onto YZ plane
+            //
             else
             {
-                direction[b] = direction[b] - (direction[b].dot(palmYZplane))*palmYZplane;
+                direction[b] = direction[b] -
+                    (direction[b].dot(palmYZplane))*palmYZplane;
             }
-        // End Test
-        /////////////////////////
 
             if (boneType == Leap::Bone::TYPE_DISTAL)
             {
@@ -238,7 +240,9 @@ bool LeapMotionManager::processFrame(LeapData &leapData)
             }
         }
 
-        // Calculate angles and scale for middle finger
+        //
+        // Calculate angles and scale according to finger
+        //
         if (finger.type() == Leap::Finger::TYPE_MIDDLE ||
             finger.type() == Leap::Finger::TYPE_RING)
         {
@@ -342,6 +346,10 @@ float LeapMotionManager::_calculateTotalAngle(Leap::Vector *vectors,
     {
         float temp = vectors[i].angleTo(vectors[i+1])*scale;
         angle += temp;
+        //
+        // Adds rotation to account for the case where the finger is pointed
+        // directly down
+        //
         if (i==0 && (angle>40))
         {
             angle += 50;

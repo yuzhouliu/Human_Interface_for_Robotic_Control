@@ -11,7 +11,7 @@
 // December 27, 2015
 //
 // Modified:
-// March 5, 2016
+// March 19, 2016
 //
 //*****************************************************************************
 #include "Window.h"
@@ -423,6 +423,28 @@ void Window::_processInput()
                     EnableMenuItem(_menu, ID_OPTIONS_STARTPLAYBACK,
                         MF_ENABLED);
                     EnableMenuItem(_menu, ID_OPTIONS_STOPPLAYBACK, MF_GRAYED);
+                    break;
+                case ID_OPTIONS_NORMALMODE:
+                    //
+                    // Options -> Normal mode
+                    //
+                    if (!_panel->setFeedbackMode(HIRCPPacket::NORMAL_MODE))
+                    {
+                        return;
+                    }
+                    EnableMenuItem(_menu, ID_OPTIONS_NORMALMODE, MF_GRAYED);
+                    EnableMenuItem(_menu, ID_OPTIONS_CLOSED, MF_ENABLED);
+                    break;
+                case ID_OPTIONS_CLOSED:
+                    //
+                    // Options -> Closed loop feedback mode
+                    //
+                    if (!_panel->setFeedbackMode(HIRCPPacket::CLOSED_LOOP_MODE))
+                    {
+                        return;
+                    }
+                    EnableMenuItem(_menu, ID_OPTIONS_NORMALMODE, MF_ENABLED);
+                    EnableMenuItem(_menu, ID_OPTIONS_CLOSED, MF_GRAYED);
                     break;
                 default:
                     break;
