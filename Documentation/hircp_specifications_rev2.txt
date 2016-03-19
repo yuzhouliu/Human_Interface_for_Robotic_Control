@@ -1,0 +1,218 @@
+Human Interface for Robotic Control Group
+Carleton University
+March 18, 2016
+
+                        The HIRCP Protocol (Revision 2)
+
+
+Copyright Notice
+
+    Copyright (c) 2015 Brandon To, Minh Mai, and Yuzhou Liu. The contents of
+    this file is licensed under BSD license (see LICENSE.txt for details). In
+    short, you may use, copy, modify, or distribute this protocol provided
+    that the names of the authors are not used to endorse any work that is
+    derived from this.
+
+
+Summary
+
+    HIRCP is a very simple protocol used by the Human Interface for Robotic
+    Control group at Carleton University for communication between HIRC desktop
+    controller application and firmware on ARM Cortex-M4 based CC3200-LAUNCHXL
+    microcontroller. This document describes the protocol and it's types of
+    packets. The document also explains the reasons behind some of the design
+    decisions.
+
+
+1. Purpose
+
+    HIRCCP is a simple protocol used to transfer servo motor position data from
+    controller application to microcontroller and transfer pressure data from
+    microcontroller to controller application. It is an application layer
+    protocol that is implemented on top of Internet Transmission Control
+    protocol (TCP). This should not exclude the possibility of implementing
+    HIRCCP on top of other transmission protocols like UDP, provided that a
+    separate reliability layer exists. It is designed for a very specific
+    application. Therefore, it lacks many features present in other haptics
+    communication protocols. It can support connection, disconnection,
+    servo position streaming (live and recorded), pressure feedback, free mode,
+    and closed-loop feedback mode.
+
+
+2. Overview of the Protocol
+
+    Connection begins with controller application sending a connection request
+    packet to the microcontroller acting as a server. If the server grants the
+    request, it sends an acknowledgement packet to signal that it is ready to
+    receive data or mode packets. Every data packet is acknowledged by a data
+    acknowledgement packet. Every mode packet is acknowledged by an
+    acknowledgement packet. Connection is terminated by sending a termination
+    request packet to the microcontroller. Connection can also be terminated
+    on error detection by sending an error packet.
+
+    As previously mentioned, HIRCP is an application layer protocol. This means
+    that a HIRCP header will be between the TCP header and the data as shown in
+    Figure 2-1. More information on the HIRCP header will be discussed later in
+    the document.
+
+                 --------------------------------------------
+                | Ethernet |   IP   |  TCP   | HIRCP  | Data |
+                |  Header  | Header | Header | Header |      |
+                 --------------------------------------------
+
+                   Figure 2-1: Encapsulated packet structure
+
+
+3. HIRCP Packets
+
+    HIRCP supports seven types of packets:
+
+        opcode  operation
+          1     Connection request (CRQ)
+          2     Mode (MODE)
+          3     Data (DATA)
+          4     Data acknowledgement (DACK)
+          5     Termination request (TRQ)
+          6     Acknowledgement (ACK)
+          7     Error (ERR)
+
+3.1 Connection Request and Mode Packets
+
+                             4 bytes      1 byte  1 byte
+                        --------------------------------
+                       | HIRCP constant | Opcode | Mode |
+                        --------------------------------
+
+                          Figure 3-1: CRQ/MODE packet
+
+    CRQ and MODE packets (opcodes 1 and 2 respectively) have the format shown
+    in Figure 3-1. The HIRCP constant is a sequence of bytes with ascii values
+    'H', 'I', 'R' and 'C', in that order. The HIRCP constant is used to
+    identify that this packet is an HIRCP packet. Any packet that does not have
+    this constant in the header should be discarded and ignored by the
+    application implementing this protocol. The type of mode is encoded as an
+    8-bit integer in the Mode field. A table of modes is given in the appendix.
+
+3.2 Termination Request and Acknowledgement Packets
+
+                                4 bytes      1 byte
+                           -------------------------
+                          | HIRCP constant | Opcode |
+                           -------------------------
+
+                           Figure 3-2: TRQ/ACK packet
+
+    TRQ and ACK packets (opcodes 5 and 6 respectively) have the format shown in
+    Figure 3-2.
+
+3.3 Data Packets
+
+       4 bytes      1 byte  1 byte  1 byte  1 byte   1 byte  1 byte  1 byte
+  --------------------------------------------------------------------------
+ | HIRCP constant | Opcode | Thumb | Index | Middle | Ring  | Pinky | Wrist |
+  --------------------------------------------------------------------------
+
+                            Figure 3-3: DATA packet
+
+    DATA packets (opcode 3) have the format shown in Figure 3-3. Rotations in
+    degrees for the wrist and each of the five fingers on the right hand are
+    encoded into their corresponding fields.
+
+3.4 Data Acknowledgement Packets
+
+         4 bytes      1 byte  2 bytes  2 bytes  2 bytes  2 bytes  2 bytes
+    ----------------------------------------------------------------------
+   | HIRCP constant | Opcode | Thumb  | Index  | Middle |  Ring  | Pinky  |
+    ----------------------------------------------------------------------
+
+                            Figure 3-4: DACK packet
+
+    DACK packets (opcode 4) have the format shown in Figure 3-4. Fingertip
+    pressure sensor values for each of the five fingers on the right hand are
+    encoded into their corresponding fields. Two bytes are needed since values
+    read from the analog-to-digital converter are in the range of 0 to 4096.
+
+3.5 Error Packets
+
+                          4 bytes      1 byte    1 byte
+                     -------------------------------------
+                    | HIRCP constant | Opcode | ErrorCode |
+                     -------------------------------------
+
+                            Figure 3-5: ERR packet
+
+    ERR packets (opcode 7) have the format shown in Figure 3-5. The type of
+    error is encoded as an 8-bit integer in the ErrorCode field. An ERR packet
+    can be the acknowledgment of any other type of packet. A table of error
+    codes and types of errors is given in the appendix.
+
+
+4. Initial Connection
+
+    A connection is established by sending a connection request from the
+    controller application to the microcontroller, and receiving a connection
+    acknowledgment in response. If an error was received in response, then the
+    request has been denied.
+
+
+5. Normal Communication
+
+    Typical communication involves the controller application sending DATA
+    packets to the microcontroller and receiving DACK packets response. A MODE
+    packet should be sent to the microcontroller any time the controller
+    application wishes to change modes of operation.
+
+
+6. Normal Termination
+
+    A connection is terminated by sending a termination request from the
+    controller application to the microcontroller, and receiving a termination
+    acknowledgment in response. If an error was received in response, then the
+    request has been denied. If a request has been denied for any reason, the
+    controller application can terminate the connection and wait for the
+    microcontroller to time out due to inactivity before attempting another
+    connection. See Section-7 on premature termination for more details.
+
+
+6. Premature Termination
+
+    A connection can also be terminated prematurely. It is up to the programmer
+    to ensure that proper steps are taken in such cases. All sockets should be
+    set to non-blocking mode and have a timeout associated with its operations.
+    Applications implementing HIRCP should assume that connection is lost on a
+    socket timeout and take the necessary actions to free any memory allocated
+    for that session. The server should then return to listening for new
+    connections on the listen socket. The client should idle for a time greater
+    than the timeout before attempting a reconnection. A watchdog timer can be
+    used for this purpose if plausible.
+
+    All errors cause termination of connection. Upon receiving or sending an
+    error the host should take the actions described previously.
+
+
+I. Appendix
+
+Modes
+
+    Value   Type
+      0     Normal mode
+      1     Closed-loop feedback mode
+
+
+Error Codes
+
+    Value   Type
+      0     Undefined
+      1     Invalid packet
+      2     Unexpected packet
+
+References
+
+    [1] Sollins, J., "The TFTP Protocol (Revision 2)", RFC 1350, Massachusetts
+        Institute of Technology, July 1992.
+
+Author's Contact
+
+    Human Interface for Robotic Control Group
+    Email: brandonto@cmail.carleton.ca
+
