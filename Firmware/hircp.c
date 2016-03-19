@@ -11,7 +11,7 @@
 // March 4, 2016
 //
 // Modified:
-// March 7, 2016
+// March 19, 2016
 //
 //*****************************************************************************
 #include "hircp.h"
@@ -36,6 +36,7 @@
 #include "prcm.h"
 #include "uart.h"
 #include "utils.h"
+
 // common interface includes
 #include "udma_if.h"
 #include "common.h"
@@ -44,6 +45,7 @@
 #endif
 
 const unsigned char HIRCP_CONSTANT[] = "HIRC";
+HIRCP_Mode g_hircp_mode = HIRCP_NORMAL;
 
 //
 // Structure that stores HIRCP packet information
@@ -266,6 +268,8 @@ tBoolean HIRCP_InitiateConnectionSequence(void)
     long lRetVal = 0;
     unsigned char recv_data[HIRCP_MAX_PACKET_LEN];
     unsigned char send_data[HIRCP_MAX_PACKET_LEN];
+    unsigned char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
+    unsigned char send_payload[HIRCP_MAX_PAYLOAD_LEN];
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
     HIRCP_Packet *recvPacket = HIRCP_CreatePacket();
 
@@ -283,20 +287,31 @@ tBoolean HIRCP_InitiateConnectionSequence(void)
         return false;
     }
 
+    //
+    // Check for mode
+    //
+    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN);
+    if (recv_payload[0] != HIRCP_NORMAL && recv_payload[0] != HIRCP_CLOSED_LOOP)
+    {
+        UART_PRINT("Invalid mode.\n\r");
+        return false;
+    }
+    g_hircp_mode = recv_payload[0];
+
     UART_PRINT("Received CRQ packet.\n\r");
 
     //
-    // Send CACK packet
+    // Send ACK packet
     //
     HIRCP_ClearPacket(sendPacket);
-    HIRCP_SetType(sendPacket, HIRCP_CACK);
+    HIRCP_SetType(sendPacket, HIRCP_ACK);
     HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
     lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
     if (lRetVal < 0)
     {
         return false;
     }
-    UART_PRINT("Sent CACK packet.\n\r");
+    UART_PRINT("Sent ACK packet.\n\r");
 
     HIRCP_DestroyPacket(sendPacket);
     HIRCP_DestroyPacket(recvPacket);
@@ -320,17 +335,17 @@ tBoolean HIRCP_InitiateTerminationSequence(void)
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
 
     //
-    // Send TACK packet
+    // Send ACK packet
     //
     HIRCP_ClearPacket(sendPacket);
-    HIRCP_SetType(sendPacket, HIRCP_TACK);
+    HIRCP_SetType(sendPacket, HIRCP_ACK);
     HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
     lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
     if (lRetVal < 0)
     {
         return false;
     }
-    UART_PRINT("Sent TACK packet.\n\r");
+    UART_PRINT("Sent ACK packet.\n\r");
 
     HIRCP_DestroyPacket(sendPacket);
     return true;

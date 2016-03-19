@@ -829,13 +829,13 @@ bool Panel::_populateFingerPressureStruct(FingerPressureStruct
         encodedPressure += buf[bufIndex++];
         assert((encodedPressure >= 0) && (encodedPressure <= 4096));
 		
-		// Setting encodedPressure if limit exceeded
-		if (encodedPressure > MAX_ENCODED_PRESSURE[i])
-		{
-			encodedPressure = MAX_ENCODED_PRESSURE[i];
-		}
-		double multiplier = (double) (log10((double)(MAX_ENCODED_PRESSURE[i]
-            - encodedPressure + 1)) )/SENSOR_SCALING;
+        // Setting encodedPressure if limit exceeded
+        if (encodedPressure > MAX_ENCODED_PRESSURE[i])
+        {
+            encodedPressure = MAX_ENCODED_PRESSURE[i];
+        }
+        double multiplier = (double)(log10((double)(MAX_ENCODED_PRESSURE[i]
+            - encodedPressure + 1))) / SENSOR_SCALING;
 
         fingerPressures.pressure[i] =
             static_cast<unsigned char>(multiplier*255);

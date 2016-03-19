@@ -49,7 +49,8 @@ public:
 
     enum FEEDBACK_MODE
     {
-        NORMAL_MODE = 0,
+        INVALID_MODE = 0,
+        NORMAL_MODE,
         CLOSED_LOOP_MODE,
     };
 

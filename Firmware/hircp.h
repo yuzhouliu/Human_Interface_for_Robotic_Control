@@ -11,7 +11,7 @@
 // March 4, 2016
 //
 // Modified:
-// March 7, 2016
+// March 19, 2016
 //
 //*****************************************************************************
 #ifndef _HIRCP_C_
@@ -22,12 +22,12 @@
 //****************************************************************************
 //         	                    CONSTANTS
 //****************************************************************************
-#define HIRCP_CRQ_PAYLOAD_LEN 0
-#define HIRCP_CACK_PAYLOAD_LEN 0
+#define HIRCP_CRQ_PAYLOAD_LEN 1
+#define HIRCP_MODE_PAYLOAD_LEN 1
 #define HIRCP_DATA_PAYLOAD_LEN 6
 #define HIRCP_DACK_PAYLOAD_LEN 10
 #define HIRCP_TRQ_PAYLOAD_LEN 0
-#define HIRCP_TACK_PAYLOAD_LEN 0
+#define HIRCP_ACK_PAYLOAD_LEN 0
 #define HIRCP_ERR_PAYLOAD_LEN 1
 
 #define HIRCP_MAX_PACKET_LEN 15
@@ -35,19 +35,32 @@
 #define HIRCP_CONSTANT_LEN 4
 #define HIRCP_OPCODE_LEN 1
 
-extern const unsigned char HIRCP_CONSTANT[];
+
+//****************************************************************************
+//         	                    Global Variables
+//****************************************************************************
 
 typedef enum HIRCP_Type
 {
     HIRCP_INVALID = 0,
     HIRCP_CRQ,
-    HIRCP_CACK,
+    HIRCP_MODE,
     HIRCP_DATA,
     HIRCP_DACK,
     HIRCP_TRQ,
-    HIRCP_TACK,
+    HIRCP_ACK,
     HIRCP_ERR,
 } HIRCP_Type;
+
+typedef enum HIRCP_MODE
+{
+    HIRCP_INVALID_MODE = 0,
+    HIRCP_NORMAL,
+    HIRCP_CLOSED_LOOP,
+} HIRCP_Mode;
+
+extern const unsigned char HIRCP_CONSTANT[];
+extern HIRCP_Mode g_hircp_mode;
 
 
 //****************************************************************************

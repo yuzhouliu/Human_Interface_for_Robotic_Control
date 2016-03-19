@@ -12,7 +12,7 @@
 //
 // Created: December 21, 2015
 //
-// Modified: March 5, 2016
+// Modified: March 19, 2016
 //
 //*****************************************************************************
 // Standard includes
@@ -156,7 +156,6 @@ void main()
     unsigned char highByte, lowByte;
     unsigned short adc_reading;
     int i;
-    int freeMovementMode = 1;		// TODO Testing, remove later
     tBoolean connected;
 
     HIRCP_Packet *sendPacket = HIRCP_CreatePacket();
@@ -244,16 +243,41 @@ void main()
                     HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN);
                     UART_PRINT("Received DATA packet.\n\r");
                 }
+                else if (HIRCP_GetType(recvPacket) == HIRCP_MODE)
+                {
+                    UART_PRINT("Received MODE packet.\n\r");
+                    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN);
+
+                    //
+                    // Check for mode
+                    //
+                    HIRCP_GetPayload(recvPacket, recv_payload, HIRCP_MAX_PAYLOAD_LEN);
+                    if (recv_payload[0] != HIRCP_NORMAL && recv_payload[0] != HIRCP_CLOSED_LOOP)
+                    {
+                        UART_PRINT("Invalid mode.\n\r");
+                        //
+                        // TODO (Brandon): Send ERR packet
+                        //
+                        break;
+                    }
+                    g_hircp_mode = recv_payload[0];
+
+                    // Sends ACK
+                    HIRCP_ClearPacket(sendPacket);
+                    HIRCP_SetType(sendPacket, HIRCP_ACK);
+                    HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
+                    lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
+                    if (lRetVal < 0)
+                    {
+            	        break;
+                    }
+                    UART_PRINT("Sent ACK packet.\n\r");
+                }
                 else if (HIRCP_GetType(recvPacket) == HIRCP_TRQ)
                 {
                     UART_PRINT("Received TRQ packet.\n\r");
                     HIRCP_InitiateTerminationSequence();
                     break;
-                }
-                else
-                {
-                    // TODO (Brandon): Handle invalid types
-                    continue;
                 }
             }
             else
@@ -262,7 +286,7 @@ void main()
                 continue;
             }
 
-            if (freeMovementMode)
+            if (g_hircp_mode == HIRCP_NORMAL)
             {
                 // Moves servo motors using data from packet
                 for (i = 0; i<NUM_SERVOS; i++)
@@ -282,7 +306,7 @@ void main()
                     send_payload[i*2+1] = (char)lowByte;
                 }
             }
-            else
+            else if (g_hircp_mode == HIRCP_CLOSED_LOOP)
             {
                 MoveServo_SearchPressure(CMD_CLOSE, send_payload);
             }
