@@ -158,9 +158,10 @@ Summary
 5. Normal Communication
 
     Typical communication involves the controller application sending DATA
-    packets to the microcontroller and receiving DACK packets response. A MODE
-    packet should be sent to the microcontroller any time the controller
-    application wishes to change modes of operation.
+    packets to the microcontroller and receiving DACK packets in response. A
+    MODE packet should be sent to the microcontroller any time the controller
+    application wishes to change modes of operation. The microcontroller should
+    respond to MODE packets with an ACK packet.
 
 
 6. Normal Termination
@@ -197,7 +198,6 @@ Modes
     Value   Type
       0     Normal mode
       1     Closed-loop feedback mode
-
 
 Error Codes
 
