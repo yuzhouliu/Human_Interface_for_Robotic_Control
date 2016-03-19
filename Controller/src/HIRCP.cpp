@@ -208,8 +208,13 @@ HIRCPPacket HIRCPPacket::createCRQPacket(FEEDBACK_MODE mode)
     HIRCPPacket packet;
 
     packet.setType(TYPE::CRQ);
-    unsigned char payload[CRQ_PAYLOAD_LEN] = {mode};
-    packet.setPayload(payload, CRQ_PAYLOAD_LEN);
+    unsigned char payload[MAX_PAYLOAD_LEN];
+    payload[0]= (unsigned char)mode;
+    for (int i=1; i<MAX_PAYLOAD_LEN; i++)
+    {
+        payload[i] = 0;
+    }
+    packet.setPayload(payload, MAX_PAYLOAD_LEN);
 
     return packet;
 }
@@ -228,8 +233,13 @@ HIRCPPacket HIRCPPacket::createMODEPacket(FEEDBACK_MODE mode)
     HIRCPPacket packet;
 
     packet.setType(TYPE::MODE);
-    unsigned char payload[MODE_PAYLOAD_LEN] = {mode};
-    packet.setPayload(payload, MODE_PAYLOAD_LEN);
+    unsigned char payload[MAX_PAYLOAD_LEN];
+    payload[0]= (unsigned char)mode;
+    for (int i=1; i<MAX_PAYLOAD_LEN; i++)
+    {
+        payload[i] = 0;
+    }
+    packet.setPayload(payload, MAX_PAYLOAD_LEN);
 
     return packet;
 }
