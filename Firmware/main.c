@@ -263,7 +263,7 @@ void main()
                     g_hircp_mode = recv_payload[0];
 
                     // Sends ACK
-                    HIRCP_ClearPacket(sendPacket);
+                    /*HIRCP_ClearPacket(sendPacket);
                     HIRCP_SetType(sendPacket, HIRCP_ACK);
                     HIRCP_GetData(sendPacket, send_data, HIRCP_MAX_PACKET_LEN);
                     lRetVal = BsdTcpServerSend(send_data, HIRCP_MAX_PACKET_LEN);
@@ -271,7 +271,8 @@ void main()
                     {
             	        break;
                     }
-                    UART_PRINT("Sent ACK packet.\n\r");
+                    UART_PRINT("Sent ACK packet.\n\r");*/
+                    continue;
                 }
                 else if (HIRCP_GetType(recvPacket) == HIRCP_TRQ)
                 {
@@ -309,6 +310,10 @@ void main()
             else if (g_hircp_mode == HIRCP_CLOSED_LOOP)
             {
                 MoveServo_SearchPressure(CMD_CLOSE, send_payload);
+            }
+            else
+            {
+                UART_PRINT("ERROR UNSUPPORTED MODE.\n\r");
             }
 
             // Configure packet fields and gets packet data to send
