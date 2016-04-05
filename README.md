@@ -42,7 +42,7 @@ and playback feature will augment the user experience.
 
 Demonstration
 ==============
-[![Demo](http://i.imgur.com/sazN6cm.gifv)](https://youtu.be/myWYUMi4jxU)
+[![Demo](http://i.imgur.com/sazN6cm.gif)](https://youtu.be/myWYUMi4jxU)
 
 (Click on the gif to go to youtube video demonstrating the project)
 
