@@ -42,11 +42,14 @@ and playback feature will augment the user experience.
 
 Demonstration
 ==============
-[![Demo](http://i.imgur.com/qk0rt3c.gif)](https://youtu.be/myWYUMi4jxU)
+[![Demo](http://i.imgur.com/sazN6cm.gifv)](https://youtu.be/myWYUMi4jxU)
+
+(Click on the gif to go to youtube video demonstrating the project)
 
 Acknowledgements
 =================
 Gael Langevin, for providing the open source 3D printed robot (http://inmoov.fr/)
+
 Professor Richard Dansereau, for acting as a supervisor to this project
 (http://www.sce.carleton.ca/faculty/dansereau.html)
 
